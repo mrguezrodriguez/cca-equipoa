@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Qué falta en la sesión 1</title>
+<style>
+  :root {
+    --bg: #faf9f7;
+    --fg: #1f1d1a;
+    --muted: #6b6660;
+    --accent: #c15f3c;
+    --accent-soft: #f3e4dd;
+    --code-bg: #f0ece6;
+    --border: #e3ddd3;
+    --ok: #3c7a4e;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--bg); color: var(--fg); line-height: 1.6;
+  }
+  .wrap { max-width: 780px; margin: 0 auto; padding: 3.5rem 1.5rem 5rem; }
+  h1 { font-size: 2.1rem; line-height: 1.2; margin-bottom: 0.5rem; }
+  h2 {
+    font-size: 1.4rem; margin: 2.6rem 0 0.8rem;
+    padding-top: 1.4rem; border-top: 1px solid var(--border);
+  }
+  h3 { font-size: 1.05rem; margin: 1.5rem 0 0.4rem; }
+  p { margin-bottom: 0.85rem; }
+  p.lead { font-size: 1.15rem; color: var(--muted); margin-bottom: 2rem; }
+  code {
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    background: var(--code-bg); padding: 0.1em 0.38em; border-radius: 0.3em;
+    font-size: 0.9em;
+  }
+  pre {
+    background: var(--code-bg); border-radius: 0.5em; padding: 1rem;
+    overflow-x: auto; margin: 0.8rem 0;
+  }
+  pre code { background: none; padding: 0; font-size: 0.85rem; line-height: 1.6; }
+  ul { margin: 0.4rem 0 1rem 1.3rem; }
+  li { margin-bottom: 0.45rem; }
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.95rem; }
+  th, td { text-align: left; padding: 0.55rem 0.7rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+  .box {
+    background: var(--accent-soft); border-left: 3px solid var(--accent);
+    padding: 0.8rem 1rem; border-radius: 0 0.4em 0.4em 0; margin: 1rem 0;
+  }
+  .where { color: var(--muted); font-size: 0.9rem; margin-bottom: 1rem; }
+  .where b { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Qué falta en la sesión 1</h1>
+<p class="lead">Comparando el deck con los módulos de Agentic Loops y Tool Interface Design. Cinco huecos reales, ordenados por lo que te costaría una pregunta.</p>
+
+<h2>1. <code>tool_choice: "any"</code> — la trampa que no está</h2>
+<p class="where">Dónde iría: <b>slide 07</b>, como quinto anti-pattern.</p>
+<p>Es un distractor de examen y el deck no lo menciona en ningún sitio. La lógica del error es seductora: "el agente termina antes de tiempo porque devuelve texto en vez de llamar a la tool, así que lo fuerzo a llamar siempre a una tool".</p>
+<p>Por qué falla: fuerzas el uso de tools <strong>también cuando el agente ha terminado de verdad</strong>. Nunca puede señalar que acabó, así que el loop no sale nunca. Cambias una terminación prematura por un bucle infinito.</p>
+<div class="box">La forma de reconocerlo: cualquier respuesta que quite al modelo la capacidad de señalar que ha terminado está mal, porque <code>stop_reason</code> deja de poder decir <code>end_turn</code>.</div>
+
+<h2>2. El umbral de 4-5 tools</h2>
+<p class="where">Dónde iría: <b>slide 13</b>, junto al callout de misrouting.</p>
+<p>Esto es lo más discriminante de los dos módulos y no está en el deck. Vuestro callout dice "ante misrouting, mejorar la descripción". Es correcto <strong>con una condición</strong> que hay que añadir:</p>
+<table>
+  <tr><th>Diagnóstico</th><th>Fix</th></tr>
+  <tr><td>Pocas tools, pero el modelo no distingue dos de ellas</td><td>Mejorar las descripciones</td></tr>
+  <tr><td>Demasiadas tools (más de 4-5 por agente)</td><td>Reducir el toolkit — reescribir 22 descripciones no arregla nada</td></tr>
+</table>
+<p>Pasado ese umbral la selección se degrada por complejidad de decisión, no por ambigüedad. Son dos problemas distintos con el mismo síntoma, y el examen pone las dos versiones para ver si diagnosticas antes de recetar.</p>
+
+<h2>3. El system prompt puede anular las descripciones</h2>
+<p class="where">Dónde iría: <b>slide 13</b>, como cierre.</p>
+<p>Instrucciones sensibles a palabras clave crean asociaciones que se imponen sobre descripciones bien escritas. Si el system prompt dice "comprueba siempre los datos del cliente antes de continuar", el modelo enruta cualquier consulta que suene a cliente hacia <code>get_customer</code> por bien redactadas que estén las tools.</p>
+<p>La consecuencia práctica: después de mejorar descripciones, <strong>releer el system prompt buscando conflictos</strong>. Es un modo de fallo silencioso — el examen lo pregunta porque en producción cuesta horas encontrarlo.</p>
+
+<h2>4. Decisión del modelo vs. secuencia fija (y su excepción)</h2>
+<p class="where">Dónde iría: <b>slide nueva</b>, después de la 03.</p>
+<p>El deck enseña el mecanismo del loop pero no nombra <em>por qué</em> se prefiere que el modelo elija. La contraposición es: decisión dirigida por el modelo frente a árboles de decisión o secuencias de tools cableadas por el desarrollador.</p>
+<p>El examen favorece lo primero porque se adapta a casos que nadie mapeó y encadena tools en órdenes no previstos. Pero tiene una excepción que conviene memorizar:</p>
+<div class="box">Cuando la lógica de negocio exige <strong>cumplimiento determinista</strong> — operaciones financieras, comprobaciones de seguridad, requisitos regulatorios — se impone el control programático. Ahí no quieres flexibilidad, quieres garantía.</div>
+
+<h2>5. Caps: runaway ≠ terminación prematura</h2>
+<p class="where">Dónde iría: <b>slide 07</b>, matizando el anti-pattern 1.</p>
+<p>Vuestro deck dice que el cap como mecanismo primario es un anti-pattern, y es correcto. Falta el uso concreto que le da el examen: presenta el cap como solución plausible a un agente que <strong>termina antes de tiempo</strong>.</p>
+<p>Hay que rechazarlo, y el argumento es de dirección: un cap pone un techo, y el problema de una terminación prematura es un suelo. Subir el máximo de iteraciones no arregla un loop que sale en la vuelta dos. La solución a la terminación prematura es <em>siempre</em> comprobar bien <code>stop_reason</code>.</p>
+
+<h2>Menores, por si quieres afinar</h2>
+<h3>Los elementos de una descripción son cinco, no cuatro</h3>
+<p>El deck lista cuatro. El material separa "qué inputs espera" de "ejemplos de consultas que maneja bien". Son cosas distintas: el formato del identificador y una consulta de ejemplo real.</p>
+
+<h3>Tool splitting y renaming</h3>
+<p>Dos técnicas que no aparecen. Partir <code>analyze_document</code> en <code>extract_data_points</code>, <code>summarize_content</code> y <code>verify_claim_against_source</code>. Y renombrar cuando dos nombres se parecen demasiado — arregla el solapamiento en la interfaz sin tocar la implementación.</p>
+
+<h3>La heurística transversal del examen</h3>
+<p>Vale para preguntas que no habéis preparado: <strong>el examen premia lo de menor esfuerzo y mayor palanca</strong>. Descripciones antes que clasificadores de routing. Acceso acotado antes que acceso completo. Servidores de comunidad antes que builds propios. Ante dos opciones válidas, la barata suele ser la correcta.</p>
+
+<h3>Calibración de cuánto insistir</h3>
+<p>El propio material aclara que la guía del examen v1.0 solo pide <code>tool_use</code> y <code>end_turn</code>. Los otros cinco valores son de producción. Merece la pena decirlo en voz alta en la sesión: se estudian porque los vais a necesitar en el capstone, no porque caigan.</p>
+
+</div>
+</body>
+</html>

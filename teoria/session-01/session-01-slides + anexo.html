@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sesión 1 — Agentic Loops y Tool Use Fundamentals</title>
+<style>
+  :root {
+    --bg: #faf9f7;
+    --fg: #1f1d1a;
+    --muted: #6b6660;
+    --accent: #c15f3c;
+    --accent-soft: #f3e4dd;
+    --code-bg: #f0ece6;
+    --border: #e3ddd3;
+    --ok: #3c7a4e;
+    --warn: #b5683a;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+    overflow: hidden;
+  }
+  .deck { height: 100vh; width: 100vw; position: relative; }
+  .slide {
+    position: absolute; inset: 0;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    padding: 6vh 8vw;
+    opacity: 0;
+    transition: opacity 0.18s ease;
+  }
+  .slide.active { display: flex; opacity: 1; }
+  .slide h1 {
+    font-size: 2.6rem; line-height: 1.15; letter-spacing: -0.02em;
+    margin-bottom: 0.6rem;
+  }
+  .slide h2 {
+    font-size: 1.9rem; line-height: 1.2; letter-spacing: -0.015em;
+    margin-bottom: 1.2rem; color: var(--fg);
+  }
+  .slide h2 .num {
+    display: inline-block; font-size: 0.95rem; font-weight: 700;
+    color: var(--accent); background: var(--accent-soft);
+    padding: 0.15em 0.6em; border-radius: 0.4em; margin-right: 0.6em;
+    vertical-align: middle; letter-spacing: 0;
+  }
+  .slide p { font-size: 1.2rem; line-height: 1.55; margin-bottom: 0.8rem; color: var(--fg); }
+  .slide p.lead { font-size: 1.35rem; color: var(--muted); }
+  .slide ul, .slide ol { margin: 0.4rem 0 0.8rem 1.4rem; }
+  .slide li { font-size: 1.15rem; line-height: 1.5; margin-bottom: 0.5rem; }
+  .slide li strong { color: var(--fg); }
+  .slide .sub { color: var(--muted); font-size: 1.05rem; }
+  .tag {
+    display: inline-block; font-size: 0.85rem; font-weight: 600;
+    color: var(--accent); background: var(--accent-soft);
+    padding: 0.2em 0.7em; border-radius: 1em; margin-bottom: 1rem;
+  }
+  table {
+    border-collapse: collapse; width: 100%; margin: 0.6rem 0 1rem;
+    font-size: 1.05rem;
+  }
+  th, td {
+    text-align: left; padding: 0.55em 0.9em;
+    border-bottom: 1px solid var(--border);
+  }
+  th { font-weight: 700; color: var(--fg); border-bottom: 2px solid var(--border); }
+  td { color: var(--fg); }
+  table.dense { font-size: 0.95rem; }
+  table.dense th, table.dense td { padding: 0.4em 0.7em; }
+  code {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    background: var(--code-bg); padding: 0.1em 0.4em; border-radius: 0.3em;
+    font-size: 0.92em;
+  }
+  pre {
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 0.6em; padding: 1rem 1.2rem; margin: 0.6rem 0 1rem;
+    overflow: auto; font-size: 0.95rem; line-height: 1.45;
+  }
+  pre code { background: none; padding: 0; font-size: 0.98rem; }
+  .ascii {
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 0.6em; padding: 1rem 1.2rem; margin: 0.4rem 0;
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: 0.82rem; line-height: 1.3; white-space: pre; overflow: auto;
+  }
+  .cols { display: flex; gap: 2.5rem; }
+  .cols > div { flex: 1; }
+  .callout {
+    border-left: 3px solid var(--accent); background: var(--accent-soft);
+    padding: 0.7rem 1rem; border-radius: 0 0.4em 0.4em 0;
+    font-size: 1.05rem; margin: 0.6rem 0;
+  }
+  .ok { color: var(--ok); font-weight: 700; }
+  .warn { color: var(--warn); font-weight: 700; }
+  .add { color: var(--ok); font-weight: 700; }
+  .del { color: var(--warn); text-decoration: line-through; }
+  tr.flow td:first-child code { background: var(--accent-soft); color: var(--accent); font-weight: 700; }
+  /* title slide */
+  .slide.title { align-items: flex-start; }
+  .slide.title h1 { font-size: 3.2rem; }
+  .slide.title .meta { font-size: 1.2rem; color: var(--muted); margin-top: 1rem; }
+  .slide.title .kicker {
+    font-size: 1rem; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 1rem;
+  }
+  /* chrome */
+  .chrome {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.5rem 1.2rem; font-size: 0.8rem; color: var(--muted);
+    pointer-events: none;
+  }
+  .progress {
+    position: fixed; top: 0; left: 0; height: 3px;
+    background: var(--accent); transition: width 0.18s ease; z-index: 10;
+  }
+  .counter { font-variant-numeric: tabular-nums; }
+  .hint { font-size: 0.75rem; }
+  @media print {
+    body { overflow: visible; }
+    .slide {
+      display: flex !important; opacity: 1 !important;
+      position: relative; page-break-after: always; height: 100vh;
+    }
+    .chrome, .progress { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<div class="deck" id="deck">
+
+  <!-- 1 -->
+  <section class="slide title active">
+    <div class="kicker">Claude Certified Architect · Programa de equipo</div>
+    <h1>Sesión 1<br>Agentic Loops y Tool Use Fundamentals</h1>
+    <p class="meta">Domain 1 (base) + Domain 2 · 120 min · Capstone: Final Project Review Agent</p>
+  </section>
+
+  <!-- 2 -->
+  <section class="slide">
+    <h2><span class="num">02</span>Objetivos de la sesión</h2>
+    <p>Al terminar sabrás:</p>
+    <ul>
+      <li>Implementar el <strong>agentic loop</strong> canónico basado en <code>stop_reason</code>.</li>
+      <li>Reconocer los <strong>4 anti-patterns</strong> de loop control que aparecen en el exam.</li>
+      <li>Entender cómo se mantiene el historial de conversación entre iteraciones.</li>
+      <li>Leer la <strong>anatomía completa</strong> de una respuesta: bloques de contenido y sus keys.</li>
+      <li>Escribir <strong>tool descriptions</strong> que diferencian tools similares e implementar structured errors.</li>
+    </ul>
+    <p class="sub">Domain 1 (27% del exam) + Domain 2 (18%).</p>
+  </section>
+
+  <!-- 3 -->
+  <section class="slide">
+    <h2><span class="num">03</span>El agentic loop en una imagen</h2>
+    <div class="ascii">                       ┌─────────────────────┐
+                       │   user_message      │
+                       └─────────┬───────────┘
+                                 ▼
+                       ┌─────────────────────┐
+                       │  client.messages    │ ◄────┐
+                       │     .create()       │      │
+                       └─────────┬───────────┘      │
+                                 ▼                   │
+                       ┌─────────────────────┐      │
+                       │  response.stop_     │      │
+                       │     reason ?        │      │
+                       └────┬───────────┬────┘      │
+                "tool_use"  │           │  "end_turn"│
+                            ▼           ▼            │
+                      ┌──────────┐  ┌─────────┐     │
+                      │ execute  │  │ extract │     │
+                      │  tools   │  │  text   │     │
+                      │ + append │  │ + return│     │
+                      └────┬─────┘  └─────────┘     │
+                           └────────────────────────┘</div>
+    <p class="sub">La señal de control es <code>stop_reason</code> — no el texto, no un cap de iteraciones.</p>
+  </section>
+
+  <!-- 4 -->
+  <section class="slide">
+    <h2><span class="num">04</span><code>stop_reason</code> — los 7 valores</h2>
+    <table class="dense">
+      <tr><th>Valor</th><th>Significado</th><th>Acción</th></tr>
+      <tr class="flow"><td><code>"tool_use"</code></td><td>Quiere ejecutar tools antes de continuar</td><td>Ejecutar, añadir resultados al historial, volver a llamar</td></tr>
+      <tr class="flow"><td><code>"end_turn"</code></td><td>Ha terminado su turno</td><td>Extraer el texto final y devolverlo</td></tr>
+      <tr class="flow"><td><code>"pause_turn"</code></td><td>Un loop de <strong>server tools</strong> llegó a su tope (10 por defecto)</td><td>Reenviar la respuesta tal cual para que continúe</td></tr>
+      <tr><td><code>"max_tokens"</code></td><td>Alcanzó tu límite de <code>max_tokens</code></td><td>No es un error: está truncada. Subir el límite o continuar</td></tr>
+      <tr><td><code>"stop_sequence"</code></td><td>Salió una de tus <code>stop_sequences</code></td><td>Leer <code>response.stop_sequence</code> para saber cuál</td></tr>
+      <tr><td><code>"refusal"</code></td><td>Declinó responder. Llega como HTTP 200, no como error</td><td>Leer <code>stop_details</code>; reintentar en otro modelo</td></tr>
+      <tr><td><code>"model_context_window_exceeded"</code></td><td>Llenó la ventana de contexto</td><td>Tratar la respuesta como truncada</td></tr>
+    </table>
+    <p class="sub">Los tres primeros son los que continúan o cortan el loop. El resto significa "esto se acabó, bien o mal".</p>
+  </section>
+
+  <!-- 5 -->
+  <section class="slide">
+    <h2><span class="num">05</span>Cuáles deciden control de flujo</h2>
+    <p>Con <strong>client tools</strong> solamente, el loop se decide con dos valores: <code>tool_use</code> sigue, <code>end_turn</code> para.</p>
+    <div class="callout">En cuanto entran <strong>server tools</strong> (web search, code execution), <code>pause_turn</code> también es control de flujo: significa "no he terminado, devuélveme esto y sigo". Si tu loop lo trata como final, cortas al modelo a media tarea.</div>
+    <p>Los otros cuatro no son decisiones, son diagnósticos. Pero tienen que <strong>sacarte del loop</strong>: si no los contemplas, el <code>if/elif</code> no entra por ninguna rama y sigues llamando a la API con el mismo historial.</p>
+    <p class="sub"><span class="warn">Ojo con <code>max_tokens</code>:</span> la respuesta es válida, solo está cortada. Tratarla como error es tirar trabajo ya pagado.</p>
+  </section>
+
+  <!-- 6 -->
+  <section class="slide">
+    <h2><span class="num">06</span>Patrón canónico — pseudocódigo</h2>
+    <pre><code>def run_agent(user_message):
+    messages = [{"role": "user", "content": user_message}]
+
+    for _ in range(MAX_ITERATIONS):           # safety net only
+        response = client.messages.create(
+            model=MODEL, tools=TOOLS, messages=messages, max_tokens=4096
+        )
+        messages.append({"role": "assistant", "content": response.content})
+
+        if response.stop_reason == "tool_use":
+            tool_results = execute_tool_blocks(response.content)
+            messages.append({"role": "user", "content": tool_results})
+            continue                          # ← seguimos iterando
+
+        <span class="add">return extract_text(response.content)  # ← cualquier otro stop_reason: salimos</span></code></pre>
+    <div class="callout">Salir <strong>por defecto</strong> en vez de comprobar <code>== "end_turn"</code>: así un valor inesperado te saca del loop en lugar de dejarte girando y pagando llamadas.</div>
+  </section>
+
+  <!-- 7 -->
+  <section class="slide">
+    <h2><span class="num">07</span>Los 4 anti-patterns que el exam te va a tirar</h2>
+    <table>
+      <tr><th>#</th><th>Anti-pattern</th><th>Por qué falla</th></tr>
+      <tr><td>1</td><td>Cap de iteraciones como mecanismo PRIMARIO</td><td>Arbitrario; falla en casos legítimos largos; enmascara bugs</td></tr>
+      <tr><td>2</td><td>Parsear texto buscando "all done", "completed"</td><td>Frágil al idioma, estilo, versión del modelo</td></tr>
+      <tr><td>3</td><td>Terminar cuando no hay texto en la respuesta</td><td>Una respuesta solo-tool_use no tiene texto y NO ha terminado</td></tr>
+      <tr><td>4</td><td>Asumir que el assistant comparte historia automáticamente</td><td>Cada llamada es stateless; tú mantienes el historial</td></tr>
+    </table>
+    <div class="callout">Heurística: cualquier opción que sustituye <code>stop_reason</code> por una heurística inventada es trampa.</div>
+  </section>
+
+  <!-- 8 -->
+  <section class="slide">
+    <h2><span class="num">08</span>Tool use — anatomía de una respuesta</h2>
+    <p class="sub">Cuando <code>stop_reason == "tool_use"</code>, <code>response.content</code> es una lista de bloques:</p>
+    <pre><code>response.content = [
+    {"type": "text", "text": "Let me look up that student..."},
+    {"type": "tool_use", "id": "toolu_01ABC", "name": "get_student",
+     "input": {"student_id": "STU_001"}},
+]</code></pre>
+    <p>Del bloque <code>tool_use</code> necesitas las tres: <code>id</code> para emparejar el resultado, <code>name</code> para saber qué función llamar, <code>input</code> para los argumentos.</p>
+    <div class="callout">El texto puede mentir sobre la intención: una respuesta puede decir "ya lo tengo" y venir con <code>tool_use</code>, o terminar en silencio con <code>end_turn</code>. Si hay un bloque <code>tool_use</code>, <code>stop_reason</code> es siempre <code>"tool_use"</code>. Son mutuamente excluyentes.</div>
+  </section>
+
+  <!-- 9 -->
+  <section class="slide">
+    <h2><span class="num">09</span>Otros bloques que aparecen sin pedirlos</h2>
+    <table class="dense">
+      <tr><th>Tipo</th><th>Cuándo aparece</th><th>Qué hacer</th></tr>
+      <tr><td><code>thinking</code></td><td>Extended thinking activado</td><td>Devolverlo íntegro, incluida su key <code>signature</code></td></tr>
+      <tr><td><code>server_tool_use</code></td><td>Web search, code execution</td><td>No construyes tú el resultado — lo ejecuta Anthropic</td></tr>
+      <tr><td><code>mcp_tool_use</code></td><td>Servidores MCP conectados</td><td>Igual que arriba</td></tr>
+      <tr><td><code>text</code> con <code>citations</code></td><td>Función de citas activada</td><td>Nada especial; explica keys inesperadas</td></tr>
+    </table>
+    <div class="callout">Por eso se hace <code>messages.append({"role": "assistant", "content": response.content})</code> con la lista <strong>entera</strong>. Si filtras y te quedas solo con <code>text</code> y <code>tool_use</code>, rompes la firma del bloque <code>thinking</code> y la API rechaza la siguiente llamada.</div>
+  </section>
+
+  <!-- 10 -->
+  <section class="slide">
+    <h2><span class="num">10</span>El bloque <code>tool_result</code> completo</h2>
+    <p class="sub">Para responder, construyes un mensaje del role <code>"user"</code> con los tool_results:</p>
+    <pre><code>messages.append({"role": "user", "content": [
+    {"type": "tool_result",
+     "tool_use_id": "toolu_01ABC",     # empareja con el tool_use
+     "content": "...",                 # string o lista de bloques
+     <span class="add">"is_error": True},                # ← opcional, y la que más se olvida</span>
+]})</code></pre>
+    <p><code>content</code> también acepta una <strong>lista de bloques</strong>: <code>text</code>, <code>image</code>, <code>document</code> o <code>search_result</code>. Así le devuelves un PDF o una captura, no solo texto.</p>
+    <div class="callout"><code>is_error</code> es la diferencia entre un script y un agente. Si tu <code>except</code> corta el bucle, el modelo no se entera de que algo falló. Si le devuelves el error, decide solo: reintentar con otro argumento, probar otra tool, o explicárselo al usuario.</div>
+  </section>
+
+  <!-- 11 -->
+  <section class="slide">
+    <h2><span class="num">11</span>Las tres reglas de orden</h2>
+    <p>No son keys, pero son la causa número uno de <span class="warn">errores 400</span> en el loop:</p>
+    <ul>
+      <li>Los <code>tool_result</code> van <strong>primero</strong> en el array de <code>content</code>. Un bloque de texto antes = 400.</li>
+      <li>El mensaje con los <code>tool_result</code> va <strong>inmediatamente después</strong> del mensaje del assistant que los pidió. Nada en medio.</li>
+      <li>Un <code>tool_result</code> <strong>por cada</strong> <code>tool_use</code>. Si pidió tres tools en paralelo y devuelves dos, error.</li>
+    </ul>
+    <pre><code>{"role": "user", "content": [
+    {"type": "text", "text": "Aquí tienes:"},        <span class="del"># ❌ texto antes</span>
+    {"type": "tool_result", "tool_use_id": "toolu_01"},
+]}</code></pre>
+    <p class="sub">El error literal: <code>tool_use ids were found without tool_result blocks immediately after</code>. Si aparece, es una de estas tres.</p>
+  </section>
+
+  <!-- 12 -->
+  <section class="slide">
+    <h2><span class="num">12</span>Nivel respuesta, no nivel bloque</h2>
+    <pre><code>{
+    "id": "msg_01234",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-sonnet-4-6",
+    "content": [ ... ],
+    "stop_reason": "end_turn",
+    <span class="add">"stop_sequence": None,   # cuál disparó, si fue el caso</span>
+    <span class="add">"stop_details": None,    # no-null solo cuando stop_reason == "refusal"</span>
+    <span class="add">"usage": {"input_tokens": 100, "output_tokens": 50},</span>
+}</code></pre>
+    <div class="callout"><code>usage</code> es el que vas a querer en el capstone: mide lo que cuesta cada vuelta. Como en cada iteración reenvías el historial entero, doce vueltas no cuestan doce veces la primera — cuestan bastante más.</div>
+  </section>
+
+  <!-- 13 -->
+  <section class="slide">
+    <h2><span class="num">13</span>Tool descriptions — la Parte B de hoy</h2>
+    <p>Las descripciones son cómo el modelo sabe <strong>cuándo usar cada tool</strong>.</p>
+    <pre><code>{
+    "name": "get_student",
+    "description": "Retrieves student information.",  # ← genérico, malo
+    ...
+}</code></pre>
+    <p>Una buena descripción incluye: qué hace, formato de inputs con ejemplos, edge cases, y <strong>cuándo usar esta tool vs sus alternativas</strong>.</p>
+    <div class="callout">Mejorar la descripción es la respuesta canónica del exam ante misrouting entre tools similares. No few-shot, no router pre-LLM, no consolidar.</div>
+  </section>
+
+  <!-- 14 -->
+  <section class="slide">
+    <h2><span class="num">14</span>El capstone que arranca aquí</h2>
+    <p class="lead"><strong>Final Project Review Agent</strong> — asiste a instructores de Bridge en la revisión de proyectos finales.</p>
+    <table>
+      <tr><th>Sesión</th><th>Estado del agente</th></tr>
+      <tr><td>1 (hoy)</td><td>Loop + 4 MCP tools con descripciones diferenciadas y structured errors</td></tr>
+      <tr><td>2</td><td>Integrado en Claude Code: CLAUDE.md, rules, commands, skills</td></tr>
+      <tr><td>3</td><td>Pipeline de extracción con tool_use + JSON schema</td></tr>
+      <tr><td>4</td><td>Multi-agente: coordinator + subagentes</td></tr>
+      <tr><td>5</td><td>Context management, escalación, conversational</td></tr>
+    </table>
+  </section>
+
+  <!-- 15 -->
+  <section class="slide">
+    <h2><span class="num">15</span>Hands-on — Parte A + Parte B</h2>
+    <div class="cols">
+      <div>
+        <p><strong>Parte A (35 min)</strong></p>
+        <p class="sub">Implementar el agentic loop con 2 tools. Kit: <code>loop_basic.py</code> con TODOs + 5 tests.</p>
+      </div>
+      <div>
+        <p><strong>Parte B (30 min)</strong></p>
+        <p class="sub">Mejorar las descripciones, añadir 2 tools más, implementar structured errors.</p>
+      </div>
+    </div>
+    <pre><code>cd starter
+pip install -r requirements.txt
+export ANTHROPIC_API_KEY="sk-ant-..."
+pytest tests/ -v   # cuando todo pasa, terminado</code></pre>
+  </section>
+
+  <!-- 16 -->
+  <section class="slide">
+    <h2><span class="num">16</span>Anti-pattern showcase</h2>
+    <p>Veremos juntos, ejecutándolos en vivo:</p>
+    <ul>
+      <li><code>loop_with_iteration_cap.py</code> — el cap como mecanismo primario.</li>
+      <li><code>loop_with_text_parsing.py</code> — buscar "completed" en el texto.</li>
+      <li><code>loop_checking_empty.py</code> — terminar al ver respuesta sin texto.</li>
+      <li><code>generic_descriptions_and_errors.py</code> — descripciones y errores genéricos.</li>
+    </ul>
+    <div class="callout">Para cada uno: ¿qué hay de incorrecto? → lo lanzamos en vivo → ¿qué pregunta del exam ataca este patrón?</div>
+  </section>
+
+  <!-- 17 -->
+  <section class="slide">
+    <h2><span class="num">17</span>Cierre</h2>
+    <p><span class="ok">✓</span> El loop agentic basado en <code>stop_reason</code> — los 7 valores, y cuáles deciden flujo.</p>
+    <p><span class="ok">✓</span> La anatomía completa de una respuesta y sus bloques.</p>
+    <p><span class="ok">✓</span> Cómo se construyen los <code>tool_result</code>, <code>is_error</code> incluido.</p>
+    <p><span class="ok">✓</span> Los 4 anti-patterns de loop control.</p>
+    <p><span class="ok">✓</span> Tool descriptions diferenciadas + structured errors.</p>
+    <div class="callout"><strong>Pre-work para Sesión 2:</strong> Capítulo 5 de la guía companion + cursos de Claude Code de Anthropic Academy.</div>
+  </section>
+
+</div>
+
+<div class="chrome">
+  <span class="hint">← → o barra espaciadora para navegar · F para pantalla completa</span>
+  <span class="counter" id="counter">1 / 17</span>
+</div>
+
+<script>
+  (function () {
+    var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+    var idx = 0;
+    var progress = document.getElementById('progress');
+    var counter = document.getElementById('counter');
+
+    function render() {
+      slides.forEach(function (s, i) { s.classList.toggle('active', i === idx); });
+      progress.style.width = ((idx + 1) / slides.length * 100) + '%';
+      counter.textContent = (idx + 1) + ' / ' + slides.length;
+      if (location.hash !== '#' + (idx + 1)) {
+        history.replaceState(null, '', '#' + (idx + 1));
+      }
+    }
+    function go(n) {
+      idx = Math.max(0, Math.min(slides.length - 1, n));
+      render();
+    }
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); go(idx + 1); }
+      else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); go(idx - 1); }
+      else if (e.key === 'Home') { go(0); }
+      else if (e.key === 'End') { go(slides.length - 1); }
+      else if (e.key === 'f' || e.key === 'F') {
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+        else document.exitFullscreen();
+      }
+    });
+    document.getElementById('deck').addEventListener('click', function (e) {
+      var x = e.clientX / window.innerWidth;
+      if (x > 0.5) go(idx + 1); else go(idx - 1);
+    });
+    var fromHash = parseInt((location.hash || '').replace('#', ''), 10);
+    if (fromHash >= 1 && fromHash <= slides.length) idx = fromHash - 1;
+    render();
+  })();
+</script>
+</body>
+</html>
