@@ -151,6 +151,7 @@
       <li>Implementar el <strong>agentic loop</strong> canónico basado en <code>stop_reason</code>.</li>
       <li>Reconocer los <strong>4 anti-patterns</strong> de loop control que aparecen en el exam.</li>
       <li>Entender cómo se mantiene el historial de conversación entre iteraciones.</li>
+      <li>Distinguir la <strong>decisión dirigida por el modelo</strong> de los árboles de decisión y secuencias preconfiguradas.</li>
       <li>Leer la <strong>anatomía completa</strong> de una respuesta: bloques de contenido y sus keys.</li>
       <li>Escribir <strong>tool descriptions</strong> que diferencian tools similares e implementar structured errors.</li>
     </ul>
@@ -186,7 +187,30 @@
 
   <!-- 4 -->
   <section class="slide">
-    <h2><span class="num">04</span><code>stop_reason</code> — los 7 valores</h2>
+    <h2><span class="num">04</span>Quién decide el siguiente paso</h2>
+    <p class="sub">El temario pide reconocer la diferencia, no implementar las dos.</p>
+    <div class="cols">
+      <div>
+        <p><strong>Dirigido por el modelo</strong></p>
+        <p class="sub">Le das las tools y el contexto. En cada vuelta Claude elige cuál llamar. El orden <strong>emerge en ejecución</strong>.</p>
+        <pre><code>tools = [buscar, calcular, notificar]
+# el orden lo decide el modelo</code></pre>
+      </div>
+      <div>
+        <p><strong>Preconfigurado</strong></p>
+        <p class="sub">Árbol de decisión o secuencia fija. El orden lo fijaste <strong>al teclear</strong>, y no cambia pase lo que pase.</p>
+        <pre><code>datos = buscar(q)
+tipo  = clasificar(datos)
+return informar(tipo)</code></pre>
+      </div>
+    </div>
+    <p>El exam favorece lo primero: se adapta a casos que nadie mapeó y encadena tools en órdenes no previstos.</p>
+    <div class="callout"><strong>La excepción que hay que memorizar:</strong> cuando la lógica de negocio exige <strong>cumplimiento determinista</strong> — operaciones financieras, comprobaciones de seguridad, requisitos regulatorios — se impone el control programático. Ahí no quieres flexibilidad, quieres garantía.</div>
+  </section>
+
+  <!-- 5 -->
+  <section class="slide">
+    <h2><span class="num">05</span><code>stop_reason</code> — los 7 valores</h2>
     <table class="dense">
       <tr><th>Valor</th><th>Significado</th><th>Acción</th></tr>
       <tr class="flow"><td><code>"tool_use"</code></td><td>Quiere ejecutar tools antes de continuar</td><td>Ejecutar, añadir resultados al historial, volver a llamar</td></tr>
@@ -200,18 +224,18 @@
     <p class="sub">Los tres primeros son los que continúan o cortan el loop. El resto significa "esto se acabó, bien o mal".</p>
   </section>
 
-  <!-- 5 -->
+  <!-- 6 -->
   <section class="slide">
-    <h2><span class="num">05</span>Cuáles deciden control de flujo</h2>
+    <h2><span class="num">06</span>Cuáles deciden control de flujo</h2>
     <p>Con <strong>client tools</strong> solamente, el loop se decide con dos valores: <code>tool_use</code> sigue, <code>end_turn</code> para.</p>
     <div class="callout">En cuanto entran <strong>server tools</strong> (web search, code execution), <code>pause_turn</code> también es control de flujo: significa "no he terminado, devuélveme esto y sigo". Si tu loop lo trata como final, cortas al modelo a media tarea.</div>
     <p>Los otros cuatro no son decisiones, son diagnósticos. Pero tienen que <strong>sacarte del loop</strong>: si no los contemplas, el <code>if/elif</code> no entra por ninguna rama y sigues llamando a la API con el mismo historial.</p>
     <p class="sub"><span class="warn">Ojo con <code>max_tokens</code>:</span> la respuesta es válida, solo está cortada. Tratarla como error es tirar trabajo ya pagado.</p>
   </section>
 
-  <!-- 6 -->
+  <!-- 7 -->
   <section class="slide">
-    <h2><span class="num">06</span>Patrón canónico — pseudocódigo</h2>
+    <h2><span class="num">07</span>Patrón canónico — pseudocódigo</h2>
     <pre><code>def run_agent(user_message):
     messages = [{"role": "user", "content": user_message}]
 
@@ -230,9 +254,9 @@
     <div class="callout">Salir <strong>por defecto</strong> en vez de comprobar <code>== "end_turn"</code>: así un valor inesperado te saca del loop en lugar de dejarte girando y pagando llamadas.</div>
   </section>
 
-  <!-- 7 -->
+  <!-- 8 -->
   <section class="slide">
-    <h2><span class="num">07</span>Los 4 anti-patterns que el exam te va a tirar</h2>
+    <h2><span class="num">08</span>Los 4 anti-patterns que el exam te va a tirar</h2>
     <table>
       <tr><th>#</th><th>Anti-pattern</th><th>Por qué falla</th></tr>
       <tr><td>1</td><td>Cap de iteraciones como mecanismo PRIMARIO</td><td>Arbitrario; falla en casos legítimos largos; enmascara bugs</td></tr>
@@ -243,9 +267,9 @@
     <div class="callout">Heurística: cualquier opción que sustituye <code>stop_reason</code> por una heurística inventada es trampa.</div>
   </section>
 
-  <!-- 8 -->
+  <!-- 9 -->
   <section class="slide">
-    <h2><span class="num">08</span>Tool use — anatomía de una respuesta</h2>
+    <h2><span class="num">09</span>Tool use — anatomía de una respuesta</h2>
     <p class="sub">Cuando <code>stop_reason == "tool_use"</code>, <code>response.content</code> es una lista de bloques:</p>
     <pre><code>response.content = [
     {"type": "text", "text": "Let me look up that student..."},
@@ -256,9 +280,9 @@
     <div class="callout">El texto puede mentir sobre la intención: una respuesta puede decir "ya lo tengo" y venir con <code>tool_use</code>, o terminar en silencio con <code>end_turn</code>. Si hay un bloque <code>tool_use</code>, <code>stop_reason</code> es siempre <code>"tool_use"</code>. Son mutuamente excluyentes.</div>
   </section>
 
-  <!-- 9 -->
+  <!-- 10 -->
   <section class="slide">
-    <h2><span class="num">09</span>Otros bloques que aparecen sin pedirlos</h2>
+    <h2><span class="num">10</span>Otros bloques que aparecen sin pedirlos</h2>
     <table class="dense">
       <tr><th>Tipo</th><th>Cuándo aparece</th><th>Qué hacer</th></tr>
       <tr><td><code>thinking</code></td><td>Extended thinking activado</td><td>Devolverlo íntegro, incluida su key <code>signature</code></td></tr>
@@ -269,9 +293,9 @@
     <div class="callout">Por eso se hace <code>messages.append({"role": "assistant", "content": response.content})</code> con la lista <strong>entera</strong>. Si filtras y te quedas solo con <code>text</code> y <code>tool_use</code>, rompes la firma del bloque <code>thinking</code> y la API rechaza la siguiente llamada.</div>
   </section>
 
-  <!-- 10 -->
+  <!-- 11 -->
   <section class="slide">
-    <h2><span class="num">10</span>El bloque <code>tool_result</code> completo</h2>
+    <h2><span class="num">11</span>El bloque <code>tool_result</code> completo</h2>
     <p class="sub">Para responder, construyes un mensaje del role <code>"user"</code> con los tool_results:</p>
     <pre><code>messages.append({"role": "user", "content": [
     {"type": "tool_result",
@@ -283,9 +307,9 @@
     <div class="callout"><code>is_error</code> es la diferencia entre un script y un agente. Si tu <code>except</code> corta el bucle, el modelo no se entera de que algo falló. Si le devuelves el error, decide solo: reintentar con otro argumento, probar otra tool, o explicárselo al usuario.</div>
   </section>
 
-  <!-- 11 -->
+  <!-- 12 -->
   <section class="slide">
-    <h2><span class="num">11</span>Las tres reglas de orden</h2>
+    <h2><span class="num">12</span>Las tres reglas de orden</h2>
     <p>No son keys, pero son la causa número uno de <span class="warn">errores 400</span> en el loop:</p>
     <ul>
       <li>Los <code>tool_result</code> van <strong>primero</strong> en el array de <code>content</code>. Un bloque de texto antes = 400.</li>
@@ -299,9 +323,9 @@
     <p class="sub">El error literal: <code>tool_use ids were found without tool_result blocks immediately after</code>. Si aparece, es una de estas tres.</p>
   </section>
 
-  <!-- 12 -->
+  <!-- 13 -->
   <section class="slide">
-    <h2><span class="num">12</span>Nivel respuesta, no nivel bloque</h2>
+    <h2><span class="num">13</span>Nivel respuesta, no nivel bloque</h2>
     <pre><code>{
     "id": "msg_01234",
     "type": "message",
@@ -316,9 +340,9 @@
     <div class="callout"><code>usage</code> es el que vas a querer en el capstone: mide lo que cuesta cada vuelta. Como en cada iteración reenvías el historial entero, doce vueltas no cuestan doce veces la primera — cuestan bastante más.</div>
   </section>
 
-  <!-- 13 -->
+  <!-- 14 -->
   <section class="slide">
-    <h2><span class="num">13</span>Tool descriptions — la Parte B de hoy</h2>
+    <h2><span class="num">14</span>Tool descriptions — la Parte B de hoy</h2>
     <p>Las descripciones son cómo el modelo sabe <strong>cuándo usar cada tool</strong>.</p>
     <pre><code>{
     "name": "get_student",
@@ -329,9 +353,9 @@
     <div class="callout">Mejorar la descripción es la respuesta canónica del exam ante misrouting entre tools similares. No few-shot, no router pre-LLM, no consolidar.</div>
   </section>
 
-  <!-- 14 -->
+  <!-- 15 -->
   <section class="slide">
-    <h2><span class="num">14</span>El capstone que arranca aquí</h2>
+    <h2><span class="num">15</span>El capstone que arranca aquí</h2>
     <p class="lead"><strong>Final Project Review Agent</strong> — asiste a instructores de Bridge en la revisión de proyectos finales.</p>
     <table>
       <tr><th>Sesión</th><th>Estado del agente</th></tr>
@@ -343,9 +367,9 @@
     </table>
   </section>
 
-  <!-- 15 -->
+  <!-- 16 -->
   <section class="slide">
-    <h2><span class="num">15</span>Hands-on — Parte A + Parte B</h2>
+    <h2><span class="num">16</span>Hands-on — Parte A + Parte B</h2>
     <div class="cols">
       <div>
         <p><strong>Parte A (35 min)</strong></p>
@@ -362,9 +386,9 @@ export ANTHROPIC_API_KEY="sk-ant-..."
 pytest tests/ -v   # cuando todo pasa, terminado</code></pre>
   </section>
 
-  <!-- 16 -->
+  <!-- 17 -->
   <section class="slide">
-    <h2><span class="num">16</span>Anti-pattern showcase</h2>
+    <h2><span class="num">17</span>Anti-pattern showcase</h2>
     <p>Veremos juntos, ejecutándolos en vivo:</p>
     <ul>
       <li><code>loop_with_iteration_cap.py</code> — el cap como mecanismo primario.</li>
@@ -375,9 +399,9 @@ pytest tests/ -v   # cuando todo pasa, terminado</code></pre>
     <div class="callout">Para cada uno: ¿qué hay de incorrecto? → lo lanzamos en vivo → ¿qué pregunta del exam ataca este patrón?</div>
   </section>
 
-  <!-- 17 -->
+  <!-- 18 -->
   <section class="slide">
-    <h2><span class="num">17</span>Cierre</h2>
+    <h2><span class="num">18</span>Cierre</h2>
     <p><span class="ok">✓</span> El loop agentic basado en <code>stop_reason</code> — los 7 valores, y cuáles deciden flujo.</p>
     <p><span class="ok">✓</span> La anatomía completa de una respuesta y sus bloques.</p>
     <p><span class="ok">✓</span> Cómo se construyen los <code>tool_result</code>, <code>is_error</code> incluido.</p>
@@ -390,7 +414,7 @@ pytest tests/ -v   # cuando todo pasa, terminado</code></pre>
 
 <div class="chrome">
   <span class="hint">← → o barra espaciadora para navegar · F para pantalla completa</span>
-  <span class="counter" id="counter">1 / 17</span>
+  <span class="counter" id="counter">1 / 18</span>
 </div>
 
 <script>
