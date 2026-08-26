@@ -245,10 +245,19 @@ return informar(tipo)</code></pre>
         )
         messages.append({"role": "assistant", "content": response.content})
 
+        if response.stop_reason == "end_turn":
+          return {"ok": True, "texto": extract_text(response.content)}
+
         if response.stop_reason == "tool_use":
             tool_results = execute_tool_blocks(response.content)
             messages.append({"role": "user", "content": tool_results})
-            continue                          # ← seguimos iterando
+            continue
+
+        if response.stop_reason == "pause_turn":
+            continue
+
+        return manejar_salida_anomala(response)   # max_tokens, refusal, stop_sequence
+
 
         <span class="add">return extract_text(response.content)  # ← cualquier otro stop_reason: salimos</span></code></pre>
     <div class="callout">Salir <strong>por defecto</strong> en vez de comprobar <code>== "end_turn"</code>: así un valor inesperado te saca del loop en lugar de dejarte girando y pagando llamadas.</div>
