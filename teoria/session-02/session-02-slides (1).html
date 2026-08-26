@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sesión 2 — Claude Code: Configuración y Workflows</title>
+<style>
+  :root {
+    --bg: #faf9f7;
+    --fg: #1f1d1a;
+    --muted: #6b6660;
+    --accent: #c15f3c;
+    --accent-soft: #f3e4dd;
+    --code-bg: #f0ece6;
+    --border: #e3ddd3;
+    --ok: #3c7a4e;
+    --warn: #b5683a;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+    overflow: hidden;
+  }
+  .deck { height: 100vh; width: 100vw; position: relative; }
+  .slide {
+    position: absolute; inset: 0;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    padding: 6vh 8vw;
+    opacity: 0;
+    transition: opacity 0.18s ease;
+  }
+  .slide.active { display: flex; opacity: 1; }
+  .slide h1 {
+    font-size: 2.6rem; line-height: 1.15; letter-spacing: -0.02em;
+    margin-bottom: 0.6rem;
+  }
+  .slide h2 {
+    font-size: 1.9rem; line-height: 1.2; letter-spacing: -0.015em;
+    margin-bottom: 1.2rem; color: var(--fg);
+  }
+  .slide h2 .num {
+    display: inline-block; font-size: 0.95rem; font-weight: 700;
+    color: var(--accent); background: var(--accent-soft);
+    padding: 0.15em 0.6em; border-radius: 0.4em; margin-right: 0.6em;
+    vertical-align: middle; letter-spacing: 0;
+  }
+  .slide p { font-size: 1.2rem; line-height: 1.55; margin-bottom: 0.8rem; color: var(--fg); }
+  .slide p.lead { font-size: 1.35rem; color: var(--muted); }
+  .slide ul, .slide ol { margin: 0.4rem 0 0.8rem 1.4rem; }
+  .slide li { font-size: 1.15rem; line-height: 1.5; margin-bottom: 0.5rem; }
+  .slide li strong { color: var(--fg); }
+  .slide .sub { color: var(--muted); font-size: 1.05rem; }
+  table {
+    border-collapse: collapse; width: 100%; margin: 0.6rem 0 1rem;
+    font-size: 1.05rem;
+  }
+  th, td {
+    text-align: left; padding: 0.55em 0.9em;
+    border-bottom: 1px solid var(--border);
+  }
+  th { font-weight: 700; color: var(--fg); border-bottom: 2px solid var(--border); }
+  td { color: var(--fg); }
+  code {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    background: var(--code-bg); padding: 0.1em 0.4em; border-radius: 0.3em;
+    font-size: 0.92em;
+  }
+  pre {
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 0.6em; padding: 1rem 1.2rem; margin: 0.6rem 0 1rem;
+    overflow: auto; font-size: 0.95rem; line-height: 1.45;
+  }
+  pre code { background: none; padding: 0; font-size: 0.98rem; }
+  .cols { display: flex; gap: 2.5rem; }
+  .cols > div { flex: 1; }
+  .callout {
+    border-left: 3px solid var(--accent); background: var(--accent-soft);
+    padding: 0.7rem 1rem; border-radius: 0 0.4em 0.4em 0;
+    font-size: 1.05rem; margin: 0.6rem 0;
+  }
+  .ok { color: var(--ok); font-weight: 700; }
+  .warn { color: var(--warn); font-weight: 700; }
+  .slide.title { align-items: flex-start; }
+  .slide.title h1 { font-size: 3.2rem; }
+  .slide.title .meta { font-size: 1.2rem; color: var(--muted); margin-top: 1rem; }
+  .slide.title .kicker {
+    font-size: 1rem; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 1rem;
+  }
+  .chrome {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.5rem 1.2rem; font-size: 0.8rem; color: var(--muted);
+    pointer-events: none;
+  }
+  .progress {
+    position: fixed; top: 0; left: 0; height: 3px;
+    background: var(--accent); transition: width 0.18s ease; z-index: 10;
+  }
+  .counter { font-variant-numeric: tabular-nums; }
+  .slide h2 .num.ax { color: #3f5d6b; background: #e4ecef; }
+  .slide.annex .kicker { color: #3f5d6b; }
+  .slide.annex { border-top: none; }
+  .slide.title.annex h1 { font-size: 2.9rem; }
+  .hint { font-size: 0.75rem; }
+  @media print {
+    body { overflow: visible; }
+    .slide {
+      display: flex !important; opacity: 1 !important;
+      position: relative; page-break-after: always; height: 100vh;
+    }
+    .chrome, .progress { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<div class="deck" id="deck">
+
+  <!-- 1 -->
+  <section class="slide title active">
+    <div class="kicker">Claude Certified Architect · Programa de equipo</div>
+    <h1>Sesión 2<br>Claude Code: Configuración y Workflows</h1>
+    <p class="meta">Domain 3 (20% del exam) · 120 min · Hoy se configura el repo capstone</p>
+  </section>
+
+  <!-- 2 -->
+  <section class="slide">
+    <h2><span class="num">02</span>Objetivos de la sesión</h2>
+    <p>Al terminar sabrás:</p>
+    <ul>
+      <li>Configurar la jerarquía <strong>CLAUDE.md</strong> (user / project / directory) correctamente.</li>
+      <li>Crear <code>.claude/rules/</code> con <strong>path globs</strong> para convenciones condicionales.</li>
+      <li>Distinguir <strong>slash commands</strong> de <strong>skills</strong>, y cuándo usar cada uno.</li>
+      <li>Decidir entre <strong>plan mode</strong> y <strong>direct execution</strong>.</li>
+      <li>Integrar Claude Code en CI/CD con el flag <code>-p</code>.</li>
+    </ul>
+    <p class="sub">D3 es el segundo domain con más peso después de Agentic Architecture.</p>
+  </section>
+
+  <!-- 3 -->
+  <section class="slide">
+    <h2><span class="num">03</span>La jerarquía CLAUDE.md</h2>
+    <table>
+      <tr><th>Nivel</th><th>Ubicación</th><th>Compartido vía git</th></tr>
+      <tr><td><strong>User</strong></td><td><code>~/.claude/CLAUDE.md</code></td><td><span class="warn">❌ NO</span> — solo para ti</td></tr>
+      <tr><td><strong>Project</strong></td><td><code>.claude/CLAUDE.md</code> o <code>CLAUDE.md</code> (root)</td><td><span class="ok">✓ SÍ</span> — todo el equipo</td></tr>
+      <tr><td><strong>Directory</strong></td><td><code>subdir/CLAUDE.md</code></td><td><span class="ok">✓ SÍ</span> — aplica a esa carpeta</td></tr>
+    </table>
+    <div class="callout"><strong>El error #1 del exam:</strong> un team member "no recibe" instrucciones → casi siempre porque están en <code>~/.claude/</code> (user) en vez de <code>.claude/</code> (project).</div>
+  </section>
+
+  <!-- 4 -->
+  <section class="slide">
+    <h2><span class="num">04</span><code>@import</code> para modularidad</h2>
+    <p>CLAUDE.md puede referenciar archivos externos con <code>@path</code>:</p>
+    <pre><code># Project CLAUDE.md
+
+Coding standards: @./standards/coding-style.md
+Testing requirements: @./standards/testing-requirements.md
+Project overview: @README.md</code></pre>
+    <ul>
+      <li><code>@</code> pegado al path, sin espacio.</li>
+      <li>Paths relativos se resuelven respecto al archivo que importa.</li>
+      <li>Profundidad máxima de anidamiento: <strong>5</strong>.</li>
+    </ul>
+    <p class="sub">Evita el CLAUDE.md monstruoso — cada paquete importa solo lo relevante.</p>
+  </section>
+
+  <!-- 5 -->
+  <section class="slide">
+    <h2><span class="num">05</span><code>.claude/rules/</code> con path globs</h2>
+    <p>Alternativa a un CLAUDE.md monolítico. Rules por tema, con <strong>YAML frontmatter</strong> que las activa condicionalmente:</p>
+    <pre><code>---
+paths: ["**/*.test.py", "**/test_*.py"]
+---
+
+Tests usan pytest con describe/it implícito por funciones.
+Usar fixtures y data factories, no hardcodear.
+No mockear la BBDD — usar una BBDD de test.</code></pre>
+    <p>La rule se carga <strong>solo</strong> cuando Claude edita un archivo que matchea el glob → ahorra contexto.</p>
+  </section>
+
+  <!-- 6 -->
+  <section class="slide">
+    <h2><span class="num">06</span>rules con globs vs subdir/CLAUDE.md</h2>
+    <div class="cols">
+      <div>
+        <p><strong><code>.claude/rules/</code> con <code>paths:</code></strong></p>
+        <p class="sub">Cuando la convención atraviesa varios directorios.</p>
+        <ul>
+          <li>Tests dispersos por todo el repo</li>
+          <li>Migraciones en varias carpetas</li>
+          <li>Archivos por extensión</li>
+        </ul>
+      </div>
+      <div>
+        <p><strong><code>subdir/CLAUDE.md</code></strong></p>
+        <p class="sub">Cuando la convención está atada a una carpeta concreta.</p>
+        <ul>
+          <li><code>terraform/CLAUDE.md</code></li>
+          <li><code>infra/CLAUDE.md</code></li>
+          <li>Carpeta con reglas propias</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout">Ejemplo capstone: <code>rules/testing.md</code> con <code>paths: ["**/test_*.py"]</code> — porque los tests están repartidos al lado de cada módulo.</div>
+  </section>
+
+  <!-- 7 -->
+  <section class="slide">
+    <h2><span class="num">07</span>Slash commands vs Skills</h2>
+    <p><strong>Slash command</strong> (<code>.claude/commands/foo.md</code>): atajo invocable, prompt template, sin frontmatter especial.</p>
+    <p><strong>Skill</strong> (<code>.claude/skills/[name]/SKILL.md</code>): workflow reusable con frontmatter:</p>
+    <table>
+      <tr><th>Frontmatter</th><th>Qué hace</th></tr>
+      <tr><td><code>context: fork</code></td><td>Corre en sub-agente aislado — output verboso no contamina la sesión</td></tr>
+      <tr><td><code>allowed-tools</code></td><td>Restringe qué tools puede usar (seguridad)</td></tr>
+      <tr><td><code>argument-hint</code></td><td>Pide un argumento si se invoca sin parámetros</td></tr>
+    </table>
+    <p class="sub">Nota: en versiones recientes commands y skills se unifican — ambos crean <code>/name</code>. El formato <code>.claude/commands/</code> sigue soportado.</p>
+  </section>
+
+  <!-- 8 -->
+  <section class="slide">
+    <h2><span class="num">08</span>Project scope vs User scope</h2>
+    <table>
+      <tr><th></th><th>Project</th><th>User</th></tr>
+      <tr><td>Commands</td><td><code>.claude/commands/</code></td><td><code>~/.claude/commands/</code></td></tr>
+      <tr><td>Skills</td><td><code>.claude/skills/</code></td><td><code>~/.claude/skills/</code></td></tr>
+      <tr><td>Compartido vía git</td><td><span class="ok">✓ SÍ</span></td><td><span class="warn">❌ NO</span></td></tr>
+    </table>
+    <div class="callout"><strong>Variante personal de un skill del equipo:</strong> créala en <code>~/.claude/skills/</code> con <strong>nombre distinto</strong> para no pisar a los compañeros.</div>
+  </section>
+
+  <!-- 9 -->
+  <section class="slide">
+    <h2><span class="num">09</span>Plan mode vs Direct execution</h2>
+    <div class="cols">
+      <div>
+        <p><strong>Plan mode</strong></p>
+        <p class="sub">El modelo solo investiga y planifica; no toca nada. Produce un plan que apruebas.</p>
+        <ul>
+          <li>Cambios multi-archivo</li>
+          <li>Decisiones arquitectónicas</li>
+          <li>Varios approaches válidos</li>
+          <li>Migraciones de librería (45+ archivos)</li>
+        </ul>
+      </div>
+      <div>
+        <p><strong>Direct execution</strong></p>
+        <p class="sub">Ejecuta directamente.</p>
+        <ul>
+          <li>Fix de un solo archivo</li>
+          <li>Stack trace claro</li>
+          <li>Añadir una validación</li>
+          <li>Cambio bien acotado</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout"><strong>Combinado:</strong> plan mode para investigar → apruebas → direct execution para implementar.</div>
+  </section>
+
+  <!-- 10 -->
+  <section class="slide">
+    <h2><span class="num">10</span>El Explore subagent</h2>
+    <p>Subagente especializado para <strong>explorar el codebase</strong>:</p>
+    <ul>
+      <li>Aísla el output verboso de descubrimiento.</li>
+      <li>Devuelve solo un summary.</li>
+      <li>Previene el agotamiento del contexto en tareas multi-fase.</li>
+    </ul>
+    <div class="callout"><strong>No confundir:</strong> plan mode es un <em>modo</em>, Explore subagent es una <em>herramienta</em> dentro del flujo.</div>
+  </section>
+
+  <!-- 11 -->
+  <section class="slide">
+    <h2><span class="num">11</span>Claude Code en CI/CD</h2>
+    <p><strong>El flag <code>-p</code> (o <code>--print</code>):</strong></p>
+    <pre><code>claude -p "Analyze this pull request for security issues"</code></pre>
+    <ul>
+      <li>Modo no-interactivo: procesa el prompt, imprime a stdout, sale.</li>
+      <li><strong>La única forma correcta</strong> de correr Claude Code en CI/CD.</li>
+      <li>Sin <code>-p</code>, el job se cuelga esperando input interactivo.</li>
+    </ul>
+    <p><strong>Output estructurado para CI:</strong></p>
+    <pre><code>claude -p "Review this PR" --output-format json --json-schema '{...}'</code></pre>
+  </section>
+
+  <!-- 12 -->
+  <section class="slide">
+    <h2><span class="num">12</span>Hands-on (55 min)</h2>
+    <p>Configurar el repo capstone como si lo recibiera un nuevo dev:</p>
+    <ol>
+      <li><code>CLAUDE.md</code> de proyecto con estándares de código y testing.</li>
+      <li><code>.claude/rules/testing.md</code> con <code>paths: ["**/test_*.py"]</code>.</li>
+      <li>Slash command <code>/review</code> en <code>.claude/commands/</code>.</li>
+      <li>Skill <code>/explore</code> con <code>context: fork</code> en <code>.claude/skills/</code>.</li>
+      <li>Workflow CI que corre <code>claude -p</code> con <code>--output-format json</code>.</li>
+      <li>Probar plan mode (tarea ambigua) vs direct execution (tarea acotada).</li>
+    </ol>
+    <p class="sub">Instrucciones completas en <code>starter/README.md</code>.</p>
+  </section>
+
+  <!-- 13 -->
+  <section class="slide">
+    <h2><span class="num">13</span>Cierre</h2>
+    <p><span class="ok">✓</span> La jerarquía CLAUDE.md y dónde va cada cosa.</p>
+    <p><span class="ok">✓</span> rules con path globs vs subdir CLAUDE.md.</p>
+    <p><span class="ok">✓</span> Commands vs skills, project vs user scope.</p>
+    <p><span class="ok">✓</span> Plan mode vs direct execution.</p>
+    <p><span class="ok">✓</span> Claude Code en CI/CD con <code>-p</code>.</p>
+    <div class="callout"><strong>Pre-work para Sesión 3:</strong> Capítulos 6 y 7 de la guía companion + cursos de prompt engineering de Anthropic Academy.</div>
+  </section>
+
+  <!-- ===================== ANEXO ===================== -->
+
+  <!-- A0 -->
+  <section class="slide title annex">
+    <div class="kicker">Anexo · Domain 3 completo</div>
+    <h1>Anexo<br>Lo que faltaba de D3</h1>
+    <p class="meta">Task Statement 3.5 completo · 4 correcciones al deck · CI/CD en profundidad · drill de examen</p>
+    <p class="sub">Contrastado contra el Exam Guide v1.0 (julio 2026) y el currículo de claudecertificationguide.com.</p>
+  </section>
+
+  <!-- A1 -->
+  <section class="slide">
+    <h2><span class="num ax">A1</span>Mapa de cobertura del deck</h2>
+    <table>
+      <tr><th>Task Statement</th><th>Estado en slides 1–13</th></tr>
+      <tr><td><strong>3.1</strong> Jerarquía CLAUDE.md</td><td><span class="ok">Cubierto</span> — falta <code>/memory</code>, <code>CLAUDE.local.md</code>, y el matiz de precedencia</td></tr>
+      <tr><td><strong>3.2</strong> Slash commands y skills</td><td><span class="ok">Cubierto</span> — falta la forma del archivo (trap de examen)</td></tr>
+      <tr><td><strong>3.3</strong> Path-specific rules</td><td><span class="ok">Cubierto</span></td></tr>
+      <tr><td><strong>3.4</strong> Plan mode vs direct</td><td><span class="ok">Cubierto</span></td></tr>
+      <tr><td><strong>3.5</strong> Iterative refinement</td><td><span class="warn">Ausente por completo</span></td></tr>
+      <tr><td><strong>3.6</strong> CI/CD</td><td><span class="warn">Parcial</span> — solo <code>-p</code>; faltan 4 conceptos más</td></tr>
+    </table>
+    <div class="callout">3.5 es <strong>uno de seis</strong> task statements de un domain que pesa el 20%. Sin él, se entra al examen a ciegas en ~3% de los ítems.</div>
+  </section>
+
+  <!-- A2 -->
+  <section class="slide">
+    <h2><span class="num ax">A2</span>3.5 — La jerarquía de técnicas</h2>
+    <p>Trabajar con Claude Code es iterativo. El examen pregunta <strong>cuál técnica va primero</strong> en cada situación.</p>
+    <table>
+      <tr><th>Síntoma</th><th>Técnica</th></tr>
+      <tr><td>La prosa se interpreta distinto en cada run</td><td><strong>Ejemplos input/output concretos</strong></td></tr>
+      <tr><td>Transformación compleja con muchos edge cases</td><td><strong>Test-driven iteration</strong></td></tr>
+      <tr><td>Dominio desconocido para ti</td><td><strong>Interview pattern</strong></td></tr>
+      <tr><td>Varios problemas que interactúan</td><td><strong>Batch</strong> (un solo mensaje)</td></tr>
+      <tr><td>Varios problemas independientes</td><td><strong>Secuencial</strong></td></tr>
+    </table>
+    <div class="callout"><strong>Trap #1:</strong> ante interpretación inconsistente, la respuesta <em>nunca</em> es "reescribe la prosa con más precisión". Prosa mejor sigue siendo prosa interpretable.</div>
+  </section>
+
+  <!-- A3 -->
+  <section class="slide">
+    <h2><span class="num ax">A3</span>3.5 — Ejemplos concretos</h2>
+    <p>2–3 pares antes/después bastan. El modelo generaliza el patrón; no hace falta enumerar todos los casos.</p>
+    <pre><code>Input:
+  getUserData(userId: string): Promise&lt;UserData&gt;
+Expected output:
+  getUserData(userId: string): Promise&lt;Result&lt;UserData, ApiError&gt;&gt;
+
+Input:
+  fetchOrders(customerId: string): Promise&lt;Order[]&gt;
+Expected output:
+  fetchOrders(customerId: string): Promise&lt;Result&lt;Order[], ApiError&gt;&gt;</code></pre>
+    <p><strong>El bucle:</strong> observar la inconsistencia → cambiar a ejemplos → verificar en un caso nuevo → añadir un ejemplo de edge case solo si falla ahí.</p>
+  </section>
+
+  <!-- A4 -->
+  <section class="slide">
+    <h2><span class="num ax">A4</span>3.5 — Tests e interview pattern</h2>
+    <div class="cols">
+      <div>
+        <p><strong>Test-driven iteration</strong></p>
+        <p class="sub">Escribe los tests primero (happy path, edge cases, performance). Luego comparte los fallos.</p>
+        <pre><code>FAIL: testMigrationHandlesNullValues
+  Expected: null preserved
+  Actual:   null replaced with ""</code></pre>
+        <p class="sub">"Expected X, got Y" no deja margen a interpretación.</p>
+      </div>
+      <div>
+        <p><strong>Interview pattern</strong></p>
+        <p class="sub">Para dominios donde <em>tú</em> no sabes qué preguntar.</p>
+        <pre><code>"Necesito una capa de caché.
+Antes de implementar, hazme
+preguntas sobre requisitos,
+edge cases y restricciones."</code></pre>
+        <p class="sub">Sale invalidación, TTL, consistencia, modos de fallo.</p>
+      </div>
+    </div>
+    <div class="callout"><strong>Trap #2:</strong> no confundirlos. Ejemplos = tú sabes la transformación, el modelo la interpreta mal. Interview = tú no sabes qué considerar.</div>
+  </section>
+
+  <!-- A5 -->
+  <section class="slide">
+    <h2><span class="num ax">A5</span>3.5 — Batch vs secuencial</h2>
+    <div class="cols">
+      <div>
+        <p><strong>Un solo mensaje</strong> — cuando los fixes interactúan.</p>
+        <pre><code>Tres cambios (se afectan entre sí):
+1. Error responses llevan error code
+2. Logging incluye ese code
+3. Los types del SDK lo reflejan</code></pre>
+        <p class="sub">El modelo necesita ver todas las restricciones a la vez o el fix de uno rompe el otro.</p>
+      </div>
+      <div>
+        <p><strong>Secuencial</strong> — cuando son independientes.</p>
+        <pre><code>1º "Renombra a camelCase"
+   [esperas resultado]
+2º "Ahora indenta a 2 espacios"</code></pre>
+        <p class="sub">Agrupar problemas independientes confunde qué feedback aplica a qué parte.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- A6 -->
+  <section class="slide">
+    <h2><span class="num ax">A6</span>Corrección: CLAUDE.md no es una cadena de precedencia</h2>
+    <p>La tabla del slide 03 sugiere jerarquía. Los docs son explícitos: los archivos se <strong>concatenan</strong> en contexto, no se sobrescriben.</p>
+    <ul>
+      <li>Orden de carga = de más amplio a más específico. Eso es <em>orden</em>, no precedencia.</li>
+      <li>Si dos reglas se contradicen, <strong>Claude puede elegir cualquiera</strong>.</li>
+      <li>CLAUDE.md se entrega como user message, no como system prompt: sin garantía de cumplimiento estricto.</li>
+    </ul>
+    <div class="callout"><strong>Consecuencia práctica:</strong> si una regla <em>debe</em> cumplirse siempre (tool bloqueado, formateador obligatorio), va en <code>settings.json</code> o en un <strong>hook</strong>, no en CLAUDE.md. <code>settings.json</code> sí tiene precedencia estricta (managed &gt; local &gt; project &gt; user).</div>
+    <p class="sub">Distractores típicos: "el scope más específico gana", "user-level sobrescribe project-level". Los docs no dicen ninguna de las dos.</p>
+  </section>
+
+  <!-- A7 -->
+  <section class="slide">
+    <h2><span class="num ax">A7</span><code>CLAUDE.local.md</code>, <code>/memory</code> y <code>/compact</code></h2>
+    <p><strong><code>CLAUDE.local.md</code></strong> — va junto a <code>CLAUDE.md</code> en cualquier nivel, se carga después, se suele gitignorar. Es el <code>~/.claude/CLAUDE.md</code> pero acotado a este repo.</p>
+    <p><strong><code>/memory</code></strong> — muestra qué archivos de memoria están cargados. Herramienta de <em>diagnóstico</em>.</p>
+    <div class="callout"><strong>Trap:</strong> <code>/memory</code> <strong>no carga</strong> configuración — la revela. La config se carga sola según su ubicación. Un distractor clásico es "el dev no ha ejecutado /memory".</div>
+    <p class="sub">Estado actual del producto: <code>/memory</code> lista y abre los archivos; <code>/context</code> reporta lo que realmente entró en la sesión. Para el examen (guía v1.0), la respuesta es <code>/memory</code>.</p>
+    <p><strong>Tras <code>/compact</code>:</strong> el CLAUDE.md de raíz vuelve (Claude lo relee de disco). Los CLAUDE.md anidados y las rules con <code>paths:</code> vuelven cuando toques un archivo que matchee.</p>
+  </section>
+
+  <!-- A8 -->
+  <section class="slide">
+    <h2><span class="num ax">A8</span>Corrección: <code>@path</code>, no <code>@import</code></h2>
+    <p>No existe la palabra clave <code>@import</code> — aunque medio internet la escriba así. La directiva es <code>@</code> + path, en su propia línea:</p>
+    <pre><code># .claude/CLAUDE.md
+
+Coding standards:
+
+@./standards/naming-conventions.md
+@./standards/error-handling.md</code></pre>
+    <div class="callout"><strong>Y lo importante:</strong> los imports cargan de forma <strong>eager</strong>. Partir un CLAUDE.md de 600 líneas en seis de 100 mejora el mantenimiento, pero el contexto que ve Claude pesa <em>exactamente lo mismo</em>.</div>
+    <p>Para reducir contexto por sesión la herramienta es <code>.claude/rules/</code> con <code>paths:</code> — eso sí carga condicionalmente.</p>
+  </section>
+
+  <!-- A9 -->
+  <section class="slide">
+    <h2><span class="num ax">A9</span>Corrección: la forma del archivo importa</h2>
+    <p>Commands y skills son hoy un <strong>sistema unificado</strong>: ambos producen <code>/nombre</code>. Lo que cambia es la estructura en disco.</p>
+    <table>
+      <tr><th>Ruta</th><th>¿Crea <code>/deploy</code>?</th></tr>
+      <tr><td><code>.claude/commands/deploy.md</code></td><td><span class="ok">✓</span> archivo plano</td></tr>
+      <tr><td><code>.claude/skills/deploy/SKILL.md</code></td><td><span class="ok">✓</span> directorio + SKILL.md (canónico)</td></tr>
+      <tr><td><code>.claude/skills/deploy.md</code></td><td><span class="warn">✗</span> archivo suelto: no se detecta</td></tr>
+    </table>
+    <ul>
+      <li>Si un skill y un command comparten nombre, <strong>gana el skill</strong>.</li>
+      <li>Ambas rutas admiten el <strong>mismo frontmatter</strong> (el slide 07 sugiere que los commands no).</li>
+      <li><code>description</code> no está en la lista del examen, pero es el campo que decide si Claude invoca el skill solo.</li>
+    </ul>
+  </section>
+
+  <!-- A10 -->
+  <section class="slide">
+    <h2><span class="num ax">A10</span>Matiz: <code>allowed-tools</code> no restringe</h2>
+    <div class="cols">
+      <div>
+        <p><strong>Respuesta de examen</strong> (guía v1.0)</p>
+        <p class="sub"><code>allowed-tools</code> restringe a qué tools puede acceder el skill.</p>
+      </div>
+      <div>
+        <p><strong>Producto actual</strong></p>
+        <p class="sub"><code>allowed-tools</code> <em>pre-aprueba</em>: esas tools corren sin pedir permiso. El resto sigue disponible.</p>
+      </div>
+    </div>
+    <p>El límite real de seguridad es <code>disallowed-tools</code> (o deny rules en permission settings): eso sí saca la tool del pool.</p>
+    <div class="callout">En el examen, marca la opción que dice "restringe". En el repo capstone, si quieres un skill de análisis realmente read-only, usa <code>disallowed-tools</code>.</div>
+  </section>
+
+  <!-- A11 -->
+  <section class="slide">
+    <h2><span class="num ax">A11</span>3.6 — Dónde aterriza el output estructurado</h2>
+    <pre><code>claude -p \
+  --output-format json \
+  --json-schema '{"type":"object","properties":{
+     "findings":{"type":"array","items":{"type":"object","properties":{
+       "file":{"type":"string"},"line":{"type":"integer"},
+       "severity":{"type":"string"},"message":{"type":"string"}}}}}}' \
+  "Review this PR for security issues"</code></pre>
+    <ul>
+      <li><code>--output-format json</code> envuelve el run (resultado, session ID, coste, uso).</li>
+      <li><code>--json-schema</code> valida la salida final contra el schema. Solo en print mode.</li>
+      <li>Los datos validados salen en <code>structured_output</code> — se extraen con <code>jq '.structured_output'</code>, <strong>no</strong> del nivel superior.</li>
+    </ul>
+    <p class="sub">Eso permite postear comentarios inline en el archivo y línea exactos, filtrar por severidad y trackear entre runs.</p>
+  </section>
+
+  <!-- A12 -->
+  <section class="slide">
+    <h2><span class="num ax">A12</span>3.6 — Aislar generación de review</h2>
+    <p>La misma sesión que generó el código es <strong>peor</strong> revisándolo. Retiene el razonamiento de por qué eligió ese enfoque, y no cuestiona decisiones que ya se justificó a sí misma.</p>
+    <pre><code># Paso 1 — generar (sesión A)
+claude -p "Implement the authentication middleware"
+
+# Paso 2 — revisar (sesión B, sin contexto compartido)
+claude -p "Review the authentication middleware for security
+issues, error handling gaps, and edge cases"</code></pre>
+    <div class="callout">Distractores a descartar: "añade instrucciones de self-review", "activa extended thinking". Ninguno elimina el sesgo de justificación previa. La respuesta es una <strong>instancia independiente</strong>.</div>
+  </section>
+
+  <!-- A13 -->
+  <section class="slide">
+    <h2><span class="num ax">A13</span>3.6 — Review incremental</h2>
+    <p>Sin contexto de reviews anteriores, cada push analiza el PR desde cero y repite los mismos hallazgos. Los que reaparecen son los que el dev vio y decidió no tocar — y un re-scan sin memoria no sabe distinguirlos de los nuevos.</p>
+    <pre><code>claude -p --output-format json \
+  "Review this PR. Findings from the previous review:
+   ${PREVIOUS_FINDINGS}
+
+   Report ONLY:
+   1. New issues not in the previous findings
+   2. Previous findings still present
+
+   Do NOT re-report findings already reviewed and dismissed."</code></pre>
+    <p class="sub">Los comentarios duplicados erosionan la confianza: si cada push genera los mismos cinco, el equipo deja de leerlos.</p>
+  </section>
+
+  <!-- A14 -->
+  <section class="slide">
+    <h2><span class="num ax">A14</span>3.6 — CLAUDE.md como contexto de CI</h2>
+    <p>En CI, Claude Code lee los CLAUDE.md igual que en interactivo. Es <strong>el</strong> mecanismo para darle contexto de proyecto a un run automatizado.</p>
+    <pre><code># .claude/CLAUDE.md — sección relevante para CI
+## Testing Standards
+
+- Usar el factory pattern de test/factories/ para datos
+- Los tests de integración conectan vía test/setup/db.ts
+- No testear detalles privados — testear contratos públicos
+- Objetivo: 80% branch coverage en código nuevo
+- Fixtures: test/fixtures/users.json, test/fixtures/orders.json</code></pre>
+    <ul>
+      <li>Sin esto, la generación de tests en CI produce boilerplate de bajo valor.</li>
+      <li>Incluye también los <strong>tests existentes</strong> en contexto: si no, propone escenarios ya cubiertos.</li>
+    </ul>
+  </section>
+
+  <!-- A15 -->
+  <section class="slide">
+    <h2><span class="num ax">A15</span>Batch API vs real-time en CI</h2>
+    <p>El Message Batches API da <strong>50% de ahorro</strong>, con hasta <strong>24h de procesamiento</strong> y <strong>sin SLA de latencia</strong>.</p>
+    <table>
+      <tr><th>Workflow</th><th>API</th><th>Por qué</th></tr>
+      <tr><td>Pre-merge check (bloqueante)</td><td><strong>Real-time</strong></td><td>El dev está esperando para mergear</td></tr>
+      <tr><td>Informe de deuda técnica nocturno</td><td><strong>Batch</strong></td><td>No urgente, 50% menos coste</td></tr>
+      <tr><td>Auditoría semanal</td><td><strong>Batch</strong></td><td>Programada, tolera latencia</td></tr>
+      <tr><td>Generación de tests nocturna</td><td><strong>Batch</strong></td><td>Se revisa por la mañana</td></tr>
+    </table>
+    <div class="callout">Sample Question 11. La trampa es "pasa los dos a batch por el ahorro". El batch tampoco soporta tool calling multi-turno dentro de una request. <code>custom_id</code> correlaciona request y respuesta.</div>
+  </section>
+
+  <!-- A16 -->
+  <section class="slide">
+    <h2><span class="num ax">A16</span>Flags CLI que conviene reconocer</h2>
+    <div class="cols">
+      <div>
+        <p><strong>System prompt</strong></p>
+        <ul>
+          <li><code>--system-prompt</code> / <code>--system-prompt-file</code> → <strong>reemplaza</strong></li>
+          <li><code>--append-system-prompt</code>[<code>-file</code>] → <strong>añade</strong></li>
+        </ul>
+        <p class="sub">Append si sigue siendo un asistente de código con reglas extra. Replace si la identidad es otra — y entonces tú te haces cargo de todo.</p>
+      </div>
+      <div>
+        <p><strong>Print mode y límites</strong></p>
+        <ul>
+          <li><code>--output-format text|json|stream-json</code></li>
+          <li><code>--max-turns &lt;n&gt;</code>, <code>--verbose</code></li>
+          <li><code>--permission-mode</code>, <code>--allowedTools</code>, <code>--disallowedTools</code>, <code>--tools</code></li>
+          <li><code>-c</code>/<code>--continue</code>, <code>-r</code>/<code>--resume &lt;id|nombre&gt;</code></li>
+          <li><code>--bare</code>: salta hooks, skills, MCP y CLAUDE.md</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- A17 -->
+  <section class="slide">
+    <h2><span class="num ax">A17</span>Drill · 5 ítems tipo examen</h2>
+    <ol>
+      <li>Un dev describe una transformación en prosa y Claude la interpreta distinto cada vez. ¿Qué haces primero? → <span class="ok">2–3 ejemplos input/output</span> <span class="sub">(no: prosa más precisa)</span></li>
+      <li>Dev B clona el repo y no recibe las convenciones que sí aplica a Dev A. → <span class="ok">Están en <code>~/.claude/CLAUDE.md</code>, muévelas a project</span></li>
+      <li>Tests dispersos junto al código en 50+ directorios, mismas convenciones. → <span class="ok"><code>.claude/rules/</code> con <code>paths: ["**/*.test.tsx"]</code></span></li>
+      <li>El job de CI se cuelga esperando input. → <span class="ok"><code>-p</code></span> <span class="sub">(no existen <code>CLAUDE_HEADLESS</code> ni <code>--batch</code>)</span></li>
+      <li>Pre-merge bloqueante + informe nocturno; el manager quiere batch para ambos. → <span class="ok">Batch solo el nocturno</span></li>
+    </ol>
+    <p class="sub">Los cinco vienen de las sample questions oficiales o de sus traps directos.</p>
+  </section>
+
+  <!-- A18 -->
+  <section class="slide">
+    <h2><span class="num ax">A18</span>Hands-on extra (30 min)</h2>
+    <p>Añadir al bloque del slide 12, sobre el mismo repo capstone:</p>
+    <ol>
+      <li>Describe una transformación en prosa, ejecútala 3 veces y anota las diferencias. Repite con 2–3 ejemplos concretos y compara la consistencia.</li>
+      <li>Usa el interview pattern en un dominio que no domines; anota qué consideraciones salen que no habías previsto.</li>
+      <li>Añade <code>--json-schema</code> al workflow de CI y extrae los hallazgos con <code>jq '.structured_output'</code>.</li>
+      <li>Parte el CI en dos invocaciones: una genera, otra revisa sin contexto compartido. Compara los hallazgos con los del self-review.</li>
+      <li>Guarda los findings del run anterior como artifact e inyéctalos en el siguiente review.</li>
+      <li>Verifica con <code>/memory</code> (o <code>/context</code>) que la rule de testing carga al editar un test y no al editar un handler.</li>
+    </ol>
+  </section>
+
+
+  <!-- ===================== ANEXO B ===================== -->
+
+  <!-- B0 -->
+  <section class="slide title annex">
+    <div class="kicker">Anexo B · Casos prácticos y examen</div>
+    <h1>Anexo B<br>Cómo se pregunta esto</h1>
+    <p class="meta">Escenarios oficiales · familias de distractores · repo capstone completo · 6 ítems con opciones</p>
+    <p class="sub">D3 casi no tiene teoría difícil. Tiene reconocimiento de patrones bajo presión de tiempo.</p>
+  </section>
+
+  <!-- B1 -->
+  <section class="slide">
+    <h2><span class="num ax">B1</span>Dónde cae D3 en el examen</h2>
+    <table>
+      <tr><th>Dato</th><th>Valor</th></tr>
+      <tr><td>Ítems totales</td><td>60 · 120 min → <strong>2 min por ítem</strong></td></tr>
+      <tr><td>Estructura</td><td>4 escenarios sacados de un banco de 6</td></tr>
+      <tr><td>Peso de D3</td><td>20% → <strong>~12 ítems</strong></td></tr>
+      <tr><td>Aprobado</td><td>720 sobre escala 100–1000</td></tr>
+      <tr><td>Formato</td><td>Opción múltiple y multi-respuesta; el ítem dice cuántas marcar</td></tr>
+    </table>
+    <div class="callout">D3 es domain primario en <strong>2 de los 6 escenarios</strong> (Code Generation y CI/CD). Si salen los dos, D3 pesa bastante más de 12 ítems en tu forma concreta del examen.</div>
+  </section>
+
+  <!-- B2 -->
+  <section class="slide">
+    <h2><span class="num ax">B2</span>Los dos escenarios donde vive D3</h2>
+    <div class="cols">
+      <div>
+        <p><strong>Escenario 2 — Code Generation</strong></p>
+        <p class="sub">Domains: D3 + D5 (contexto y fiabilidad).</p>
+        <ul>
+          <li>Dónde va cada archivo de configuración</li>
+          <li>Plan mode vs direct execution</li>
+          <li>Refinamiento iterativo (3.5)</li>
+          <li>Sesiones largas: <code>/compact</code>, scratchpads, resume</li>
+        </ul>
+      </div>
+      <div>
+        <p><strong>Escenario 5 — CI/CD</strong></p>
+        <p class="sub">Domains: D3 + D4 (prompt engineering).</p>
+        <ul>
+          <li><code>-p</code>, output estructurado, schemas</li>
+          <li>Falsos positivos y criterios explícitos</li>
+          <li>Review multi-pase y multi-instancia</li>
+          <li>Batch vs real-time</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout">Consecuencia para la sesión: media Sesión 2 se examina con lenguaje de D4 y D5. Merece la pena anticipar el puente en vez de tratar cada domain como una isla.</div>
+  </section>
+
+  <!-- B3 -->
+  <section class="slide">
+    <h2><span class="num ax">B3</span>Las seis familias de distractores</h2>
+    <table>
+      <tr><th>Familia</th><th>Cómo suena</th><th>Por qué falla</th></tr>
+      <tr><td><strong>Over-engineering</strong></td><td>"Entrena un clasificador con tickets históricos"</td><td>Infraestructura antes de agotar prompt/config</td></tr>
+      <tr><td><strong>Prompt donde hace falta garantía</strong></td><td>"Refuerza el system prompt para que sea obligatorio"</td><td>Cumplimiento probabilístico ante consecuencias reales</td></tr>
+      <tr><td><strong>Feature inventada</strong></td><td>"Activa <code>CLAUDE_HEADLESS=true</code>"</td><td>No existe</td></tr>
+      <tr><td><strong>Resuelve otro problema</strong></td><td>"Análisis de sentimiento para escalar"</td><td>El sentimiento no correlaciona con complejidad</td></tr>
+      <tr><td><strong>Correcta pero no es "el primer paso"</strong></td><td>"Consolida las dos tools en una"</td><td>Válida como arquitectura, cara como primer arreglo</td></tr>
+      <tr><td><strong>Carga al humano</strong></td><td>"Que los devs partan los PR en trozos de 3-4 archivos"</td><td>No mejora el sistema, lo externaliza</td></tr>
+    </table>
+  </section>
+
+  <!-- B4 -->
+  <section class="slide">
+    <h2><span class="num ax">B4</span>Cosas que no existen (y aparecen como opción)</h2>
+    <ul>
+      <li><code>CLAUDE_HEADLESS=true</code> — la variable de entorno no existe. La respuesta es <code>-p</code>.</li>
+      <li><code>--batch</code> como flag de Claude Code — no existe. El Batch API es otra cosa, y es del API, no del CLI.</li>
+      <li><code>.claude/config.json</code> con un array <code>commands</code> — mecanismo inventado.</li>
+      <li><code>@import</code> como palabra clave — la directiva es <code>@</code> + path.</li>
+      <li>Redirigir <code>stdin</code> desde <code>/dev/null</code> — es un apaño de Unix, no dirección el modo interactivo.</li>
+      <li>"Ejecuta <code>/memory</code> para cargar la configuración" — <code>/memory</code> diagnostica, no carga.</li>
+    </ul>
+    <div class="callout">Si una opción menciona un flag o archivo que no reconoces, sospecha antes de asumir que es tu laguna. El examen usa inventos plausibles con frecuencia.</div>
+  </section>
+
+  <!-- B5 -->
+  <section class="slide">
+    <h2><span class="num ax">B5</span>El repo capstone, entero</h2>
+    <pre><code>repo/
+├── CLAUDE.md                      # o .claude/CLAUDE.md — estándares del equipo
+├── CLAUDE.local.md                # gitignored: tus manías en este repo
+├── .claude/
+│   ├── rules/
+│   │   ├── testing.md             # paths: ["**/*.test.*"]
+│   │   ├── api-conventions.md     # paths: ["src/api/**/*"]
+│   │   └── terraform.md           # paths: ["**/*.tf"]
+│   ├── skills/
+│   │   └── explore/
+│   │       └── SKILL.md           # context: fork, argument-hint
+│   ├── commands/
+│   │   └── review.md              # alias plano → /review
+│   └── settings.json              # lo que DEBE cumplirse
+├── .mcp.json                      # MCP de equipo, con ${TOKEN}
+├── packages/api/CLAUDE.md         # convenciones solo de este paquete
+└── .github/workflows/review.yml
+
+~/.claude/
+├── CLAUDE.md                      # tus preferencias, NO viaja por git
+├── skills/deep-explore/SKILL.md   # tu variante personal, otro nombre
+└── .claude.json                   # MCP experimentales tuyos</code></pre>
+  </section>
+
+  <!-- B6 -->
+  <section class="slide">
+    <h2><span class="num ax">B6</span>El workflow de CI, completo</h2>
+    <pre><code>name: claude-review
+on: [pull_request]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }        # el diff necesita historia
+
+      - name: Recuperar findings previos
+        run: echo "PREV=$(cat .claude-findings.json 2>/dev/null)" &gt;&gt; $GITHUB_ENV
+
+      - name: Review                     # -p: sin él, el job se cuelga
+        env: { ANTHROPIC_API_KEY: "${{ secrets.ANTHROPIC_API_KEY }}" }
+        run: |
+          claude -p --output-format json --json-schema "$(cat schema.json)" \
+            "Review this PR. Previous findings: $PREV.
+             Report only new or still-unaddressed issues." \
+            | jq '.structured_output' &gt; findings.json
+
+      - name: Postear inline
+        run: ./scripts/post-comments.sh findings.json</code></pre>
+    <p class="sub">Forma, no copia-pega. Lo examinable: <code>-p</code>, el schema, <code>jq '.structured_output'</code>, y los findings previos inyectados.</p>
+  </section>
+
+  <!-- B7 -->
+  <section class="slide">
+    <h2><span class="num ax">B7</span>Sesiones: reanudar, forkear o empezar de cero</h2>
+    <table>
+      <tr><th>Situación</th><th>Qué haces</th></tr>
+      <tr><td>Sigues la misma investigación mañana, el código no ha cambiado</td><td><code>--resume &lt;nombre&gt;</code></td></tr>
+      <tr><td>Quieres comparar dos estrategias desde el mismo análisis base</td><td><code>fork_session</code></td></tr>
+      <tr><td>Los tool results de ayer están <strong>obsoletos</strong> (el código cambió)</td><td><strong>Sesión nueva</strong> con un resumen estructurado inyectado</td></tr>
+      <tr><td>Reanudas y algunos archivos cambiaron</td><td>Reanudar <em>y avisar</em> qué archivos, para re-análisis dirigido</td></tr>
+    </table>
+    <div class="callout">Es Task Statement 1.7 (Domain 1), pero se pregunta con vocabulario de Claude Code y encaja aquí. Regla: contexto previo mayormente válido → resume; contexto previo rancio → empezar de cero con resumen.</div>
+  </section>
+
+  <!-- B8 -->
+  <section class="slide">
+    <h2><span class="num ax">B8</span>La escalera de garantía</h2>
+    <p>Casi cualquier pregunta de "cómo hago que Claude siempre haga X" se resuelve subiendo un peldaño:</p>
+    <table>
+      <tr><th>Peldaño</th><th>Garantía</th><th>Cuándo basta</th></tr>
+      <tr><td>Prompt / system prompt</td><td>Probabilística</td><td>Criterio, matices, preferencias</td></tr>
+      <tr><td>Few-shot examples</td><td>Probabilística, mejor calibrada</td><td>Formato y casos ambiguos</td></tr>
+      <tr><td>CLAUDE.md / rules</td><td>Probabilística, siempre en contexto</td><td>Convenciones del equipo</td></tr>
+      <tr><td><code>settings.json</code></td><td><strong>Determinista</strong> (lo aplica el cliente)</td><td>Permisos, tools bloqueadas</td></tr>
+      <tr><td>Hooks / gates programáticos</td><td><strong>Determinista</strong></td><td>Verificar identidad antes de un refund</td></tr>
+      <tr><td>Quitar la tool del tool set</td><td><strong>Imposible, no improbable</strong></td><td>La tool no es de ese rol</td></tr>
+    </table>
+    <div class="callout">Si el enunciado menciona dinero, identidad, cumplimiento o "el 12% de las veces falla", la respuesta está en los tres peldaños de abajo.</div>
+  </section>
+
+  <!-- B9 -->
+  <section class="slide">
+    <h2><span class="num ax">B9</span>D3 visto desde los otros domains</h2>
+    <table>
+      <tr><th>Concepto de D3</th><th>Se repregunta como…</th></tr>
+      <tr><td><code>context: fork</code>, Explore subagent</td><td>D5 — aislar output verboso para no agotar contexto</td></tr>
+      <tr><td>Sesiones independientes generación/review</td><td>D4 — arquitecturas de review multi-instancia</td></tr>
+      <tr><td>Review por archivo + pase de integración</td><td>D1 — prompt chaining y descomposición de tareas</td></tr>
+      <tr><td>CLAUDE.md para contexto de CI</td><td>D4 — criterios explícitos para reducir falsos positivos</td></tr>
+      <tr><td><code>--json-schema</code> en el CLI</td><td>D4 — <code>tool_use</code> con JSON schema en el API</td></tr>
+      <tr><td>Hooks vs prompt</td><td>D1 — enforcement programático (TS 1.4 y 1.5)</td></tr>
+    </table>
+    <p class="sub">Misma idea, distinto envoltorio. Reconocerla ahorra tiempo en el examen y evita estudiarla dos veces.</p>
+  </section>
+
+  <!-- B10 -->
+  <section class="slide">
+    <h2><span class="num ax">B10</span>Lo que NO hay que estudiar</h2>
+    <p>La guía lista temas explícitamente fuera de alcance. Ahorra horas saberlo:</p>
+    <ul>
+      <li>Fine-tuning, entrenamiento, pesos, RLHF, Constitutional AI</li>
+      <li>Desplegar u hospedar servidores MCP (infra, redes, contenedores)</li>
+      <li>Autenticación, API keys, OAuth, facturación, rate limits y pricing</li>
+      <li>Detalles de implementación de prompt caching (basta saber que existe)</li>
+      <li>Tokenización y conteo de tokens</li>
+      <li>Computer use, visión, streaming / SSE</li>
+      <li>Configuraciones de AWS, GCP o Azure; embeddings y vector DBs</li>
+    </ul>
+    <div class="callout">Si en el hands-on alguien se atasca montando un MCP server propio: no entra. Configurarlo sí, desplegarlo no.</div>
+  </section>
+
+  <!-- B11 -->
+  <section class="slide">
+    <h2><span class="num ax">B11</span>Drill con opciones · 1 y 2</h2>
+    <p><strong>1.</strong> Convenciones distintas por área; los tests están junto a cada componente en 50+ carpetas y deben seguir todos las mismas reglas. ¿Enfoque más mantenible?</p>
+    <p class="sub">A) Todo en el CLAUDE.md raíz · B) <span class="ok">rules con <code>paths: ["**/*.test.tsx"]</code></span> · C) Un CLAUDE.md por carpeta con tests · D) Un skill que los devs invoquen antes de tocar tests</p>
+    <p class="sub"><strong>Por qué D tienta:</strong> parece "automático". No lo es — requiere invocación o intent match. La pregunta pide carga <em>automática</em> por tipo de archivo.</p>
+    <p><strong>2.</strong> El equipo quiere <code>/review</code> para todos al clonar, y un dev quiere un <code>/brainstorm</code> personal cuyo output verboso no ensucie la conversación.</p>
+    <p class="sub">A) Ambos en <code>~/.claude/commands/</code> y que cada uno los copie · B) Ambos en <code>.claude/commands/</code>, brainstorm con <code>context: fork</code> · C) <span class="ok"><code>/review</code> en <code>.claude/commands/</code>; brainstorm en <code>~/.claude/skills/brainstorm/SKILL.md</code> con <code>context: fork</code></span> · D) <code>/review</code> documentado en CLAUDE.md</p>
+    <p class="sub"><strong>Por qué B tienta:</strong> el <code>context: fork</code> es correcto, pero mete un skill personal en el repo del equipo.</p>
+  </section>
+
+  <!-- B12 -->
+  <section class="slide">
+    <h2><span class="num ax">B12</span>Drill con opciones · 3 y 4</h2>
+    <p><strong>3.</strong> Un PR toca 14 archivos. El review de un solo pase da feedback detallado en unos archivos y superficial en otros, y marca como problema en un archivo lo que aprueba en otro.</p>
+    <p class="sub">A) <span class="ok">Un pase por archivo + un pase de integración cross-file</span> · B) Obligar a partir los PR en 3-4 archivos · C) Modelo con más contexto · D) Tres pases y reportar solo lo que aparezca en dos</p>
+    <p class="sub"><strong>Por qué C tienta:</strong> suena a límite técnico. No lo es: es dilución de atención, y más ventana no la arregla. <strong>D</strong> además suprimiría bugs reales detectados de forma intermitente.</p>
+    <p><strong>4.</strong> Reestructurar un monolito en microservicios: decenas de archivos, decisiones sobre fronteras de servicio y dependencias.</p>
+    <p class="sub">A) <span class="ok">Plan mode para explorar y diseñar antes de tocar nada</span> · B) Direct execution incremental, que las fronteras emerjan · C) Direct execution con instrucciones exhaustivas · D) Empezar directo y pasar a plan mode si aparece complejidad</p>
+    <p class="sub"><strong>Por qué D tienta:</strong> suena pragmático. Pero la complejidad ya está <em>enunciada</em>, no es especulativa. Esperar sorpresas es el error.</p>
+  </section>
+
+  <!-- B13 -->
+  <section class="slide">
+    <h2><span class="num ax">B13</span>Drill con opciones · 5 y 6</h2>
+    <p><strong>5.</strong> Dev A tiene a Claude Code siguiendo las convenciones de naming a la perfección. Dev B, recién incorporado, obtiene resultados inconsistentes. Mismo repo, misma rama.</p>
+    <p class="sub">A) A B le falta instalar el MCP server con las reglas · B) Las reglas están en un <code>.claude/rules/</code> que su setup no soporta · C) <span class="ok">Las convenciones viven en el <code>~/.claude/CLAUDE.md</code> de A</span> · D) B no ha ejecutado <code>/memory</code> para cargarlas</p>
+    <p class="sub"><strong>Por qué D tienta:</strong> <code>/memory</code> existe y suena a "cargar". Diagnostica, no carga.</p>
+    <p><strong>6.</strong> Quieres un <code>/review</code> con el checklist del equipo, disponible para todo el que clone el repo. ¿Dónde va el archivo?</p>
+    <p class="sub">A) <span class="ok"><code>.claude/commands/</code> del repositorio</span> · B) <code>~/.claude/commands/</code> de cada dev · C) En el CLAUDE.md raíz · D) En <code>.claude/config.json</code> con un array <code>commands</code></p>
+    <p class="sub"><strong>Ojo:</strong> <code>.claude/skills/review/SKILL.md</code> también sería correcto y es la ruta canónica. Si ambas aparecen como opciones, gana la de skills; si solo aparece commands, es válida.</p>
+  </section>
+
+  <!-- B14 -->
+  <section class="slide">
+    <h2><span class="num ax">B14</span>Checklist de 60 segundos por ítem</h2>
+    <ol>
+      <li><strong>Lee el calificador.</strong> "Primer paso", "más efectivo", "más mantenible" y "garantizado" apuntan a respuestas distintas del mismo escenario.</li>
+      <li><strong>Busca la causa raíz en el enunciado.</strong> Si te dan logs, la causa suele estar literalmente ahí; no culpes a un agente que hizo bien su parte.</li>
+      <li><strong>¿Hay consecuencias reales?</strong> Dinero, identidad, cumplimiento → sube por la escalera de garantía.</li>
+      <li><strong>Descarta inventos.</strong> Flags o archivos que no existen eliminan una opción de golpe.</li>
+      <li><strong>Descarta el over-engineering.</strong> Si nadie ha probado aún prompt o configuración, un clasificador entrenado no es la respuesta.</li>
+      <li><strong>Entre dos correctas, gana la proporcionada</strong> al esfuerzo que pide la pregunta.</li>
+    </ol>
+    <p class="sub">Dos minutos por ítem. Este checklist cabe en treinta segundos y resuelve la mayoría de los empates.</p>
+  </section>
+
+  <!-- A19 -->
+  <section class="slide">
+    <h2><span class="num ax">A19</span>Cierre del anexo</h2>
+    <p><span class="ok">✓</span> 3.5 completo: ejemplos &gt; prosa, tests, interview, batch vs secuencial.</p>
+    <p><span class="ok">✓</span> CLAUDE.md se concatena; lo que debe cumplirse va en settings o hooks.</p>
+    <p><span class="ok">✓</span> <code>@path</code> carga eager; para ahorrar contexto, rules con <code>paths:</code>.</p>
+    <p><span class="ok">✓</span> Skills = directorio con SKILL.md; <code>allowed-tools</code> pre-aprueba, no restringe.</p>
+    <p><span class="ok">✓</span> CI: <code>structured_output</code>, sesiones separadas, review incremental, CLAUDE.md como contexto.</p>
+    <p><span class="ok">✓</span> Anexo B: escenarios 2 y 5, familias de distractores, escalera de garantía, drill con opciones.</p>
+    <div class="callout"><strong>Ojo con los "estado actual":</strong> donde el producto ha evolucionado (<code>/context</code>, <code>allowed-tools</code>, <code>disallowed-tools</code>), en el examen responde según la guía v1.0 y en el repo aplica lo que funciona hoy.</div>
+  </section>
+
+</div>
+
+<div class="chrome">
+  <span class="hint">← → o barra espaciadora para navegar · F para pantalla completa</span>
+  <span class="counter" id="counter">1 / 48</span>
+</div>
+
+<script>
+  (function () {
+    var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+    var idx = 0;
+    var progress = document.getElementById('progress');
+    var counter = document.getElementById('counter');
+
+    function render() {
+      slides.forEach(function (s, i) { s.classList.toggle('active', i === idx); });
+      progress.style.width = ((idx + 1) / slides.length * 100) + '%';
+      counter.textContent = (idx + 1) + ' / ' + slides.length;
+      if (location.hash !== '#' + (idx + 1)) {
+        history.replaceState(null, '', '#' + (idx + 1));
+      }
+    }
+    function go(n) {
+      idx = Math.max(0, Math.min(slides.length - 1, n));
+      render();
+    }
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); go(idx + 1); }
+      else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); go(idx - 1); }
+      else if (e.key === 'Home') { go(0); }
+      else if (e.key === 'End') { go(slides.length - 1); }
+      else if (e.key === 'f' || e.key === 'F') {
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+        else document.exitFullscreen();
+      }
+    });
+    document.getElementById('deck').addEventListener('click', function (e) {
+      var x = e.clientX / window.innerWidth;
+      if (x > 0.5) go(idx + 1); else go(idx - 1);
+    });
+    var fromHash = parseInt((location.hash || '').replace('#', ''), 10);
+    if (fromHash >= 1 && fromHash <= slides.length) idx = fromHash - 1;
+    render();
+  })();
+</script>
+</body>
+</html>
