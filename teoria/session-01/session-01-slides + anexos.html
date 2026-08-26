@@ -259,8 +259,6 @@ return informar(tipo)</code></pre>
         return manejar_salida_anomala(response)   # max_tokens, refusal, stop_sequence
 
 
-        <span class="add">return extract_text(response.content)  # ← cualquier otro stop_reason: salimos</span></code></pre>
-    <div class="callout">Salir <strong>por defecto</strong> en vez de comprobar <code>== "end_turn"</code>: así un valor inesperado te saca del loop en lugar de dejarte girando y pagando llamadas.</div>
   </section>
 
   <!-- 8 -->
