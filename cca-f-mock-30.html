@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CCA-F · Mock 30 · cronometrado</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Newsreader:opsz,wght@6..72,400;6..72,500&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1B1F3B;--ink-soft:#4A4F72;--paper:#EEF0F4;--card:#FFFFFF;--line:#CDD2DE;
+    --si:#0B6E4F;--no:#A83246;--mark:#B8891C;
+    --display:"Bricolage Grotesque","Helvetica Neue",Arial,sans-serif;
+    --body:"Newsreader",Georgia,serif;--mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:820px;margin:0 auto;padding:0 20px}
+  h1{font-family:var(--display);font-weight:800;font-size:clamp(30px,5.5vw,46px);line-height:1.05;letter-spacing:-.02em;margin:0 0 18px}
+  h2{font-family:var(--display);font-weight:800;font-size:26px;margin:0 0 14px}
+  p{margin:0 0 14px}
+  code{font-family:var(--mono);font-size:.85em;background:#E3E7EF;padding:1px 5px;border-radius:2px}
+  .kicker{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);margin:0 0 14px}
+
+  /* portada */
+  #intro{padding:64px 0}
+  .facts{display:flex;flex-wrap:wrap;border:1px solid var(--line);background:var(--card);margin:0 0 26px}
+  .facts div{flex:1 1 110px;padding:12px 14px;border-right:1px solid var(--line)}
+  .facts div:last-child{border-right:0}
+  .facts dt{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft)}
+  .facts dd{margin:2px 0 0;font-family:var(--display);font-weight:600;font-size:19px}
+  .rules{font-size:16.5px;color:#2C3152;padding-left:20px}
+  .rules li{margin:0 0 8px}
+  .big{
+    display:inline-block;margin:14px 0 0;padding:15px 30px;border:0;cursor:pointer;
+    background:var(--ink);color:#fff;font-family:var(--display);font-weight:600;font-size:19px;
+  }
+  .big:hover{background:#2A3060}
+
+  /* barra examen */
+  #bar{position:sticky;top:0;z-index:20;background:var(--ink);color:#EDEFF6;display:none}
+  #bar .inner{max-width:820px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:16px;justify-content:space-between}
+  #clock{font-family:var(--mono);font-size:20px;font-weight:600;letter-spacing:.02em}
+  #clock.warn{color:#F0C05A}
+  #clock.crit{color:#F08A9C}
+  #progress{font-family:var(--mono);font-size:12px;color:#A8AFCB}
+  #bar button{background:none;border:1px solid #4A5384;color:#EDEFF6;font-family:var(--mono);font-size:12px;padding:7px 13px;cursor:pointer}
+  #bar button:hover{background:#2E376B}
+
+  /* pregunta */
+  #exam{display:none;padding:34px 0 60px}
+  .qmeta{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin:0 0 10px}
+  .qtext{font-family:var(--display);font-weight:600;font-size:clamp(19px,3.2vw,24px);line-height:1.32;margin:0 0 8px}
+  .qscen{font-size:17px;color:#2C3152;margin:0 0 20px}
+  .opts{display:grid;gap:8px;margin:0 0 24px}
+  .opt{
+    display:flex;gap:12px;align-items:flex-start;padding:13px 16px;border:1px solid var(--line);
+    background:var(--card);cursor:pointer;font-size:17px;text-align:left;font-family:var(--body);color:var(--ink);
+  }
+  .opt:hover{background:#F6F7FA}
+  .opt.sel{border-color:var(--ink);background:#F1F3F8;box-shadow:inset 0 0 0 1px var(--ink)}
+  .opt .letter{font-family:var(--mono);font-size:12px;color:var(--ink-soft);margin-top:3px;flex:0 0 auto}
+  .opt.sel .letter{color:var(--ink);font-weight:600}
+  .nav{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .nav button{padding:11px 18px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-family:var(--display);font-weight:600;font-size:16px;cursor:pointer}
+  .nav button:hover:not(:disabled){background:#E7EAF1}
+  .nav button:disabled{opacity:.4;cursor:default}
+  .nav button.primary{background:var(--ink);border-color:var(--ink);color:#fff}
+  .nav button.primary:hover{background:#2A3060}
+  .nav button.flag[aria-pressed="true"]{border-color:var(--mark);color:var(--mark)}
+  .grid{display:flex;flex-wrap:wrap;gap:5px;margin:26px 0 0;padding:20px 0 0;border-top:1px solid var(--line)}
+  .grid button{width:32px;height:32px;border:1px solid var(--line);background:var(--card);font-family:var(--mono);font-size:12px;cursor:pointer;color:var(--ink-soft)}
+  .grid button.done{background:var(--ink);border-color:var(--ink);color:#fff}
+  .grid button.flagged{border-color:var(--mark);border-width:2px}
+  .grid button.here{outline:2px solid var(--mark);outline-offset:1px}
+
+  /* resultados */
+  #results{display:none;padding:40px 0 70px}
+  .score{border:1px solid var(--line);background:var(--card);padding:26px;margin:0 0 26px}
+  .score .n{font-family:var(--display);font-weight:800;font-size:56px;line-height:1;letter-spacing:-.02em}
+  .score .n span{font-size:24px;color:var(--ink-soft)}
+  .bars{margin:20px 0 0}
+  .bars .row{display:flex;align-items:center;gap:12px;margin:0 0 7px;font-family:var(--mono);font-size:12px}
+  .bars .lab{width:132px;flex:0 0 auto;color:var(--ink-soft)}
+  .bars .track{flex:1;height:9px;background:#E3E7EF}
+  .bars .fill{height:9px;background:var(--si)}
+  .bars .fill.low{background:var(--no)}
+  .rev{border:1px solid var(--line);background:var(--card);margin:0 0 10px}
+  .rev .head{padding:14px 18px;display:flex;gap:12px;align-items:flex-start}
+  .rev .st{font-family:var(--mono);font-size:11px;padding:2px 7px;border:1px solid;flex:0 0 auto;margin-top:3px}
+  .rev .st.ok{color:var(--si);border-color:var(--si)}
+  .rev .st.bad{color:var(--no);border-color:var(--no)}
+  .rev .q{font-size:16.5px}
+  .rev .why{padding:0 18px 16px;font-size:16px;color:#2C3152;border-top:1px dashed var(--line);padding-top:13px}
+  .rev .why b{color:var(--si);font-weight:500}
+  .rev .why .miss{color:var(--no)}
+  footer{padding:30px 0 60px;color:var(--ink-soft);font-size:15px;border-top:1px solid var(--line)}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+  :focus-visible{outline:2px solid var(--mark);outline-offset:2px}
+</style>
+</head>
+<body>
+
+<div id="bar">
+  <div class="inner">
+    <span id="clock">60:00</span>
+    <span id="progress">0 / 30 respondidas</span>
+    <button type="button" id="finish">Terminar y corregir</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+<section id="intro">
+  <p class="kicker">CCA-F · simulacro original · ninguna pregunta repetida de los repasos A y B</p>
+  <h1>30 preguntas. 60 minutos. A libro cerrado.</h1>
+  <dl class="facts">
+    <div><dt>preguntas</dt><dd>30</dd></div>
+    <div><dt>tiempo</dt><dd>60 min</dd></div>
+    <div><dt>ritmo</dt><dd>2 min</dd></div>
+    <div><dt>reparto</dt><dd>27·18·20·20·15</dd></div>
+  </dl>
+  <ul class="rules">
+    <li>Sin notebooks, sin apuntes, sin Claude. El examen real es proctorizado: si aquí haces trampa, el resultado no te sirve para nada.</li>
+    <li>Contesta todas. No hay penalización, y dejar una en blanco es regalar el punto.</li>
+    <li>Marca con la bandera las que dudes y vuelve al final si te sobra tiempo.</li>
+    <li>Al corregir, lee el razonamiento incluso de las que acertaste: lo que se transfiere al examen real es <em>por qué caía cada distractor</em>, no la respuesta.</li>
+  </ul>
+  <button class="big" id="start">Empezar el cronómetro</button>
+</section>
+
+<section id="exam">
+  <p class="qmeta" id="qmeta"></p>
+  <p class="qtext" id="qtext"></p>
+  <p class="qscen" id="qscen"></p>
+  <div class="opts" id="opts"></div>
+  <div class="nav">
+    <button type="button" id="prev">← Anterior</button>
+    <button type="button" id="next" class="primary">Siguiente →</button>
+    <button type="button" id="flag" class="flag" aria-pressed="false">⚑ Marcar</button>
+  </div>
+  <div class="grid" id="grid"></div>
+</section>
+
+<section id="results">
+  <div class="score">
+    <p class="kicker">Resultado</p>
+    <p class="n" id="rscore"></p>
+    <p id="rtime" style="font-family:var(--mono);font-size:13px;color:var(--ink-soft);margin:8px 0 0"></p>
+    <div class="bars" id="rbars"></div>
+    <p id="rnote" style="margin:22px 0 0;font-size:16.5px;color:#2C3152"></p>
+  </div>
+  <h2>Repaso pregunta a pregunta</h2>
+  <div id="review"></div>
+  <footer>
+    El examen real puntúa en escala 100-1000 y pondera por dominio, así que este porcentaje bruto no traduce directamente a los 720. Úsalo como termómetro: por debajo del 75% aquí, todavía no estás.
+  </footer>
+</section>
+
+</div>
+
+<script>
+const Q = [
+/* ---------------- D1 · 8 ---------------- */
+{d:"D1", t:"Agentic Architecture",
+ q:"El modelo emite dos bloques tool_use en la misma respuesta. ¿Cómo continúas el loop?",
+ s:"Tu agente tiene get_student y lookup_submission. En una iteración, response.content trae los dos bloques tool_use a la vez.",
+ o:["Ejecutas la primera, devuelves su tool_result y esperas a que el modelo pida la segunda en la siguiente vuelta.",
+    "Ejecutas ambas y devuelves los dos tool_result en un único mensaje user, cada uno con su tool_use_id.",
+    "Ejecutas solo la primera y descartas la segunda: el modelo la repetirá si de verdad la necesita.",
+    "Lanzas un error, porque una respuesta con dos tool_use indica que el modelo se ha confundido."],
+ ok:1,
+ w:"Cuando el modelo pide varias tools en un mismo turno es porque son independientes y quiere paralelizarlas. Los resultados vuelven juntos, en un solo mensaje user, correlacionados por tool_use_id.",
+ k:"La A serializa sin motivo y desperdicia una llamada al modelo. La C rompe la conversación: la API espera un tool_result por cada tool_use emitido. La D convierte comportamiento normal en excepción."},
+
+{d:"D1", t:"Agentic Architecture",
+ q:"¿Agente autónomo o workflow determinista?",
+ s:"Clasificas 400 tickets al día. Los pasos son siempre los mismos y en el mismo orden: extraer campos, clasificar la categoría, enrutar a una cola. No hay decisiones que dependan de resultados intermedios.",
+ o:["Un agente con tools, para que pueda adaptarse si algún ticket es raro.",
+    "Un workflow determinista con llamadas al modelo en los pasos que lo necesitan.",
+    "Un sistema multi-agente con un coordinator, para poder escalar el volumen.",
+    "Un agente con MAX_ITERATIONS bajo, para acotar el coste."],
+ ok:1,
+ w:"La arquitectura agéntica se paga en latencia, coste y variabilidad, y solo compensa cuando el camino no se conoce de antemano. Aquí el camino es fijo: cada paso puede ser una llamada, orquestada por tu código.",
+ k:"A, C y D dan por hecha la autonomía y luego intentan contenerla. El examen pregunta esto al revés de como suena: la respuesta suele ser la arquitectura más simple que resuelve el caso."},
+
+{d:"D1", t:"Agentic Architecture",
+ q:"¿Qué tiene que llevar el prompt de una Task call al subagente?",
+ s:"Diseñas el handoff entre coordinator y subagentes de investigación.",
+ o:["Una referencia al punto de la conversación donde el coordinator explicó el objetivo.",
+    "El objetivo, el contexto necesario ya resuelto, el formato de retorno esperado y qué cuenta como terminado.",
+    "El identificador de sesión del coordinator, para que el subagente recupere el historial.",
+    "Instrucciones de tono y estilo, ya que el resto lo hereda del system prompt del coordinator."],
+ ok:1,
+ w:"El subagente arranca sin nada más que su prompt. Un handoff completo es autocontenido: objetivo, datos, forma del retorno y criterio de terminación.",
+ k:"A y C asumen acceso a un contexto que no existe. La D confunde qué se hereda: no hereda nada del coordinator."},
+
+{d:"D1", t:"Agentic Architecture",
+ q:"El agente tiene que retomar mañana un caso que hoy quedó a medias.",
+ s:"Un instructor abre una revisión el lunes, el agente avanza y la conversación se cierra. El martes el instructor vuelve para continuar.",
+ o:["Mantener la sesión abierta y confiar en que el contexto siga disponible al día siguiente.",
+    "Persistir el estado del caso fuera del modelo (identificador, decisiones tomadas, pendientes) y reconstruir el contexto al reabrirlo.",
+    "Guardar el historial completo de mensajes y reenviarlo entero en la primera llamada del martes.",
+    "Pedirle al instructor que resuma el lunes al empezar el martes."],
+ ok:1,
+ w:"La API no tiene memoria: la continuidad entre sesiones es estado externo que tú modelas. Lo que persistes son hechos y decisiones, no la transcripción.",
+ k:"La A da por hecha una persistencia que no existe. La C funciona un par de días y luego revienta por tamaño y por lost in the middle. La D traslada al usuario un trabajo que es tuyo."},
+
+{d:"D1", t:"Agentic Architecture",
+ q:"Una tool devuelve 503 Service Unavailable a mitad del loop.",
+ s:"Estás diseñando el manejo de errores del agente.",
+ o:["Clasificarlo como transitorio y reintentable: reintento con backoff, y si persiste, error estructurado hacia arriba.",
+    "Escalar a un humano de inmediato: un error del servicio no lo puede resolver el agente.",
+    "Devolver el error crudo al modelo como tool_result y dejar que decida qué hacer.",
+    "Abortar el loop y reiniciarlo desde el primer mensaje."],
+ ok:0,
+ w:"La clasificación del error decide la estrategia. Un 503 es de entorno y transitorio: backoff y reintento, y solo si agota los intentos se propaga con contexto.",
+ k:"La B escala algo que se arregla solo en dos segundos. La C delega al modelo una decisión de infraestructura que es determinista. La D tira todo el progreso del loop."},
+
+{d:"D1", t:"Agentic Architecture",
+ q:"El agente llega a 40 iteraciones y sale carísimo.",
+ s:"Los logs muestran que llama a la misma tool con exactamente los mismos argumentos una y otra vez, sin que el resultado cambie.",
+ o:["Subir MAX_ITERATIONS: claramente necesita más vueltas para resolverlo.",
+    "Bajar MAX_ITERATIONS a 5 para acotar el gasto.",
+    "Detectar la repetición de la pareja (tool, argumentos) sin progreso, cortar el loop y devolver un error estructurado con lo conseguido.",
+    "Cambiar a un modelo más capaz que no se quede atascado."],
+ ok:2,
+ w:"El síntoma no es que falten vueltas: es que no hay progreso. Un detector de no-progreso corta el bucle y te dice por qué, que es lo que necesitas para arreglar la causa (normalmente una tool que devuelve algo inútil o una descripción ambigua).",
+ k:"A gasta más. B recorta el gasto y esconde el bug: los casos legítimos que necesitan 8 vueltas también mueren. D es la familia «más recursos»."},
+
+{d:"D1", t:"Agentic Architecture",
+ q:"Seis subagentes que necesitan consultarse constantemente entre sí.",
+ s:"Tu diseño reparte una investigación en seis subagentes, y cada uno necesita saber a menudo qué han encontrado los demás para no duplicar trabajo.",
+ o:["Montar comunicación peer-to-peer entre los seis para que se coordinen directamente.",
+    "Replantear la descomposición: si necesitan hablar constantemente, las subtareas no son independientes.",
+    "Dar a los seis una memoria compartida en la que escriban sus hallazgos.",
+    "Añadir un séptimo subagente que haga de bus de mensajes entre los demás."],
+ ok:1,
+ w:"La descomposición correcta produce subtareas que se pueden resolver aisladas. La necesidad constante de coordinación es la señal de que el corte está mal hecho, no de que falte infraestructura de comunicación.",
+ k:"A, C y D construyen mecanismos cada vez más caros para sostener un reparto equivocado. Es la familia del over-engineering aplicada a topologías."},
+
+{d:"D1", t:"Agentic Architecture",
+ q:"¿En qué punto pides aprobación humana?",
+ s:"El agente redacta y envía correos a alumnos sobre el estado de su proyecto. Enviar es irreversible.",
+ o:["Al principio de la sesión, aprobando que el agente pueda operar sobre ese alumno.",
+    "Justo antes de la llamada que envía, mostrando el destinatario y el texto concretos que van a salir.",
+    "Al final, revisando en un informe diario todos los correos enviados.",
+    "Nunca, si el system prompt describe con detalle qué correos puede enviar."],
+ ok:1,
+ w:"La aprobación tiene que caer en la acción irreversible y con el payload exacto a la vista: aprobar en abstracto no es aprobar.",
+ k:"A autoriza una categoría, no un acto. C es auditoría posterior, con el correo ya enviado. D confía una garantía a un prompt."},
+
+/* ---------------- D2 · 5 ---------------- */
+{d:"D2", t:"Tool Design & MCP",
+ q:"Una tool que devuelve 8.000 filas.",
+ s:"query_submissions devuelve todas las entregas de una cohorte. El agente se queda sin contexto en cuanto la llama.",
+ o:["Aumentar la ventana de contexto usando un modelo mayor.",
+    "Añadir parámetros de filtro y paginación al schema, y que la tool devuelva un conjunto acotado más el total de coincidencias.",
+    "Truncar el tool_result a los primeros 2.000 caracteres antes de devolverlo al modelo.",
+    "Guardar el resultado en un fichero y devolver la ruta al modelo."],
+ ok:1,
+ w:"El tool_result entra entero en el contexto: el diseño de la tool es diseño de contexto. Filtrar y paginar en la tool, y devolver el total para que el modelo sepa que hay más.",
+ k:"A es más recursos. C trunca a ciegas y puede cortar justo la fila que importaba, sin que nadie se entere. D solo mueve el problema si el modelo no puede leer el fichero."},
+
+{d:"D2", t:"Tool Design & MCP",
+ q:"Un parámetro de texto libre que llega con valores inventados.",
+ s:"validate_against_rubric recibe track como string. En los logs aparecen valores como \"fullstack\", \"Full Stack Dev\" o \"FS\", y ninguno casa con los cuatro tracks reales.",
+ o:["Normalizar los valores recibidos con un mapeo de sinónimos en el código de la tool.",
+    "Declarar track como enum con los cuatro valores válidos en el input_schema.",
+    "Explicar en la descripción de la tool cuáles son los tracks válidos.",
+    "Validar después de la llamada y devolver un error para que el modelo reintente."],
+ ok:1,
+ w:"El enum en el schema restringe el espacio de valores en el momento de generar la llamada. Es la versión estructural del mismo problema que resuelve required mal puesto: se decide en el schema, no después.",
+ k:"C es prosa. A y D limpian o corrigen a posteriori: funcionan, pero pagan una ronda extra o dependen de que tu mapeo cubra la próxima variante que se invente."},
+
+{d:"D2", t:"Tool Design & MCP",
+ q:"La misma integración, tres aplicaciones distintas.",
+ s:"Tenéis un sistema interno de expedientes. Lo quieren consumir el agente de revisión, el bot de Slack y una herramienta de la oficina de admisiones.",
+ o:["Definir las tools una vez y copiar las definiciones en cada una de las tres aplicaciones.",
+    "Exponer el sistema como un servidor MCP y que las tres aplicaciones lo consuman.",
+    "Montar una tool genérica call_internal_api que reciba el endpoint como string.",
+    "Crear un subagente especializado por aplicación."],
+ ok:1,
+ w:"Ese es exactamente el caso de MCP: una integración estandarizada y reutilizable entre aplicaciones, mantenida en un único sitio.",
+ k:"A se desincroniza a la tercera semana. C convierte el schema en texto libre y pierde toda la validación. D no resuelve la integración, solo añade capas."},
+
+{d:"D2", t:"Tool Design & MCP",
+ q:"Exponer una rúbrica para que el modelo la consulte.",
+ s:"Montas un servidor MCP. La rúbrica de evaluación es un documento que el modelo necesita leer como referencia; no es una acción que ejecutar.",
+ o:["Como tool get_rubric, porque todo lo que el modelo usa se expone como tool.",
+    "Como resource, que es el primitivo para contexto consultable.",
+    "Como prompt, para que quede disponible como plantilla.",
+    "Inyectada directamente en el system prompt en cada llamada."],
+ ok:1,
+ w:"Los tres primitivos de MCP se reparten por quién controla la cosa: las tools las invoca el modelo, los resources aportan contexto y los prompts son plantillas para el usuario. Un documento de referencia es un resource.",
+ k:"A ignora la distinción que el examen mide. C confunde plantilla con contenido. D funciona pero infla cada llamada con un documento que no siempre hace falta."},
+
+{d:"D2", t:"Tool Design & MCP",
+ q:"Dos tools que hacen casi lo mismo.",
+ s:"get_grade devuelve la nota final y get_score devuelve la puntuación por criterio. El modelo las intercambia a menudo.",
+ o:["Renombrarlas a get_final_grade y get_criterion_scores, con descripciones que digan qué devuelve cada una, cuándo usarla y cuál no usar en su lugar.",
+    "Fusionarlas en una sola tool con un parámetro booleano detailed.",
+    "Forzar siempre get_grade con tool_choice y calcular el desglose en código.",
+    "Añadir al system prompt un párrafo explicando la diferencia entre nota y puntuación."],
+ ok:0,
+ w:"El misrouting entre tools parecidas se corrige en la interfaz que el modelo ve: nombres que se distinguen solos y descripciones con el cuándo, el qué devuelve y el límite explícito hacia la otra tool.",
+ k:"B esconde la decisión en un booleano opaco y el modelo se equivocará igual al ponerlo. C elimina una capacidad real. D pone en el system prompt lo que debería estar en la descripción de la tool, donde el modelo lo lee al decidir."},
+
+/* ---------------- D3 · 6 ---------------- */
+{d:"D3", t:"Claude Code",
+ q:"Claude Code no debe tocar nunca infra/.",
+ s:"El directorio infra/ contiene manifiestos de despliegue y nadie quiere ediciones automáticas ahí.",
+ o:["Escribir en el CLAUDE.md del proyecto que infra/ no se toca bajo ningún concepto.",
+    "Configurar una regla de permisos que deniegue la escritura en esa ruta.",
+    "Poner un CLAUDE.md dentro de infra/ que lo prohíba.",
+    "Un hook PostToolUse que revierta las ediciones sobre infra/."],
+ ok:1,
+ w:"Prohibición dura con consecuencia real: control determinista en la capa de permisos. El modelo no puede saltarse lo que no tiene permitido.",
+ k:"A y C son instrucciones: reducen la probabilidad, no la eliminan. D deshace daño ya hecho, y en un fichero de infraestructura eso puede llegar tarde."},
+
+{d:"D3", t:"Claude Code",
+ q:"¿Qué va en el CLAUDE.md del proyecto?",
+ s:"Estáis estrenando Claude Code en el repo y quieres que arranque siendo útil desde el primer día.",
+ o:["El histórico de decisiones de arquitectura del último año.",
+    "Los comandos de build, test y lint, las convenciones del repo y las rarezas que no se deducen del código.",
+    "La documentación completa de la API interna.",
+    "El listado de todos los ficheros del proyecto con una descripción de cada uno."],
+ ok:1,
+ w:"El CLAUDE.md es contexto operativo: lo que un compañero nuevo necesita que le cuenten porque no se deduce leyendo el repo. Corto y accionable.",
+ k:"A, C y D lo convierten en un documento largo que compite consigo mismo por la atención, y que además se desactualiza a la primera semana."},
+
+{d:"D3", t:"Claude Code",
+ q:"Un CLAUDE.md de 900 líneas que ya casi nadie ve respetado.",
+ s:"Ha ido creciendo durante meses y ahora mezcla convenciones generales con detalles de tres subsistemas concretos.",
+ o:["Reorganizarlo con headers y un índice al principio.",
+    "Recortarlo a las convenciones que aplican siempre y mover lo específico a reglas con paths por subsistema.",
+    "Partirlo en varios CLAUDE.md, uno por subdirectorio.",
+    "Mover la mitad menos importante al ~/.claude/CLAUDE.md de cada dev."],
+ ok:1,
+ w:"Un contexto que aplica siempre y que casi nunca es relevante se diluye. Lo específico va donde se dispara por path; el CLAUDE.md se queda con lo transversal.",
+ k:"A reordena el mismo volumen. C escala mal y deja fuera los directorios futuros. D rompe justo lo que hace útil el nivel project: que llegue a todos."},
+
+{d:"D3", t:"Claude Code",
+ q:"Que el linter pase después de cada edición de fichero.",
+ s:"Queréis que ninguna edición de Claude Code quede sin pasar el formateador del repo.",
+ o:["Un hook PostToolUse sobre las tools de edición que ejecute el formateador.",
+    "Una línea en el CLAUDE.md pidiendo que ejecute el linter tras cada cambio.",
+    "Un hook PreToolUse que bloquee la edición si el fichero no está formateado.",
+    "Un slash command /lint que los devs invoquen al terminar."],
+ ok:0,
+ w:"Aquí PostToolUse es justo lo correcto: la acción que quieres es reactiva y se dispara después de la edición, sin consecuencia irreversible de por medio. Pre y Post no compiten, responden a preguntas distintas.",
+ k:"B es probabilístico. C bloquea por el estado previo del fichero, que no es lo que quieres comprobar. D depende de que alguien se acuerde.",
+ note:"Contraste deliberado con el caso del refund: allí Post llegaba tarde porque el dinero ya había salido."},
+
+{d:"D3", t:"Claude Code",
+ q:"Una exploración larga que llenaría el contexto del dev.",
+ s:"Antes de tocar nada, alguien necesita mapear qué módulos dependen de la capa de autenticación. El recorrido genera muchísimo output intermedio.",
+ o:["Ejecutarlo en la sesión principal y usar /compact al terminar.",
+    "Delegarlo a un subagente con su propio contexto, que devuelva solo las conclusiones.",
+    "Aumentar el límite de contexto de la sesión.",
+    "Trocear la exploración en diez sesiones cortas."],
+ ok:1,
+ w:"El aislamiento de contexto es el mecanismo: el trabajo verboso vive en un contexto separado y al principal solo vuelve el resultado.",
+ k:"A limpia después de haber contaminado, y compactar pierde información. C es más recursos. D fragmenta la tarea y le quita al análisis la visión de conjunto."},
+
+{d:"D3", t:"Claude Code",
+ q:"Un skill que solo tiene sentido en un repo.",
+ s:"Has escrito un skill que aplica el protocolo de migraciones de vuestro repo de datos. En los demás repos no pinta nada.",
+ o:["En el ~/.claude/skills/ de cada dev del equipo de datos.",
+    "En el .claude/skills/ del repositorio de datos.",
+    "En el ~/.claude/skills/ de todos, con una condición en el frontmatter que compruebe el repo.",
+    "En el CLAUDE.md del repositorio de datos."],
+ ok:1,
+ w:"El nivel del skill se elige por su alcance: si pertenece a un proyecto, vive en el proyecto, se versiona con él y llega a quien lo clona.",
+ k:"A y C lo instalan donde no aplica y hay que mantenerlo por persona. D confunde skill con instrucción de contexto."},
+
+/* ---------------- D4 · 6 ---------------- */
+{d:"D4", t:"Prompt Engineering",
+ q:"Formato exacto de salida y razonamiento largo a la vez.",
+ s:"Necesitas que el modelo razone sobre un caso complejo y que el resultado llegue con una estructura fija que tu código pueda leer.",
+ o:["Prefill del turno assistant con el comienzo de la estructura.",
+    "tool_use con input_schema para el resultado, dejando que el razonamiento ocurra antes.",
+    "Un prompt que pida primero el razonamiento y después el JSON, separados por un delimitador.",
+    "Dos llamadas: una para razonar y otra para formatear el resultado de la primera."],
+ ok:1,
+ w:"El prefill controla el arranque, no garantiza el resto, y además no es compatible con extended thinking. La garantía de estructura sigue siendo tool_use.",
+ k:"C vuelve a depender de que el modelo respete un formato descrito en prosa. D funciona, pero paga dos llamadas para lo que una resuelve con schema."},
+
+{d:"D4", t:"Prompt Engineering",
+ q:"El 70% de los casos salen clasificados como medium.",
+ s:"Tu enum de urgencia tiene high, medium y low. Al revisar a mano, muchos de esos medium eran claramente high o low.",
+ o:["Eliminar medium y forzar una decisión binaria.",
+    "Definir cada nivel con condiciones verificables, incluida la de qué NO cuenta para cada uno.",
+    "Bajar la temperatura para que las clasificaciones sean más decididas.",
+    "Añadir un campo de confianza y revisar a mano los medium de baja confianza."],
+ ok:1,
+ w:"La categoría intermedia se convierte en vertedero cuando los criterios no están definidos: ante la duda, el modelo elige la opción que nunca es del todo errónea. Se arregla definiendo, no quitando.",
+ k:"A fuerza decisiones falsas en los casos que sí son intermedios. C es sampling, no criterio. D es self-reported confidence, mal calibrado justo en los casos dudosos."},
+
+{d:"D4", t:"Prompt Engineering",
+ q:"Extracción sobre documentos de 60 páginas.",
+ s:"Cada memoria de proyecto tiene secciones muy distintas y necesitas campos de todas ellas.",
+ o:["Una sola llamada con el documento completo y un schema con todos los campos.",
+    "Una pasada por sección con el schema de esa sección, y consolidación en código.",
+    "Resumir el documento primero y extraer sobre el resumen.",
+    "Un modelo con ventana mayor y una única llamada."],
+ ok:1,
+ w:"Múltiples pasadas acotadas reparten la atención del modelo y hacen que cada extracción tenga un objetivo claro. Consolidar es trabajo determinista, así que lo hace tu código.",
+ k:"A y D confían en que la atención se reparta bien en un contexto enorme: es donde aparece el lost in the middle. C extrae sobre una versión que ya perdió los datos concretos."},
+
+{d:"D4", t:"Prompt Engineering",
+ q:"JSON válido y semánticamente imposible.",
+ s:"La extracción devuelve una fecha de entrega anterior a la fecha de matrícula. El schema no se queja: los dos campos son strings con formato de fecha.",
+ o:["Añadir la restricción al input_schema para que JSON Schema la valide.",
+    "Validar la coherencia entre campos en tu código y, si falla, reintentar con el error concreto.",
+    "Explicar en la descripción del campo que la entrega es siempre posterior a la matrícula.",
+    "Asumirlo: el schema garantiza sintaxis, no semántica, y no hay más que hacer."],
+ ok:1,
+ w:"El schema cubre la forma; la coherencia entre campos es validación semántica y vive en tu código. Y este es un caso donde el retry con feedback sí funciona, porque el dato está en el documento.",
+ k:"A pide al schema algo que no expresa. C es prosa. D se rinde ante un fallo que tiene arreglo estándar."},
+
+{d:"D4", t:"Prompt Engineering",
+ q:"Un system prompt largo y estable en miles de llamadas.",
+ s:"Tu clasificador manda cada día 5.000 peticiones que comparten un system prompt de 4.000 tokens con las instrucciones y los ejemplos.",
+ o:["Acortar el system prompt hasta que quepa en unos cientos de tokens.",
+    "Cachear el prefijo estable para no pagarlo entero en cada llamada.",
+    "Mover las instrucciones al mensaje user para que ocupen menos.",
+    "Mandar las instrucciones solo en la primera llamada del día."],
+ ok:1,
+ w:"Un prefijo grande, estable y muy reutilizado es el caso de libro del caching: pagas por él una vez y las llamadas siguientes lo reutilizan.",
+ k:"A sacrifica los ejemplos, que son justo lo que sostiene la consistencia. C no ahorra tokens y además pierde autoridad. D asume una memoria entre llamadas que no existe."},
+
+{d:"D4", t:"Prompt Engineering",
+ q:"¿Cuándo sí tiene sentido bajar la temperatura?",
+ s:"Alguien del equipo propone poner temperature en 0 en todo el pipeline.",
+ o:["Siempre: elimina la variabilidad y hace el sistema reproducible.",
+    "Cuando el criterio ya está definido de forma determinista y solo quieres reducir la variación del sampling.",
+    "Nunca: reduce la calidad del razonamiento del modelo.",
+    "Cuando el output es inconsistente, para estabilizarlo."],
+ ok:1,
+ w:"La temperatura actúa sobre el muestreo, no sobre la definición del criterio. Con la regla bien especificada es un ajuste razonable; como remedio a la ambigüedad, no arregla nada.",
+ k:"D es la trampa recurrente: la inconsistencia por criterio vago sigue igual a temperatura 0, solo que ahora falla de forma reproducible. A y C generalizan de más en cada dirección."},
+
+/* ---------------- D5 · 5 ---------------- */
+{d:"D5", t:"Context & Reliability",
+ q:"El agente empieza a mezclar datos de dos alumnos.",
+ s:"El instructor lleva 40 turnos y ha tratado dos casos en la misma conversación. El agente empieza a atribuir a uno hechos del otro.",
+ o:["Una conversación separada por caso, o un case facts block que marque cuál es el caso activo y separe los hechos por identificador.",
+    "Pedir al instructor que abra un ticket por alumno.",
+    "Recordar en cada turno, dentro del prompt, que no debe mezclar alumnos.",
+    "Compactar la conversación para reducir el ruido."],
+ ok:0,
+ w:"La contaminación entre casos se resuelve estructurando el contexto: hechos atribuidos a un identificador, y el caso activo señalado explícitamente.",
+ k:"B traslada el problema al usuario. C es un recordatorio contra un fallo de estructura. D comprime y hace más probable que se pierda la atribución."},
+
+{d:"D5", t:"Context & Reliability",
+ q:"Un 429 en la cuarta iteración de ocho.",
+ s:"El agente lleva media conversación y varias tools ejecutadas cuando la API devuelve rate limit.",
+ o:["Reiniciar el loop desde el mensaje inicial del usuario.",
+    "Backoff exponencial y reintentar esa llamada, conservando el estado del loop.",
+    "Devolver al usuario un error y pedirle que lo intente más tarde.",
+    "Reducir el número de tools disponibles para que el agente haga menos llamadas."],
+ ok:1,
+ w:"El estado del loop vive en tu lista de mensajes: una llamada fallida por rate limit se reintenta sin perder nada de lo hecho.",
+ k:"A repite y vuelve a pagar todo el trabajo previo. C convierte un fallo transitorio en fallo de cara al usuario. D cambia el diseño del agente por un problema de cuota."},
+
+{d:"D5", t:"Context & Reliability",
+ q:"El agente no debe revelar notas todavía sin publicar.",
+ s:"Es una regla dura de política académica.",
+ o:["Instrucción explícita y contundente en el system prompt.",
+    "Que la tool no devuelva las notas no publicadas: el dato no llega al contexto.",
+    "Un hook PostToolUse que borre las notas no publicadas de la respuesta antes de mostrarla.",
+    "Few-shot examples mostrando cómo negarse educadamente."],
+ ok:1,
+ w:"El control más fuerte es el que hace imposible el fallo: si el dato nunca entra en el contexto, no hay nada que filtrar. La restricción vive en la fuente de datos.",
+ k:"A y D son probabilísticos. C ya tuvo el dato dentro del contexto y depende de acertar al detectarlo en el texto de salida."},
+
+{d:"D5", t:"Context & Reliability",
+ q:"¿Cómo sabes si el agente va bien en producción?",
+ s:"Lleva un mes desplegado y os preguntan por su fiabilidad.",
+ o:["Por los thumbs up/down de los usuarios.",
+    "Por un conjunto de casos etiquetados que se ejecuta periódicamente, con la tasa de acierto desglosada por categoría.",
+    "Por el porcentaje de conversaciones que terminan sin escalar.",
+    "Por la valoración que el propio modelo hace de sus respuestas."],
+ ok:1,
+ w:"Sin casos con respuesta conocida no hay medida: el eval set desglosado por categoría te dice además dónde falla, que es lo que permite arreglarlo.",
+ k:"A mide satisfacción y llega sesgado. C confunde no escalar con acertar: el fallo peor es justo el que no escala. D es self-report sin calibrar."},
+
+{d:"D5", t:"Context & Reliability",
+ q:"Cambio de modelo antes de desplegar.",
+ s:"Sale una versión nueva y queréis actualizar el pipeline de extracción, que lleva meses estable.",
+ o:["Desplegar y vigilar los errores que reporten los usuarios la primera semana.",
+    "Pasar el eval set con el modelo nuevo y comparar contra la línea base antes de desplegar.",
+    "Desplegar solo si el modelo nuevo es más capaz según los benchmarks publicados.",
+    "Mantener el modelo antiguo indefinidamente: si funciona, no se toca."],
+ ok:1,
+ w:"Un cambio de modelo es un cambio que puede regresionar comportamientos que dependían de detalles del anterior. El eval set convierte esa duda en un número comparable.",
+ k:"A usa a los usuarios de suite de tests. C confía en benchmarks generales para un caso particular. D evita el riesgo renunciando a las mejoras, y el modelo antiguo acaba retirándose igual."}
+];
+
+const TOTAL_SEC = 60 * 60;
+const ans = new Array(Q.length).fill(null);
+const flags = new Array(Q.length).fill(false);
+let cur = 0, left = TOTAL_SEC, timer = null;
+const $ = id => document.getElementById(id);
+
+function fmt(s){
+  const m = Math.floor(s / 60), r = s % 60;
+  return String(m).padStart(2, "0") + ":" + String(r).padStart(2, "0");
+}
+
+function tick(){
+  left--;
+  $("clock").textContent = fmt(Math.max(left, 0));
+  $("clock").className = left <= 300 ? "crit" : (left <= 900 ? "warn" : "");
+  if(left <= 0){ clearInterval(timer); finish(); }
+}
+
+function start(){
+  $("intro").style.display = "none";
+  $("exam").style.display = "block";
+  $("bar").style.display = "block";
+  buildGrid();
+  paint();
+  timer = setInterval(tick, 1000);
+  window.scrollTo(0, 0);
+}
+
+function buildGrid(){
+  const g = $("grid");
+  g.innerHTML = "";
+  Q.forEach((_, n) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.textContent = n + 1;
+    b.addEventListener("click", () => { cur = n; paint(); window.scrollTo(0, 0); });
+    g.appendChild(b);
+  });
+}
+
+function refreshGrid(){
+  [...$("grid").children].forEach((b, n) => {
+    b.className = (ans[n] !== null ? "done " : "") + (flags[n] ? "flagged " : "") + (n === cur ? "here" : "");
+  });
+  const done = ans.filter(a => a !== null).length;
+  $("progress").textContent = done + " / " + Q.length + " respondidas";
+}
+
+function paint(){
+  const q = Q[cur];
+  $("qmeta").textContent = "Pregunta " + (cur + 1) + " de " + Q.length + " · " + q.d + " " + q.t;
+  $("qtext").textContent = q.q;
+  $("qscen").textContent = q.s;
+  const box = $("opts");
+  box.innerHTML = "";
+  q.o.forEach((text, n) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "opt" + (ans[cur] === n ? " sel" : "");
+    const l = document.createElement("span");
+    l.className = "letter";
+    l.textContent = "ABCD"[n];
+    const t = document.createElement("span");
+    t.textContent = text;
+    b.append(l, t);
+    b.addEventListener("click", () => { ans[cur] = n; paint(); });
+    box.appendChild(b);
+  });
+  $("prev").disabled = cur === 0;
+  $("next").textContent = cur === Q.length - 1 ? "Ir a corregir" : "Siguiente →";
+  $("flag").setAttribute("aria-pressed", flags[cur] ? "true" : "false");
+  refreshGrid();
+}
+
+$("start").addEventListener("click", start);
+$("prev").addEventListener("click", () => { if(cur > 0){ cur--; paint(); window.scrollTo(0,0);} });
+$("next").addEventListener("click", () => {
+  if(cur < Q.length - 1){ cur++; paint(); window.scrollTo(0,0); } else { finish(); }
+});
+$("flag").addEventListener("click", () => { flags[cur] = !flags[cur]; paint(); });
+$("finish").addEventListener("click", () => {
+  const blank = ans.filter(a => a === null).length;
+  if(blank > 0 && !confirm("Te quedan " + blank + " sin responder. ¿Corregir igualmente?")) return;
+  finish();
+});
+
+function finish(){
+  clearInterval(timer);
+  $("exam").style.display = "none";
+  $("bar").style.display = "none";
+  $("results").style.display = "block";
+
+  let hits = 0;
+  const byD = {};
+  Q.forEach((q, n) => {
+    byD[q.d] = byD[q.d] || {ok:0, all:0};
+    byD[q.d].all++;
+    if(ans[n] === q.ok){ hits++; byD[q.d].ok++; }
+  });
+  const pct = Math.round(hits * 100 / Q.length);
+  $("rscore").innerHTML = hits + " <span>/ " + Q.length + " · " + pct + "%</span>";
+  const used = TOTAL_SEC - Math.max(left, 0);
+  $("rtime").textContent = "tiempo empleado " + fmt(used) + " · " + (used / Q.length).toFixed(0) + " s por pregunta";
+
+  const names = {D1:"D1 agéntica 27%", D2:"D2 tools/MCP 18%", D3:"D3 Claude Code 20%", D4:"D4 prompting 20%", D5:"D5 contexto 15%"};
+  const bars = $("rbars");
+  bars.innerHTML = "";
+  ["D1","D2","D3","D4","D5"].forEach(d => {
+    const s = byD[d];
+    const p = Math.round(s.ok * 100 / s.all);
+    const row = document.createElement("div");
+    row.className = "row";
+    row.innerHTML = '<span class="lab">' + names[d] + '</span>' +
+      '<span class="track"><span class="fill' + (p < 75 ? " low" : "") + '" style="width:' + p + '%"></span></span>' +
+      '<span>' + s.ok + "/" + s.all + '</span>';
+    bars.appendChild(row);
+  });
+
+  const weak = ["D1","D2","D3","D4","D5"].filter(d => byD[d].ok / byD[d].all < 0.75);
+  $("rnote").textContent = weak.length
+    ? "Por debajo del 75% en: " + weak.map(d => names[d]).join(", ") + ". Ahí es donde toca volver, empezando por el dominio de más peso."
+    : "Por encima del 75% en los cinco dominios. Repite el simulacro en unos días para comprobar que se sostiene.";
+
+  const rev = $("review");
+  rev.innerHTML = "";
+  Q.forEach((q, n) => {
+    const right = ans[n] === q.ok;
+    const el = document.createElement("div");
+    el.className = "rev";
+    const head = document.createElement("div");
+    head.className = "head";
+    const st = document.createElement("span");
+    st.className = "st " + (right ? "ok" : "bad");
+    st.textContent = right ? "OK" : "FALLO";
+    const qq = document.createElement("span");
+    qq.className = "q";
+    qq.textContent = (n + 1) + ". " + q.q + "  [" + q.d + "]";
+    head.append(st, qq);
+    const why = document.createElement("div");
+    why.className = "why";
+    const p1 = document.createElement("p");
+    const b = document.createElement("b");
+    b.textContent = "ABCD"[q.ok] + ") " + q.o[q.ok];
+    p1.appendChild(b);
+    const p2 = document.createElement("p");
+    p2.textContent = q.w;
+    why.append(p1, p2);
+    if(!right && ans[n] !== null){
+      const p3 = document.createElement("p");
+      p3.className = "miss";
+      p3.textContent = "Marcaste " + "ABCD"[ans[n]] + ". " + q.k;
+      why.appendChild(p3);
+    } else {
+      const p3 = document.createElement("p");
+      p3.style.color = "var(--ink-soft)";
+      p3.textContent = q.k;
+      why.appendChild(p3);
+    }
+    if(q.note){
+      const p4 = document.createElement("p");
+      p4.style.color = "var(--mark)";
+      p4.textContent = q.note;
+      why.appendChild(p4);
+    }
+    el.append(head, why);
+    rev.appendChild(el);
+  });
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>

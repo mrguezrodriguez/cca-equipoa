@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CCA-F · chuleta de la víspera</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1B1F3B;--soft:#565C7E;--line:#B9C0D0;--si:#0B6E4F;--no:#A83246;--mark:#B8891C;
+    --display:"Bricolage Grotesque","Helvetica Neue",Arial,sans-serif;
+    --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;background:#DFE3EA;color:var(--ink);
+    font-family:var(--mono);font-size:8.4pt;line-height:1.34;
+    -webkit-font-smoothing:antialiased;
+  }
+  .sheet{
+    width:210mm;min-height:297mm;margin:22px auto;background:#fff;padding:11mm 11mm 8mm;
+    box-shadow:0 2px 22px rgba(27,31,59,.18);
+  }
+  .top{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1.6pt solid var(--ink);padding-bottom:5px;margin-bottom:9px}
+  .top h1{font-family:var(--display);font-weight:800;font-size:15pt;margin:0;letter-spacing:-.01em}
+  .top .meta{font-size:7.4pt;color:var(--soft);letter-spacing:.04em}
+  .axis{
+    border:1pt solid var(--ink);padding:6px 9px;margin:0 0 9px;display:flex;gap:10px;align-items:baseline;
+    font-size:8.6pt;
+  }
+  .axis b{font-family:var(--display);font-size:9.4pt;white-space:nowrap}
+  .axis .no{color:var(--no)}
+  .axis .si{color:var(--si)}
+
+  .cols{column-count:2;column-gap:7mm;column-fill:balance}
+  .blk{break-inside:avoid;margin:0 0 8px;border:.6pt solid var(--line)}
+  .blk h2{
+    font-family:var(--display);font-weight:700;font-size:8.6pt;margin:0;padding:3px 7px;
+    background:var(--ink);color:#fff;letter-spacing:.01em;display:flex;justify-content:space-between;
+  }
+  .blk h2 span{font-family:var(--mono);font-weight:400;font-size:7pt;opacity:.75}
+  table{width:100%;border-collapse:collapse}
+  td{padding:3px 7px;border-bottom:.4pt solid #E1E5EC;vertical-align:top}
+  tr:last-child td{border-bottom:0}
+  td.k{white-space:nowrap;color:var(--ink);font-weight:600;width:1%}
+  td.k.g{color:var(--si)}
+  td.k.r{color:var(--no)}
+  .blk ul{margin:0;padding:4px 7px 5px 20px}
+  .blk li{margin:0 0 2.5px}
+  .arrow{color:var(--soft)}
+
+  .foot{border-top:1.6pt solid var(--ink);margin-top:6px;padding-top:5px;font-size:7.6pt;color:var(--soft);display:flex;justify-content:space-between;gap:10px}
+  .foot b{color:var(--ink)}
+
+  .print{
+    position:fixed;right:18px;bottom:18px;background:var(--ink);color:#fff;border:0;
+    font-family:var(--display);font-weight:700;font-size:13px;padding:11px 20px;cursor:pointer;
+  }
+  .print:hover{background:#2A3060}
+
+  @media print{
+    @page{size:A4 portrait;margin:0}
+    body{background:#fff}
+    .sheet{width:auto;min-height:0;margin:0;padding:9mm 10mm;box-shadow:none}
+    .print{display:none}
+  }
+</style>
+</head>
+<body>
+
+<div class="sheet">
+
+  <div class="top">
+    <h1>CCA-F · lo que hay que saber frío</h1>
+    <div class="meta">60 preguntas · 120 min · 720/1000 · D1 27 · D2 18 · D3 20 · D4 20 · D5 15</div>
+  </div>
+
+  <div class="axis">
+    <b>El eje:</b>
+    <span><span class="no">mejora probabilística</span> (prosa, heurística, self-report, recordatorio) frente a <span class="si">garantía estructural</span> (schema, criterio verificable, señal de la API, hook, permiso). Ante dos opciones plausibles, gana la que <span class="si">garantiza</span>.</span>
+  </div>
+
+  <div class="cols">
+
+    <div class="blk">
+      <h2>Loop <span>D1</span></h2>
+      <table>
+        <tr><td class="k">tool_use</td><td>ejecutas, añades tool_result como <em>user</em>, sigues</td></tr>
+        <tr><td class="k">end_turn</td><td>única salida real</td></tr>
+        <tr><td class="k">MAX_ITER</td><td>salvaguarda, nunca mecanismo de parada</td></tr>
+        <tr><td class="k r">sin texto</td><td>no significa fin: tool_use puede venir solo</td></tr>
+        <tr><td class="k r">parsear</td><td>"I'm done" rompe con cada wording</td></tr>
+        <tr><td class="k">N tool_use</td><td>ejecutas todas, N tool_result en un mensaje</td></tr>
+      </table>
+    </div>
+
+    <div class="blk">
+      <h2>Multi-agente <span>D1</span></h2>
+      <ul>
+        <li>Paralelo = las N Task calls <b>en un mismo turno</b>.</li>
+        <li>Subagente = contexto aislado: todo explícito en la Task call (objetivo, datos, formato, criterio de fin).</li>
+        <li>Fallo a mitad → structured error con categoría, retryable y <b>partial_results</b>. El coordinator decide.</li>
+        <li>Fuentes que discrepan → contested finding con provenance. Nunca promediar.</li>
+        <li>Reporte incompleto y subagentes OK → mirar la <b>decomposition</b>.</li>
+        <li>Hueco concreto → re-delegación <b>targeted</b>, no rebootear.</li>
+        <li>Necesitan hablar constantemente → el corte está mal hecho.</li>
+        <li>Least privilege: cada rol, solo sus tools.</li>
+      </ul>
+    </div>
+
+    <div class="blk">
+      <h2>tool_choice <span>D2 · D4</span></h2>
+      <table>
+        <tr><td class="k r">auto</td><td>puede contestar en texto · chat</td></tr>
+        <tr><td class="k g">any</td><td>alguna tool, elige cuál · varios tipos de doc</td></tr>
+        <tr><td class="k g">tool:X</td><td>esa tool · una sola forma de output</td></tr>
+      </table>
+    </div>
+
+    <div class="blk">
+      <h2>Tools y MCP <span>D2</span></h2>
+      <ul>
+        <li>Descripción = interfaz: cuándo usarla, qué devuelve, límites hacia la otra tool, ejemplo.</li>
+        <li>Valores cerrados → <b>enum en el schema</b>, no en la descripción.</li>
+        <li>Resultado enorme → filtro y paginación en la tool: el tool_result entra entero al contexto.</li>
+        <li>MCP = integración reutilizable entre apps; tool local = lógica propia.</li>
+        <li>Primitivos: <b>tools</b> (el modelo actúa) · <b>resources</b> (contexto consultable) · <b>prompts</b> (plantillas).</li>
+        <li><b>Built-in</b>: de servidor (búsqueda web, ejecución de código) se resuelven solas; de cliente (editor, bash, computer use) las ejecutas tú.</li>
+        <li>Tool que falla → error estructurado <b>como tool_result</b>, no excepción.</li>
+      </ul>
+    </div>
+
+    <div class="blk">
+      <h2>Claude Code <span>D3 · 20%</span></h2>
+      <table>
+        <tr><td class="k">.claude/CLAUDE.md</td><td>estándares de equipo (project, git)</td></tr>
+        <tr><td class="k">~/.claude/</td><td>personal, no se comparte</td></tr>
+        <tr><td class="k">.claude/rules/</td><td>paths: glob → dispara por patrón</td></tr>
+        <tr><td class="k">.claude/commands/</td><td>slash commands compartidos</td></tr>
+        <tr><td class="k">context: fork</td><td>skill verboso, contexto aislado</td></tr>
+        <tr><td class="k">allowed-tools</td><td>seguridad, NO aislamiento</td></tr>
+        <tr><td class="k">permisos</td><td>prohibición dura por ruta</td></tr>
+        <tr><td class="k">plan mode</td><td>multi-fichero + decisión de diseño</td></tr>
+        <tr><td class="k">claude -p</td><td>no interactivo · sin él CI se cuelga</td></tr>
+        <tr><td class="k">--output-format json</td><td>+ --json-schema = parseable</td></tr>
+        <tr><td class="k">precedencia</td><td>enterprise &gt; project &gt; user</td></tr>
+      </table>
+    </div>
+
+    <div class="blk">
+      <h2>Schema <span>D4</span></h2>
+      <table>
+        <tr><td class="k g">tool_use</td><td>sintaxis garantizada, llega parseado</td></tr>
+        <tr><td class="k">required</td><td>solo lo que SIEMPRE está (si no, inventa)</td></tr>
+        <tr><td class="k">["x","null"]</td><td>lo que puede faltar</td></tr>
+        <tr><td class="k">"other"+detail</td><td>fuera de catálogo</td></tr>
+        <tr><td class="k">"unclear"</td><td>no puede decidir (≠ no encaja)</td></tr>
+        <tr><td class="k r">prosa/regex</td><td>nunca para garantizar JSON</td></tr>
+      </table>
+    </div>
+
+    <div class="blk">
+      <h2>Prompting <span>D4</span></h2>
+      <ul>
+        <li>Adjetivo ("conservador", "delicado") → condiciones verificables + <b>qué NO cuenta</b>.</li>
+        <li>Prosa inconsistente → <b>2-4 few-shot con el razonamiento</b>.</li>
+        <li>Retry <b>con feedback específico</b> + tope: arregla formato, estructura, aritmética. No crea datos ausentes.</li>
+        <li>Dato que no está en la fuente → null + resolver en código.</li>
+        <li>Coherencia entre campos → validación semántica en código.</li>
+        <li>Docs largos → varias pasadas acotadas + consolidar en código.</li>
+        <li>Revisar código generado → <b>instancia limpia</b>; reviews grandes → multi-pass.</li>
+        <li>Prefill: controla el arranque, no el resto, y no con extended thinking.</li>
+        <li>temperature 0: reduce sampling, no define criterios.</li>
+        <li>Prefijo largo y estable, muy reutilizado → caching.</li>
+      </ul>
+    </div>
+
+    <div class="blk">
+      <h2>Batch vs síncrona <span>D4</span></h2>
+      <table>
+        <tr><td class="k">batch</td><td>50% coste · hasta 24 h · custom_id correlaciona · sin multi-turn</td></tr>
+        <tr><td class="k">síncrona</td><td>cualquier cosa que alguien esté esperando</td></tr>
+      </table>
+    </div>
+
+    <div class="blk">
+      <h2>Contexto <span>D5</span></h2>
+      <table>
+        <tr><td class="k g">case facts</td><td>IDs, importes, fechas, concerns · fuera del summary · reinyectado</td></tr>
+        <tr><td class="k">summary</td><td>turnos antiguos, en general</td></tr>
+        <tr><td class="k">verbatim</td><td>últimos N turnos, literales</td></tr>
+        <tr><td class="k">retrieval</td><td>historial enorme: recupera, no resume</td></tr>
+        <tr><td class="k r">/compact solo</td><td>borra justo los números</td></tr>
+        <tr><td class="k r">+ ventana</td><td>lost in the middle sigue ahí</td></tr>
+        <tr><td class="k">caching</td><td>prefijo grande, estable y muy reutilizado</td></tr>
+        <tr><td class="k">entre sesiones</td><td>estado externo: decisiones y pendientes, no la transcripción</td></tr>
+        <tr><td class="k">exploración</td><td>contexto aislado antes, no /compact después</td></tr>
+      </table>
+    </div>
+
+    <div class="blk">
+      <h2>Fiabilidad <span>D5</span></h2>
+      <table>
+        <tr><td class="k g">PreToolUse</td><td>precondición · consecuencia de negocio · bloquea antes</td></tr>
+        <tr><td class="k">PostToolUse</td><td>reactivo (lint tras editar) · audita, no previene</td></tr>
+        <tr><td class="k">prompt</td><td>guía: tono, estilo, orden</td></tr>
+        <tr><td class="k g">en la fuente</td><td>lo que no llega al contexto no se filtra</td></tr>
+        <tr><td class="k">escalación</td><td>criterios explícitos + few-shot con el policy gap</td></tr>
+        <tr><td class="k r">nunca</td><td>sentiment · self-confidence sin calibrar · classifier</td></tr>
+        <tr><td class="k">medir</td><td>eval set etiquetado por categoría · repetir al cambiar de modelo</td></tr>
+      </table>
+    </div>
+
+    <div class="blk">
+      <h2>Conversacional <span>S7</span></h2>
+      <ul>
+        <li>La API es <b>stateless</b>: la memoria la montas tú.</li>
+        <li>Drift dentro del límite de tokens → reinyectar guidelines en breakpoints.</li>
+        <li>Guidelines en <b>system</b>. En user pierden autoridad.</li>
+        <li>Contradicción del usuario → surface &amp; clarify.</li>
+        <li>Petición vaga → preguntar <b>listando</b> los candidatos que ya tienes.</li>
+        <li>Conversación nueva cada N turnos: nunca.</li>
+      </ul>
+    </div>
+
+    <div class="blk">
+      <h2>Las 7 formas del distractor</h2>
+      <ul>
+        <li><b>Flag inventado</b> — CLAUDE_HEADLESS, --batch, output: summary.</li>
+        <li><b>Más prosa</b> — reescribir, mayúsculas, bullets.</li>
+        <li><b>Más recursos</b> — modelo mayor, max_tokens, ventana, temp 0.</li>
+        <li><b>Over-engineering</b> — classifier, router, fallback entre APIs.</li>
+        <li><b>Parche</b> — regex, copiar a mano, promediar.</li>
+        <li><b>Borrón y cuenta nueva</b> — sesión nueva, reiterar todo.</li>
+        <li><b>Correcto en otro universo</b> — cierto en general, no es el fallo del enunciado.</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="foot">
+    <span><b>Ritmo</b> 2 min/pregunta · contesta todas · marca y vuelve</span>
+    <span><b>Antes de decidir</b> relee el dato que parece decorativo: "dentro de los token limits", "los subagentes ejecutaron bien", "el 8% de los casos"</span>
+  </div>
+
+</div>
+
+<button class="print" onclick="window.print()">Imprimir</button>
+</body>
+</html>
