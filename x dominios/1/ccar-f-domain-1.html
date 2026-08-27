@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Domain 1 · Agentic Architecture &amp; Orchestration — CCAR-F</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#E7ECF1;
+  --panel:#FAFBFC;
+  --ink:#0F1A26;
+  --ink-soft:#4A5A6B;
+  --line:#C9D3DC;
+  --det:#0C6D78;      /* determinista / correcto */
+  --anti:#A62347;     /* antipatrón / trampa */
+  --now:#9C6600;      /* matiz: producto real hoy */
+  --display:'Space Grotesk',system-ui,sans-serif;
+  --body:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:70px}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--body);font-size:16.5px;line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:820px;margin:0 auto;padding:0 22px}
+
+/* ---------- nav ---------- */
+nav{
+  position:sticky;top:0;z-index:20;background:rgba(231,236,241,.93);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--line);
+}
+nav .wrap{display:flex;gap:2px;overflow-x:auto;padding-top:9px;padding-bottom:9px;scrollbar-width:none}
+nav .wrap::-webkit-scrollbar{display:none}
+nav a{
+  font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);text-decoration:none;
+  padding:4px 9px;border-radius:4px;white-space:nowrap;
+}
+nav a:hover,nav a:focus-visible{background:var(--ink);color:var(--panel)}
+
+/* ---------- hero ---------- */
+header{padding:56px 0 40px;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:var(--mono);font-size:12.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--det)}
+h1{
+  font-family:var(--display);font-weight:700;font-size:clamp(2.1rem,6vw,3.1rem);
+  line-height:1.06;letter-spacing:-.025em;margin:.28em 0 .3em;
+}
+.lede{font-size:1.09rem;color:var(--ink-soft);max-width:60ch;margin:0}
+.hero-meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.pill{
+  font-family:var(--mono);font-size:12px;border:1px solid var(--line);background:var(--panel);
+  padding:5px 10px;border-radius:100px;
+}
+.pill b{color:var(--det);font-weight:600}
+
+/* ---------- diagrama ---------- */
+figure{margin:34px 0 0;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:20px 18px 14px}
+figure svg{width:100%;height:auto;display:block}
+figcaption{font-family:var(--mono);font-size:12px;color:var(--ink-soft);margin-top:12px;text-align:center}
+
+/* ---------- secciones ---------- */
+section{padding:46px 0;border-bottom:1px solid var(--line)}
+.tag{font-family:var(--mono);font-size:12.5px;color:var(--det);letter-spacing:.06em}
+h2{font-family:var(--display);font-weight:700;font-size:1.62rem;letter-spacing:-.018em;margin:.18em 0 .55em;line-height:1.18}
+h3{font-family:var(--display);font-weight:500;font-size:1.06rem;margin:1.9em 0 .5em;letter-spacing:-.01em}
+p{margin:0 0 1em}
+ul,ol{margin:0 0 1em;padding-left:1.15em}
+li{margin-bottom:.42em}
+strong{font-weight:600}
+
+/* ---------- keys ---------- */
+.k{
+  font-family:var(--mono);font-size:.88em;background:#DCE7E9;color:#08525A;
+  padding:1px 5px;border-radius:3px;font-weight:600;white-space:nowrap;
+}
+.key{
+  border-left:3px solid var(--det);background:var(--panel);
+  padding:14px 16px;margin:20px 0;border-radius:0 6px 6px 0;
+}
+.key .lbl{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--det);display:block;margin-bottom:5px}
+.key p:last-child{margin-bottom:0}
+
+.trap{border-left:3px solid var(--anti);background:#FBF3F5;padding:14px 16px;margin:20px 0;border-radius:0 6px 6px 0}
+.trap .lbl{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--anti);display:block;margin-bottom:5px}
+.trap ul{margin-bottom:0}
+.trap p:last-child{margin-bottom:0}
+
+.now{border-left:3px solid var(--now);background:#FBF6EC;padding:14px 16px;margin:20px 0;border-radius:0 6px 6px 0}
+.now .lbl{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--now);display:block;margin-bottom:5px}
+.now p:last-child{margin-bottom:0}
+
+.case{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:15px 17px;margin:20px 0}
+.case .lbl{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-soft);display:block;margin-bottom:6px}
+.case p:last-child{margin-bottom:0}
+
+/* ---------- tablas ---------- */
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:.93rem;background:var(--panel)}
+th,td{text-align:left;padding:9px 11px;border:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);font-weight:600;background:#F0F3F6}
+td code,li code,p code{font-family:var(--mono);font-size:.87em;background:#E3E9EE;padding:1px 4px;border-radius:3px}
+
+/* ---------- quiz ---------- */
+.quiz{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:22px 20px;margin:26px 0}
+.quiz h3{margin-top:0;font-family:var(--display);font-weight:700;font-size:1.2rem}
+.q{padding:16px 0;border-top:1px solid var(--line)}
+.q:first-of-type{border-top:none;padding-top:6px}
+.q .num{font-family:var(--mono);font-size:11.5px;color:var(--det);letter-spacing:.08em}
+.q .stem{margin:5px 0 11px;font-weight:600;line-height:1.45}
+.opt{
+  display:block;width:100%;text-align:left;font:inherit;font-size:.95rem;line-height:1.45;
+  background:#fff;border:1px solid var(--line);border-radius:5px;
+  padding:9px 12px;margin-bottom:7px;cursor:pointer;transition:border-color .12s,background .12s;
+}
+.opt:hover:not(:disabled){border-color:var(--ink-soft)}
+.opt:disabled{cursor:default}
+.opt.good{border-color:var(--det);background:#E6F1F2;box-shadow:inset 3px 0 0 var(--det)}
+.opt.bad{border-color:var(--anti);background:#FBF0F3;box-shadow:inset 3px 0 0 var(--anti)}
+.why{
+  font-size:.92rem;margin-top:9px;padding:11px 13px;border-radius:5px;
+  background:#F0F3F6;border:1px solid var(--line);display:none;
+}
+.why.show{display:block}
+.why b{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.08em}
+.why.ok b{color:var(--det)}
+.why.no b{color:var(--anti)}
+.score{
+  font-family:var(--mono);font-size:13px;margin-top:18px;padding-top:14px;
+  border-top:1px solid var(--line);color:var(--ink-soft);
+}
+.score b{color:var(--ink);font-size:15px}
+
+footer{padding:40px 0 60px;font-size:.9rem;color:var(--ink-soft)}
+footer a{color:var(--det)}
+:focus-visible{outline:2px solid var(--det);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+@media (max-width:560px){
+  body{font-size:16px}
+  header{padding:36px 0 30px}
+  section{padding:36px 0}
+}
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <a href="#top">Domain 1</a>
+  <a href="#s11">1.1 Loops</a>
+  <a href="#s12">1.2 Orquestación</a>
+  <a href="#s13">1.3 Subagentes</a>
+  <a href="#check">Check</a>
+  <a href="#s14">1.4 Enforcement</a>
+  <a href="#s15">1.5 Hooks</a>
+  <a href="#s16">1.6 Descomposición</a>
+  <a href="#s17">1.7 Sesiones</a>
+  <a href="#chuleta">Chuleta</a>
+  <a href="#final">Examen</a>
+</div></nav>
+
+<header id="top"><div class="wrap">
+  <span class="eyebrow">Claude Certified Architect · Foundations · CCAR-F</span>
+  <h1>Domain 1<br>Arquitectura agéntica y orquestación</h1>
+  <p class="lede">El dominio más pesado del examen. Casi todo se reduce a una idea: cuando algo tiene que pasar <em>siempre</em>, no lo pides en un prompt, lo impones en código.</p>
+  <div class="hero-meta">
+    <span class="pill"><b>27%</b> del examen</span>
+    <span class="pill">7 task statements</span>
+    <span class="pill">~16 de 60 preguntas</span>
+    <span class="pill">Escenarios 1, 3 y 4</span>
+  </div>
+
+  <figure>
+    <svg viewBox="0 0 700 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagrama del loop agéntico: petición, respuesta, stop_reason decide continuar o terminar">
+      <defs>
+        <marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="3.2" orient="auto">
+          <path d="M0,0 L7,3.2 L0,6.4 z" fill="#4A5A6B"/>
+        </marker>
+        <marker id="art" markerWidth="9" markerHeight="9" refX="7" refY="3.2" orient="auto">
+          <path d="M0,0 L7,3.2 L0,6.4 z" fill="#0C6D78"/>
+        </marker>
+      </defs>
+      <g font-family="IBM Plex Mono, monospace" font-size="12.5">
+        <rect x="24" y="96" width="128" height="52" rx="5" fill="#fff" stroke="#0F1A26" stroke-width="1.4"/>
+        <text x="88" y="118" text-anchor="middle" fill="#0F1A26">messages</text>
+        <text x="88" y="134" text-anchor="middle" fill="#0F1A26">.create()</text>
+
+        <path d="M154 122 H206" stroke="#4A5A6B" stroke-width="1.4" marker-end="url(#ar)" fill="none"/>
+
+        <polygon points="284,80 356,122 284,164 212,122" fill="#DCE7E9" stroke="#0C6D78" stroke-width="1.6"/>
+        <text x="284" y="118" text-anchor="middle" fill="#08525A" font-weight="600">stop_</text>
+        <text x="284" y="133" text-anchor="middle" fill="#08525A" font-weight="600">reason</text>
+
+        <path d="M284 78 V44 H470" stroke="#0C6D78" stroke-width="1.5" fill="none" marker-end="url(#art)"/>
+        <text x="330" y="36" fill="#0C6D78">"tool_use" → sigue</text>
+
+        <rect x="472" y="20" width="196" height="52" rx="5" fill="#fff" stroke="#0C6D78" stroke-width="1.4"/>
+        <text x="570" y="42" text-anchor="middle" fill="#08525A">ejecuta la tool</text>
+        <text x="570" y="58" text-anchor="middle" fill="#08525A">→ tool_result</text>
+
+        <path d="M668 46 H686 V212 H88 V150" stroke="#0C6D78" stroke-width="1.5" fill="none" marker-end="url(#art)"/>
+        <text x="388" y="228" text-anchor="middle" fill="#08525A">append al historial · sin esto, el modelo no ve nada nuevo</text>
+
+        <path d="M284 166 V198 H430" stroke="#4A5A6B" stroke-width="1.4" fill="none" marker-end="url(#ar)"/>
+        <text x="330" y="190" fill="#4A5A6B">"end_turn" → para</text>
+        <rect x="432" y="174" width="140" height="46" rx="5" fill="#fff" stroke="#4A5A6B" stroke-width="1.3"/>
+        <text x="502" y="202" text-anchor="middle" fill="#4A5A6B">respuesta final</text>
+      </g>
+    </svg>
+    <figcaption>El loop agéntico. Todo el Domain 1 orbita alrededor de este rombo.</figcaption>
+  </figure>
+</div></header>
+
+<!-- ============ 1.1 ============ -->
+<section id="s11"><div class="wrap">
+  <span class="tag">Task Statement 1.1</span>
+  <h2>Loops agénticos</h2>
+
+  <p>Un loop agéntico es flujo de control que escribes tú en código. No es un truco de prompt ni un bucle de reintentos. Son cuatro pasos que se repiten:</p>
+
+  <ol>
+    <li>Mandas la petición a la Messages API con <strong>todo el historial</strong> (system prompt, mensajes previos, tool results de la iteración anterior).</li>
+    <li>Miras el campo <span class="k">stop_reason</span> de la respuesta.</li>
+    <li>Si es <span class="k">"tool_use"</span>: ejecutas la tool, <strong>añades el resultado al historial</strong> y vuelves a llamar.</li>
+    <li>Si es <span class="k">"end_turn"</span>: has terminado, devuelves la respuesta al usuario.</li>
+  </ol>
+
+  <p>El paso 3 es donde se rompen los loops de verdad. Si ejecutas la tool pero no metes el <code>tool_result</code> en el historial, el modelo nunca ve lo que devolvió: en la siguiente vuelta no tiene información nueva sobre la que razonar y se queda dando vueltas o responde a ciegas.</p>
+
+  <div class="key">
+    <span class="lbl">Key concept</span>
+    <p><span class="k">stop_reason</span> es la <strong>única</strong> señal fiable de control del loop. Es determinista y no ambigua. Nunca uses parseo de lenguaje natural, comprobaciones de tipo de contenido ni topes de iteraciones como mecanismo principal de parada.</p>
+  </div>
+
+  <h3>Por qué esto es así (y no una manía del examen)</h3>
+  <p>El modelo puede devolver texto <em>y</em> bloques <code>tool_use</code> en la misma respuesta. «Voy a buscar tu pedido» es texto, y justo detrás viene la llamada a la tool. Cualquier señal que mires dentro del contenido es ambigua por construcción. <span class="k">stop_reason</span> existe precisamente para sacar esa decisión del contenido y meterla en un campo con dos valores. Es un campo de protocolo, no una interpretación.</p>
+
+  <h3>Model-driven vs. árbol de decisión</h3>
+  <p>En un loop agéntico, Claude decide qué tool llamar leyendo el contexto: eso es <strong>toma de decisiones dirigida por el modelo</strong>. Lo contrario es un <strong>árbol de decisión preconfigurado</strong> o una secuencia fija que hardcodea el desarrollador.</p>
+  <p>El examen prefiere lo dirigido por el modelo porque se adapta a casos que nadie mapeó y encadena tools en órdenes no previstos. <strong>La excepción</strong>: cuando la lógica de negocio exige cumplimiento determinista (dinero, seguridad, compliance), el enforcement programático gana. Eso es el 1.4.</p>
+
+  <div class="case">
+    <span class="lbl">Caso de uso · el bug de terminación prematura</span>
+    <p>Un agente de soporte funciona con consultas simples pero se corta a mitad en las complejas. El código comprueba <code>response.content[0].type == "text"</code> para decidir si ha terminado. Claude devuelve «Déjame consultar tu pedido» junto al bloque <code>tool_use</code>; el código ve texto en la posición [0], concluye que ha acabado y devuelve una respuesta incompleta.</p>
+    <p><strong>El arreglo:</strong> sustituir la comprobación de tipo de contenido por <span class="k">stop_reason</span>. Funciona independientemente de qué tipos de contenido aparezcan.</p>
+  </div>
+
+  <div class="trap">
+    <span class="lbl">Trampas de examen</span>
+    <ul>
+      <li>Usar <code>content[0].type == "text"</code> como indicador de finalización.</li>
+      <li>Poner un tope de iteraciones («para a las 10 vueltas») como mecanismo <em>principal</em> de parada. Como red de seguridad sí vale; como control primario, no.</li>
+      <li>Parsear frases tipo «he terminado» o «tarea completada».</li>
+      <li>Forzar <code>tool_choice: "any"</code> para que el agente no devuelva texto: eso obliga a llamar tools incluso cuando ya ha acabado, y te monta un bucle infinito.</li>
+    </ul>
+    <p><strong>Ojo al distractor recurrente:</strong> el examen ofrece topes de iteraciones como arreglo para la terminación <em>prematura</em>. No cuadra: los topes atacan loops desbocados, no salidas anticipadas.</p>
+  </div>
+
+  <div class="now">
+    <span class="lbl">Matiz: examen vs. API real</span>
+    <p>La guía v1.0 solo evalúa <code>tool_use</code> y <code>end_turn</code>. La API en producción devuelve más: <code>pause_turn</code>, <code>max_tokens</code>, <code>stop_sequence</code>, <code>refusal</code> y <code>model_context_window_exceeded</code>. Regla sana en código real: trata cualquier valor distinto de <code>end_turn</code> como «no ha terminado, mira por qué», en vez de asumir que es <code>tool_use</code>.</p>
+  </div>
+</div></section>
+
+<!-- ============ 1.2 ============ -->
+<section id="s12"><div class="wrap">
+  <span class="tag">Task Statement 1.2</span>
+  <h2>Orquestación multiagente</h2>
+
+  <p>El examen prueba un solo patrón: <strong>hub-and-spoke</strong> con un coordinador en el centro.</p>
+  <ul>
+    <li><strong>Coordinador</strong> (el hub): recibe la tarea, la descompone, decide qué subagentes invocar, les pasa contexto, agrega resultados, gestiona errores y enruta información.</li>
+    <li><strong>Subagentes</strong> (los radios): cada uno hace una tarea especializada (buscar en web, analizar documentos, sintetizar, generar informes) y devuelve al coordinador.</li>
+  </ul>
+
+  <div class="key">
+    <span class="lbl">Key concept</span>
+    <p><strong>Toda</strong> la comunicación pasa por el coordinador. Los subagentes nunca hablan entre sí. Ni por eficiencia, ni por comodidad. Esto da tres cosas que el examen valora: <strong>observabilidad</strong> (todo se loguea en un punto), <strong>gestión de errores consistente</strong> y <strong>flujo de información controlado</strong> (el coordinador decide qué ve cada uno).</p>
+  </div>
+
+  <h3>El principio de aislamiento — lo más malentendido del dominio</h3>
+  <p>Los subagentes <strong>no heredan</strong> el historial del coordinador. Cuando se lanza uno, arranca solo con lo que el coordinador ha escrito explícitamente en su prompt. No tiene acceso a:</p>
+  <ul>
+    <li>el system prompt del coordinador,</li>
+    <li>los mensajes previos de la conversación del coordinador,</li>
+    <li>los resultados de otros subagentes,</li>
+    <li>ninguna «memoria compartida» ni estado global — <strong>no existe tal cosa</strong>.</li>
+  </ul>
+  <p>Tampoco comparten memoria <em>entre invocaciones</em>: si el coordinador llama dos veces al agente de búsqueda, la segunda llamada no sabe nada de la primera. Cada invocación es independiente.</p>
+
+  <h3>Las cuatro responsabilidades del coordinador</h3>
+  <table>
+    <tr><th>Responsabilidad</th><th>Qué significa en la práctica</th></tr>
+    <tr><td><strong>Selección dinámica</strong></td><td>Analiza la consulta y elige qué subagentes hacen falta. No enruta todo por el pipeline completo: una pregunta factual simple no necesita la cadena búsqueda→análisis→síntesis.</td></tr>
+    <tr><td><strong>Partición del scope</strong></td><td>Reparte subtemas o tipos de fuente distintos a cada agente para no duplicar. Uno mira papers académicos, otro noticias.</td></tr>
+    <tr><td><strong>Refinamiento iterativo</strong></td><td>Evalúa la síntesis buscando huecos, re-delega con consultas dirigidas y vuelve a sintetizar hasta que la cobertura basta. No es un disparo único.</td></tr>
+    <tr><td><strong>Enrutado centralizado</strong></td><td>Todo pasa por él, por observabilidad y control.</td></tr>
+  </table>
+
+  <div class="case">
+    <span class="lbl">Caso de uso · el fallo de descomposición estrecha</span>
+    <p>Un sistema investiga «tecnologías de energía renovable». El coordinador lo descompone en «eficiencia de paneles solares» y «diseño de aerogeneradores». Cada subagente hace un trabajo impecable en lo suyo. El informe final es excelente sobre solar y eólica, y no dice ni una palabra de geotermia, mareomotriz, biomasa o fusión.</p>
+    <p><strong>La causa raíz es la descomposición del coordinador</strong>, no los subagentes. Buscaron bien lo que se les asignó; la síntesis sintetizó todo lo que recibió. Simplemente esos subtemas nunca se asignaron a nadie.</p>
+    <p>Regla que te salva varias preguntas: si el output falla en <strong>amplitud</strong> (faltan categorías enteras), mira la descomposición. Si falla en <strong>profundidad</strong>, mira al subagente.</p>
+  </div>
+
+  <div class="trap">
+    <span class="lbl">Trampas de examen</span>
+    <ul>
+      <li>Culpar a los subagentes de abajo por huecos de cobertura.</li>
+      <li>Asumir que los subagentes comparten memoria o heredan historial.</li>
+      <li>Proponer comunicación directa entre subagentes «por eficiencia».</li>
+      <li><strong>Añadir más subagentes</strong> para arreglar un problema de descomposición: recibirán asignaciones igual de estrechas.</li>
+    </ul>
+  </div>
+
+  <div class="now">
+    <span class="lbl">Matiz: examen vs. producto real</span>
+    <p>En el Claude Code actual un subagente sí puede lanzar sus propios subagentes (delegación anidada padre-hijo). El «nunca, bajo ningún concepto» es una simplificación del examen. En el examen, comunicación directa entre subagentes = respuesta incorrecta, siempre.</p>
+  </div>
+</div></section>
+
+<!-- ============ 1.3 ============ -->
+<section id="s13"><div class="wrap">
+  <span class="tag">Task Statement 1.3</span>
+  <h2>Invocación de subagentes y paso de contexto</h2>
+
+  <p>Si el 1.2 era la arquitectura, el 1.3 es el cableado.</p>
+
+  <h3>La Task tool</h3>
+  <p>La <strong>Task tool</strong> es el mecanismo con el que un coordinador lanza subagentes. Y hay un requisito de configuración binario:</p>
+
+  <div class="key">
+    <span class="lbl">Key concept</span>
+    <p>El <span class="k">allowedTools</span> del coordinador tiene que incluir <span class="k">"Task"</span>. Sin eso, el coordinador no puede invocar ningún subagente, da igual lo bien definidos que estén. Es una puerta cerrada, no una preferencia.</p>
+  </div>
+
+  <p>Cada subagente se define con un <strong>AgentDefinition</strong> de tres campos:</p>
+  <ol>
+    <li><strong>Description</strong> — qué hace (el coordinador la usa para decidir cuándo invocarlo).</li>
+    <li><strong>System prompt</strong> — sus instrucciones.</li>
+    <li><strong>Restricciones de tools</strong> — a qué tools accede, acotadas a su rol.</li>
+  </ol>
+
+  <div class="now">
+    <span class="lbl">Matiz: nombre de la tool</span>
+    <p>El Claude Code actual renombró <code>Task</code> a <code>Agent</code>; <code>Task</code> sigue funcionando como alias y el Agent SDK emite <code>Agent</code> en los bloques de tool-use. <strong>En el examen contesta «Task tool»</strong>; en código actual verás <code>Agent</code>.</p>
+  </div>
+
+  <h3>Las tres reglas del paso de contexto</h3>
+  <table>
+    <tr><th>Regla</th><th>Detalle</th></tr>
+    <tr><td><strong>1. Findings completos</strong></td><td>Si el agente de síntesis necesita los resultados de búsqueda y el análisis documental, el coordinador se los pasa <em>enteros</em> en su prompt. No puede «consultarlos» en ningún sitio.</td></tr>
+    <tr><td><strong>2. Contenido ≠ metadatos</strong></td><td>Usa formatos estructurados que separen el contenido (la afirmación) de los metadatos (URL, nombre del documento, página). Sin metadatos, el agente de abajo no puede atribuir nada.</td></tr>
+    <tr><td><strong>3. Objetivos, no procedimientos</strong></td><td>El prompt del coordinador dice qué hay que lograr y con qué criterios de calidad, no el paso a paso. Las instrucciones procedimentales impiden que el subagente se adapte a lo inesperado.</td></tr>
+  </table>
+
+  <div class="case">
+    <span class="lbl">Caso de uso · el fallo de atribución</span>
+    <p>El agente de síntesis produce un informe estupendo con afirmaciones sin fuente. El agente de búsqueda devolvió URLs y títulos correctamente; el de análisis, referencias de página. Ambos verificados como correctos.</p>
+    <p><strong>Causa raíz:</strong> el coordinador pasó el contenido pero <strong>quitó los metadatos</strong>. El agente de síntesis no puede citar fuentes que nunca recibió. El arreglo no es tocar su prompt ni darle acceso a la tool de búsqueda: es que el coordinador pase metadatos estructurados junto al contenido.</p>
+  </div>
+
+  <p>El formato que espera el examen, con cada finding cargando su atribución:</p>
+  <table>
+    <tr><th>Campo</th><th>Tipo</th></tr>
+    <tr><td><code>claim</code></td><td>contenido</td></tr>
+    <tr><td><code>source_url</code></td><td>metadato</td></tr>
+    <tr><td><code>document_name</code></td><td>metadato</td></tr>
+    <tr><td><code>page_number</code></td><td>metadato</td></tr>
+    <tr><td><code>confidence</code></td><td>metadato</td></tr>
+    <tr><td><code>retrieved_by</code></td><td>metadato</td></tr>
+  </table>
+
+  <h3>Spawning en paralelo</h3>
+  <div class="key">
+    <span class="lbl">Key concept</span>
+    <p>Para tareas independientes, el coordinador emite <strong>varias llamadas a la Task tool en una sola respuesta</strong>. El spawning secuencial (un subagente por turno) añade latencia a cambio de nada. En las opciones de respuesta, busca «en una sola respuesta» o «simultáneamente»: esas señalan el patrón paralelo.</p>
+  </div>
+
+  <h3><code>fork_session</code></h3>
+  <p>Crea <strong>ramas independientes desde una línea base de análisis compartida</strong>. Después de analizar un codebase, forkeas para comparar dos estrategias de testing: cada rama parte del mismo entendimiento inicial y luego va por su lado sin ver a la otra.</p>
+  <p><strong>No es lo mismo que <code>--resume</code>.</strong> Resume continúa una sesión concreta; fork abre una rama nueva. Fork para explorar alternativas divergentes, resume para seguir la misma línea. Lo verás otra vez en el 1.7.</p>
+
+  <div class="trap">
+    <span class="lbl">Trampas de examen</span>
+    <ul>
+      <li>Asumir herencia automática de contexto.</li>
+      <li>Culpar al agente de síntesis por las citas que faltan.</li>
+      <li>Invocación secuencial de tareas que son independientes.</li>
+      <li>Confundir <code>fork_session</code> con <code>--resume</code>.</li>
+    </ul>
+  </div>
+</div></section>
+
+<!-- ============ CHECKPOINT ============ -->
+<section id="check"><div class="wrap">
+  <span class="tag">Punto de control</span>
+  <h2>Chequeo rápido: 1.1 – 1.3</h2>
+  <p>Cuatro preguntas antes de seguir. Si fallas alguna, vuelve a esa sección antes de pasar al 1.4.</p>
+  <div class="quiz" id="quizA"></div>
+</div></section>
+
+<!-- ============ 1.4 ============ -->
+<section id="s14"><div class="wrap">
+  <span class="tag">Task Statement 1.4</span>
+  <h2>Enforcement de workflow y handoff</h2>
+
+  <p>Aquí está la línea que más puntos te da o te quita en todo el dominio.</p>
+
+  <table>
+    <tr><th></th><th>Guía por prompt</th><th>Enforcement programático</th></tr>
+    <tr><td><strong>Qué es</strong></td><td>Instrucciones en el system prompt: «verifica siempre la identidad antes de un reembolso».</td><td>Hooks, prerequisite gates o checks en código que bloquean físicamente la tool hasta que se cumpla el requisito.</td></tr>
+    <tr><td><strong>Garantía</strong></td><td>Probabilística. Funciona el 90-95% de las veces. Tasa de fallo distinta de cero.</td><td>Determinista. Funciona el 100%.</td></tr>
+    <tr><td><strong>Cuándo vale</strong></td><td>Formato, estilo, orden de presentación. Un fallo no es un riesgo de negocio.</td><td>Dinero, seguridad, compliance.</td></tr>
+  </table>
+
+  <div class="key">
+    <span class="lbl">Regla de decisión del examen</span>
+    <p>Si <strong>un solo fallo</strong> causaría pérdida económica, brecha de seguridad o incumplimiento regulatorio → enforcement programático. Siempre.</p>
+  </div>
+
+  <h3>Por qué esto es así</h3>
+  <p>Un modelo es probabilístico por definición. Un prompt más contundente puede bajar el fallo del 8% al 3%, pero nunca llega a 0. Cuando el coste de un único fallo es un reembolso a la cuenta equivocada o una multa del regulador, la diferencia entre 3% y 0% no es de grado: es de naturaleza. Por eso el examen rechaza sistemáticamente «mejorar el prompt» en escenarios de alto riesgo, aunque sea una respuesta razonable en la vida real.</p>
+
+  <div class="case">
+    <span class="lbl">Caso de uso · el 8% de fallo</span>
+    <p>Datos de producción: un agente de soporte procesa reembolsos sin verificar la titularidad de la cuenta en el 8% de los casos. El system prompt ya dice «verifica siempre la identidad antes de procesar un reembolso». Funciona el 92% de las veces. Ya ha habido reembolsos a cuentas equivocadas.</p>
+    <p><strong>Arreglo:</strong> un prerequisite gate. Antes de que <code>process_refund</code> pueda ejecutarse, el sistema comprueba que <code>get_customer</code> haya devuelto un customer ID verificado en esta sesión. Si no, la tool devuelve un error que obliga al modelo a verificar primero. El gate es código: el modelo no puede saltárselo decidiendo saltárselo.</p>
+  </div>
+
+  <h3>Hooks de ciclo de vida de subagentes</h3>
+  <table>
+    <tr><th>Hook</th><th>Cuándo</th><th>Qué puede hacer</th></tr>
+    <tr><td><span class="k">SubagentStart</span></td><td>Al lanzarse un subagente vía Task/Agent.</td><td>Solo observa: recibe tipo e id, loguea, puede inyectar contexto. <strong>No bloquea ni modifica</strong> la invocación.</td></tr>
+    <tr><td><span class="k">SubagentStop</span></td><td>Al terminar y devolver resultados.</td><td>Valida el output; si no cumple, devuelve <code>decision: "block"</code> con motivo y <strong>manda al subagente de vuelta a trabajar</strong>. No transforma el output.</td></tr>
+  </table>
+  <p>¿Y si necesitas bloquear el <em>spawning</em> o reescribir lo que devuelve? Entonces no son estos hooks: pon un <strong>PreToolUse</strong> sobre la tool Agent para denegar o reescribir la invocación, o un <strong>PostToolUse</strong> sobre esa misma llamada, cuyo campo <code>updatedToolOutput</code> sustituye el resultado antes de que el modelo lo lea.</p>
+  <p>Dos detalles finos: los subagentes pueden definir sus propios PreToolUse/PostToolUse en el frontmatter de su AgentDefinition, y quedan <strong>acotados a ese subagente</strong> (el de facturación bloquea reembolsos por encima de un umbral; el de soporte técnico no tiene esa restricción). Y los hooks <code>Stop</code> definidos en el frontmatter de un subagente se <strong>autoconvierten</strong> en eventos <code>SubagentStop</code> en runtime.</p>
+
+  <h3>Peticiones con varios asuntos</h3>
+  <p>«Quiero devolver el pedido, cambiar mi dirección de envío y preguntar por mis puntos.» El patrón correcto: <strong>descomponer</strong> en asuntos distintos → <strong>investigar en paralelo</strong> con contexto compartido (los datos de la cuenta sirven para los tres) → <strong>sintetizar una resolución unificada</strong> en una sola respuesta. Mal: tratarlos en secuencia como conversaciones separadas, o responder al primero y olvidar el resto.</p>
+
+  <h3>Protocolo de handoff</h3>
+  <p>La restricción crítica: <strong>el agente humano no tiene acceso a la transcripción</strong>. El resumen es lo único que recibe, así que tiene que ser autocontenido. Cinco campos:</p>
+  <ul>
+    <li><strong>Customer ID</strong> — para abrir la cuenta.</li>
+    <li><strong>Resumen de la conversación</strong> — qué pidió y qué se ha intentado.</li>
+    <li><strong>Análisis de causa raíz</strong> — el diagnóstico del agente.</li>
+    <li><strong>Importe del reembolso</strong>, si aplica — la cifra concreta, no una referencia vaga.</li>
+    <li><strong>Acción recomendada</strong>.</li>
+  </ul>
+
+  <div class="trap">
+    <span class="lbl">Trampas de examen</span>
+    <ul>
+      <li>«Reforzar el system prompt» ante un fallo de compliance.</li>
+      <li>Few-shot examples como suficientes para garantizar cumplimiento.</li>
+      <li>Un <strong>clasificador de enrutado</strong> para arreglar un problema de compliance: el clasificador decide <em>qué agente</em> atiende, y el fallo ocurre <em>dentro</em> de la secuencia de ejecución del agente. Distinta capa.</li>
+      <li>Resúmenes de handoff a los que les falta algún campo.</li>
+    </ul>
+  </div>
+</div></section>
+
+<!-- ============ 1.5 ============ -->
+<section id="s15"><div class="wrap">
+  <span class="tag">Task Statement 1.5</span>
+  <h2>Hooks del Agent SDK</h2>
+
+  <p>Los hooks son la implementación práctica del lado determinista del 1.4. Se sientan justo en la frontera entre las decisiones del modelo y el mundo real.</p>
+
+  <div class="key">
+    <span class="lbl">Key concept — la dirección lo es todo</span>
+    <p><span class="k">PostToolUse</span> corre <strong>después</strong> de ejecutar la tool pero antes de que el modelo procese el resultado → transforma datos.<br>
+    <span class="k">PreToolUse</span> corre <strong>antes</strong> de ejecutar → bloquea, modifica o redirige la llamada. La tool nunca llega a ejecutarse si el hook la bloquea.</p>
+  </div>
+
+  <h3>PostToolUse: normalización de datos</h3>
+  <p>Cada tool MCP devuelve lo suyo: una base de datos de clientes escupe timestamps Unix, un sistema de pedidos ISO 8601, una API de estado códigos numéricos y otra strings. Sin normalizar, el modelo tiene que interpretar formatos mezclados en <em>cada</em> iteración, y ahí es donde aparece la inconsistencia: hoy convierte bien el timestamp, mañana confunde el día con el mes en un <code>DD/MM/YYYY</code>, o lee «P» como «processed» en vez de «pending».</p>
+  <p>Un PostToolUse normaliza antes de que el modelo lo vea: fechas → ISO 8601, códigos → strings legibles, importes → decimal consistente con código de divisa.</p>
+
+  <div class="case">
+    <span class="lbl">Caso de uso · PreToolUse en tres sabores</span>
+    <ul>
+      <li><strong>Umbral:</strong> intercepta <code>process_refund</code>; si el importe supera 500 $, bloquea y redirige a escalado humano.</li>
+      <li><strong>Prerequisito de compliance:</strong> intercepta <code>transfer_funds</code>; si el check AML no está hecho en esta sesión, bloquea y devuelve un error que indica hacerlo primero.</li>
+      <li><strong>Aprobación de manager:</strong> intercepta <code>approve_discount</code> por encima del 20%; pausa y enruta a una cola de aprobación.</li>
+    </ul>
+  </div>
+
+  <div class="trap">
+    <span class="lbl">La trampa estrella</span>
+    <p>El examen ofrecerá un <strong>PostToolUse para bloquear</strong> acciones que violan políticas — a veces disfrazado de «marca las transferencias sin AML y las manda a revisión manual». Es incorrecto: cuando ese hook se dispara, <strong>la transferencia ya salió</strong>. Para prevenir, PreToolUse.</p>
+  </div>
+
+  <table>
+    <tr><th>Requisito</th><th>Mecanismo</th><th>Garantía</th></tr>
+    <tr><td>Se cumple el 100% de las veces</td><td>Hooks</td><td>Determinista</td></tr>
+    <tr><td>Preferible, pero una desviación ocasional no pasa nada</td><td>Prompts</td><td>Probabilística</td></tr>
+  </table>
+
+  <p>Y la otra cara: usar un hook para «responde siempre en markdown» es sobreingeniería. La decisión no es si el prompt es «suficientemente bueno», sino si la consecuencia de un fallo aislado justifica una garantía determinista.</p>
+</div></section>
+
+<!-- ============ 1.6 ============ -->
+<section id="s16"><div class="wrap">
+  <span class="tag">Task Statement 1.6</span>
+  <h2>Estrategias de descomposición de tareas</h2>
+
+  <h3>Patrón 1 · Pipelines secuenciales fijos (prompt chaining)</h3>
+  <p>Pasos predeterminados que se ejecutan en orden; la salida de uno alimenta al siguiente y la secuencia no cambia según lo que se vaya encontrando.</p>
+  <p><strong>Para:</strong> tareas predecibles y estructuradas — revisiones de código, procesamiento documental, extracción de datos, checks de compliance.<br>
+  <strong>A favor:</strong> consistencia, fácil de depurar (sabes qué paso produjo qué) y de monitorizar.<br>
+  <strong>En contra:</strong> no se adapta. Si el paso 2 descubre algo que debería cambiar el enfoque del paso 3, el pipeline no puede ajustarse.</p>
+
+  <h3>Patrón 2 · Descomposición dinámica adaptativa</h3>
+  <p>Genera subtareas según lo que va descubriendo. El plan evoluciona.</p>
+  <p><strong>Para:</strong> investigación abierta donde no conoces el alcance de entrada — exploración de sistemas legacy, auditorías de seguridad, debugging de un sistema desconocido.<br>
+  <strong>Ejemplo:</strong> añadir tests a un codebase legacy. Mapeas la estructura → identificas zonas de alto impacto → priorizas → empiezas a escribir y descubres que el Módulo A depende del B, que no tiene tests → repriorizas para testear B primero.<br>
+  <strong>En contra:</strong> menos predecible, tiempo de ejecución variable, más difícil de depurar.</p>
+
+  <table>
+    <tr><th>Tarea</th><th>Patrón</th></tr>
+    <tr><td>Pasos conocidos de antemano, input estructurado</td><td>Pipeline fijo</td></tr>
+    <tr><td>Revisión de código multi-fichero</td><td>Pipeline fijo</td></tr>
+    <tr><td>Extracción documental (campos y formato predeterminados)</td><td>Pipeline fijo</td></tr>
+    <tr><td>Alcance abierto o desconocido</td><td>Dinámica</td></tr>
+    <tr><td>Exploración de codebase legacy</td><td>Dinámica</td></tr>
+    <tr><td>Debugging de un sistema desconocido</td><td>Dinámica</td></tr>
+  </table>
+
+  <h3>Dilución de atención</h3>
+  <p>Modo de fallo específico: procesar demasiados ítems en una sola pasada produce <strong>profundidad inconsistente</strong>. Síntomas:</p>
+  <ul>
+    <li>Feedback detallado en los primeros ficheros, cada vez más superficial en los últimos.</li>
+    <li>Un patrón señalado como problemático en un fichero y aprobado sin comentario en otro con código idéntico.</li>
+    <li>Bugs obvios que se escapan en unos ficheros mientras se cazan detalles de estilo en otros.</li>
+  </ul>
+  <p><strong>Por qué pasa:</strong> el modelo reparte atención entre todos los ítems del contexto. A más ítems, menos atención por ítem; los primeros se llevan una parte desproporcionada y los últimos se leen en diagonal.</p>
+
+  <div class="key">
+    <span class="lbl">El arreglo es estructural, no de modelo</span>
+    <p><strong>Arquitectura multi-pasada:</strong> (1) una pasada de análisis local <em>por ítem</em>, cada una con todo el presupuesto de atención sobre un solo fichero; (2) una pasada de <strong>integración cross-fichero</strong> al final, que busca específicamente flujo de datos, consistencia de API y uso coherente de patrones entre ficheros.</p>
+  </div>
+
+  <div class="case">
+    <span class="lbl">Caso de uso · la review de 14 ficheros</span>
+    <p>Ficheros 1-5: feedback detallado con referencias de línea. 6-9: moderado. 10-14: superficial, se le escapan null pointers e inyecciones SQL. Y un <code>forEach</code> marcado como ineficiente en el fichero 3 pasa sin comentario en el 11.</p>
+    <p>Ni un modelo mejor, ni una ventana de contexto mayor, ni un prompt más detallado. 14 pasadas por fichero + 1 de integración.</p>
+  </div>
+
+  <div class="trap">
+    <span class="lbl">Trampas de examen</span>
+    <ul>
+      <li>Modelo más potente o ventana de contexto más grande como arreglo de la dilución de atención. Es un problema de arquitectura, no de capacidad.</li>
+      <li>«Un prompt mejor en una sola pasada» como equivalente a multi-pasada.</li>
+      <li>Pipeline fijo para investigación abierta (o dinámica para procesamiento estructurado). Empareja el patrón con la tarea, no con lo que suena más sofisticado.</li>
+      <li><strong>Batching sin pasada de integración</strong>: agrupar de 5 en 5 reduce la dilución dentro de cada lote pero se pierde todo lo que cruza entre lotes.</li>
+      <li>Hacer tres pasadas independientes y quedarte solo con lo que aparece en dos: eso suprime bugs reales que solo se detectan de forma intermitente.</li>
+    </ul>
+  </div>
+</div></section>
+
+<!-- ============ 1.7 ============ -->
+<section id="s17"><div class="wrap">
+  <span class="tag">Task Statement 1.7</span>
+  <h2>Estado de sesión y reanudación</h2>
+
+  <p>Tres opciones, tres trabajos distintos. El examen prueba que elijas la correcta para el escenario.</p>
+
+  <table>
+    <tr><th>Opción</th><th>Qué hace</th><th>Cuándo</th><th>Cuándo NO</th></tr>
+    <tr>
+      <td><span class="k">--resume &lt;nombre&gt;</span></td>
+      <td>Continúa una sesión concreta restaurando <strong>todo</strong> el historial, incluidos los tool results.</td>
+      <td>El contexto previo sigue siendo válido; los ficheros no han cambiado.</td>
+      <td>Se han modificado ficheros desde la última sesión.</td>
+    </tr>
+    <tr>
+      <td><span class="k">fork_session</span></td>
+      <td>Rama independiente desde una línea base compartida. Tras el fork, las ramas no se ven entre sí.</td>
+      <td>Explorar enfoques divergentes desde el mismo análisis inicial (dos estrategias de refactor).</td>
+      <td>Solo quieres continuar la misma línea de trabajo. Y <strong>nunca</strong> para arreglar contexto obsoleto: el fork hereda la basura.</td>
+    </tr>
+    <tr>
+      <td><span class="k">Sesión nueva + resumen</span></td>
+      <td>Empiezas de cero e inyectas un resumen estructurado de los hallazgos previos. Sin tool results viejos.</td>
+      <td>Los resultados previos están obsoletos, o el contexto se ha degradado tras una sesión larga.</td>
+      <td>El contexto previo sigue válido y quieres el historial completo: ahí resume es más eficiente.</td>
+    </tr>
+  </table>
+
+  <h3>El problema del contexto obsoleto</h3>
+  <p>Es el concepto central del 1.7. Al reanudar, se restaura el historial <strong>entero</strong>, incluido cada tool result de la sesión anterior. Si leíste un fichero ayer y hoy está modificado, el contenido viejo sigue ahí como tool result. El modelo razona con ese dato viejo <em>junto a</em> los nuevos, y de ahí salen las contradicciones.</p>
+
+  <div class="case">
+    <span class="lbl">Caso de uso · el bug del consejo contradictorio</span>
+    <p>Día 1: analizas el módulo de autenticación de un codebase de 50 ficheros y detectas tres problemas. Por la noche los arreglas tocando <code>auth.ts</code>, <code>session.ts</code> y <code>middleware.ts</code>. Día 2: reanudas y Claude te recomienda arreglar los tres problemas ya arreglados. Y al preguntarle por el estado actual de <code>auth.ts</code>, unas veces cita el código viejo y otras el nuevo.</p>
+    <p><strong>Arreglo:</strong> sesión nueva con un resumen: «El análisis previo identificó tres problemas en estos tres ficheros. Los tres están corregidos. Reanaliza solo esos tres para verificar las correcciones y detectar problemas nuevos introducidos por los cambios.»</p>
+  </div>
+
+  <div class="trap">
+    <span class="lbl">El arreglo ingenuo, y por qué no basta</span>
+    <p>«Reanudo y le pido que relea los ficheros modificados» es mejor que nada, pero <strong>los tool results obsoletos siguen en el historial</strong>. El modelo puede seguir tirando de ellos, sobre todo en decisiones tangenciales que no tocan directamente los ficheros modificados. Por eso la respuesta correcta es sesión nueva con resumen inyectado, no resume + relectura.</p>
+  </div>
+
+  <h3>Reanálisis dirigido vs. reexploración completa</h3>
+  <p>Si han cambiado 3 de 50 ficheros, releer los 50 es tiempo tirado. El patrón correcto: sesión nueva → inyectas el resumen y <strong>nombras los ficheros que han cambiado</strong> → el agente reanaliza solo esos → combina el análisis fresco con el resumen preservado del resto.</p>
+
+  <div class="now">
+    <span class="lbl">Matiz: cómo se nombran las sesiones</span>
+    <p><code>--resume</code> solo reanuda sesiones que ya existen: acepta un ID o nombre, o abre un selector interactivo, pero nunca crea una sesión. En la CLI actual nombras la sesión al arrancarla con <code>--name</code> / <code>-n</code> (o a mitad con <code>/rename</code>). También existe <code>-c</code> / <code>--continue</code>, que reanuda la conversación más reciente del directorio sin nombrar nada.</p>
+  </div>
+</div></section>
+
+<!-- ============ CHULETA ============ -->
+<section id="chuleta"><div class="wrap">
+  <span class="tag">Repaso</span>
+  <h2>Chuleta de desambiguación</h2>
+  <p>Las seis confusiones que el examen explota una y otra vez.</p>
+
+  <table>
+    <tr><th>Si dudas entre…</th><th>Quédate con esto</th></tr>
+    <tr><td><code>PreToolUse</code> vs <code>PostToolUse</code></td><td>Pre = <strong>antes</strong>, bloquea/modifica. Post = <strong>después</strong>, transforma datos. Bloquear con Post siempre es incorrecto: la acción ya ocurrió.</td></tr>
+    <tr><td><code>SubagentStart</code> vs <code>SubagentStop</code></td><td>Start solo observa (no bloquea). Stop sí puede bloquear con motivo y devolver al subagente a trabajar, pero no reescribe su output.</td></tr>
+    <tr><td><code>fork_session</code> vs <code>--resume</code></td><td>Fork = divergencia desde base compartida. Resume = continuación. Ninguno de los dos arregla contexto obsoleto.</td></tr>
+    <tr><td>Pipeline fijo vs dinámica</td><td>¿Conozco los pasos de antemano? Fijo. ¿El alcance emerge al investigar? Dinámica.</td></tr>
+    <tr><td>Prompt vs enforcement programático</td><td>¿Un solo fallo cuesta dinero, seguridad o compliance? Programático. ¿Es formato o estilo? Prompt.</td></tr>
+    <tr><td>Fallo del coordinador vs del subagente</td><td>Falta <strong>amplitud</strong> (categorías enteras) → descomposición del coordinador. Faltan <strong>metadatos/citas</strong> → paso de contexto del coordinador. Falta profundidad en lo asignado → el subagente.</td></tr>
+  </table>
+
+  <h3>Cinco frases que valen puntos</h3>
+  <ul>
+    <li><span class="k">stop_reason</span> es la única señal de control del loop.</li>
+    <li>Los tool results <strong>se añaden al historial</strong>, o el modelo no ve nada nuevo.</li>
+    <li>Los subagentes no heredan <strong>nada</strong>: todo va explícito en su prompt.</li>
+    <li><code>allowedTools</code> debe incluir <code>"Task"</code> o no hay subagentes.</li>
+    <li>Para tareas independientes, varias Task calls <strong>en una sola respuesta</strong>.</li>
+  </ul>
+</div></section>
+
+<!-- ============ FINAL ============ -->
+<section id="final"><div class="wrap">
+  <span class="tag">Simulacro</span>
+  <h2>Examen del Domain 1</h2>
+  <p>Diez preguntas al estilo del examen: escenarios de producción con distractores plausibles. Contesta antes de leer la explicación.</p>
+  <div class="quiz" id="quizB"></div>
+</div></section>
+
+<footer><div class="wrap">
+  <p>Guía de estudio del Domain 1 (27%) para el <strong>Claude Certified Architect — Foundations</strong> (CCAR-F), elaborada a partir del temario de <a href="https://claudecertificationguide.com/learn/1-agentic-architecture">claudecertificationguide.com</a> y del Exam Guide oficial v1.0 (julio 2026).</p>
+  <p>Siguiente: Domain 2 — Tool Design &amp; MCP Integration (18%).</p>
+</div></footer>
+
+<script>
+const QUIZ_A = [
+  {
+    stem: "Tu agente se corta a mitad de tarea en las consultas complejas. El loop comprueba si el primer bloque de contenido es texto para decidir que ha terminado. ¿Qué cambias?",
+    opts: [
+      "Añadir un tope de 15 iteraciones para que dé tiempo a las consultas complejas",
+      "Comprobar stop_reason: continuar si es \"tool_use\", terminar si es \"end_turn\"",
+      "Poner tool_choice en \"any\" para que siempre llame a una tool en vez de devolver texto",
+      "Parsear el texto buscando frases de cierre antes de terminar el loop"
+    ],
+    ok: 1,
+    why: "Claude puede devolver texto y bloques tool_use en la misma respuesta, así que la presencia de texto no indica nada. El tope de iteraciones ataca loops desbocados, no salidas prematuras. Forzar tool_choice \"any\" impide que el agente termine nunca."
+  },
+  {
+    stem: "Un sistema multiagente investiga «tecnologías de energía renovable» y entrega un informe impecable sobre solar y eólica, sin mencionar geotermia, mareomotriz ni biomasa. Cada subagente hizo bien lo suyo. ¿Causa raíz?",
+    opts: [
+      "El agente de búsqueda usó consultas demasiado estrechas",
+      "El agente de síntesis no detectó los huecos ni pidió cobertura adicional",
+      "El coordinador descompuso el tema solo en solar y eólica",
+      "El agente de análisis documental no tenía acceso a fuentes de las otras categorías"
+    ],
+    ok: 2,
+    why: "Fallo de amplitud, no de profundidad. Los subagentes solo pueden investigar lo que se les asigna, y esos subtemas nunca se asignaron a nadie. Añadir más subagentes tampoco lo arreglaría: recibirían asignaciones igual de estrechas."
+  },
+  {
+    stem: "El agente de síntesis produce un informe con afirmaciones sin fuente. Los agentes de búsqueda y de análisis devuelven correctamente URLs, títulos y referencias de página. ¿Causa raíz?",
+    opts: [
+      "Al system prompt del agente de síntesis le faltan instrucciones explícitas de citar fuentes",
+      "El coordinador pasa el contenido sin metadatos estructurados: ni URLs, ni nombres de documento, ni páginas",
+      "Hay que dar al agente de síntesis acceso directo a la tool de búsqueda para que verifique las fuentes",
+      "El agente de búsqueda devuelve un formato que la síntesis no sabe parsear"
+    ],
+    ok: 1,
+    why: "El agente de síntesis no puede citar lo que nunca recibió. Los subagentes tienen contexto aislado: el arreglo está aguas arriba, en que el coordinador preserve los metadatos junto al contenido, no en tocar el prompt de la síntesis."
+  },
+  {
+    stem: "El coordinador debe lanzar un agente de búsqueda web y otro de análisis documental. Las dos tareas son independientes. ¿Cuál es el patrón correcto?",
+    opts: [
+      "Lanzar el de búsqueda, esperar el resultado y luego lanzar el de análisis, para que el segundo aproveche el contexto del primero",
+      "Emitir las dos llamadas a la Task tool en una sola respuesta del coordinador",
+      "Usar fork_session para crear dos ramas paralelas desde la sesión del coordinador",
+      "Lanzar el de búsqueda y que él invoque directamente al de análisis cuando termine"
+    ],
+    ok: 1,
+    why: "Tareas independientes van en paralelo: varias Task calls en una única respuesta. La opción secuencial añade latencia a cambio de nada. fork_session sirve para explorar alternativas divergentes, no para paralelizar subagentes. Y la última rompe el hub-and-spoke."
+  }
+];
+
+const QUIZ_B = [
+  {
+    stem: "Datos de producción: en el 12% de los casos el agente se salta get_customer y llama a lookup_order solo con el nombre que dice el cliente, lo que a veces provoca reembolsos a cuentas equivocadas. ¿Qué cambio es más efectivo?",
+    opts: [
+      "Reforzar el system prompt indicando que la verificación con get_customer es obligatoria antes de cualquier operación sobre pedidos",
+      "Añadir un prerequisito programático que bloquee lookup_order y process_refund hasta que get_customer devuelva un ID verificado",
+      "Añadir few-shot examples que muestren al agente llamando siempre primero a get_customer",
+      "Implementar un clasificador que analice cada petición y habilite solo el subconjunto de tools apropiado"
+    ],
+    ok: 1,
+    why: "Consecuencia financiera de un fallo único → enforcement determinista. Prompt y few-shot son ambos probabilísticos: bajarían el 12% pero nunca a cero. El clasificador actúa sobre qué tools están disponibles, no sobre el orden de ejecución, que es el problema real."
+  },
+  {
+    stem: "El equipo de compliance exige que el 100% de las transferencias internacionales pase el check AML. Hoy se hace por instrucción en el prompt y funciona ~95% de las veces. ¿Qué implementas?",
+    opts: [
+      "Un PostToolUse que marque las transferencias que se saltaron el AML y las encole para revisión manual",
+      "Instrucciones AML detalladas en el system prompt, con ejemplos y advertencias sobre las sanciones",
+      "Un PreToolUse que bloquee transfer_funds hasta que aml_check devuelva un pase verificado",
+      "Few-shot examples que demuestren el flujo correcto de verificación antes de cada transferencia"
+    ],
+    ok: 2,
+    why: "PostToolUse corre después: cuando se dispara, la transferencia ya salió y la infracción regulatoria ya existe. Solo un hook de pre-ejecución previene. Es la trampa más repetida del 1.5: un Post disfrazado de solución de compliance."
+  },
+  {
+    stem: "Una PR toca 14 ficheros. La review en una sola pasada da feedback detallado en unos y superficial en otros, se le escapan bugs evidentes y marca un patrón como problemático en un fichero mientras aprueba código idéntico en otro. ¿Cómo la reestructuras?",
+    opts: [
+      "Cambiar a un modelo con ventana de contexto mayor para que los 14 ficheros reciban atención suficiente",
+      "Exigir a los desarrolladores que partan las PR grandes en envíos de 3-4 ficheros",
+      "Analizar cada fichero por separado y después una pasada específica de integración cross-fichero",
+      "Ejecutar tres pasadas independientes sobre la PR completa y reportar solo lo que aparezca en al menos dos"
+    ],
+    ok: 2,
+    why: "Es dilución de atención: un problema arquitectónico, no de capacidad del modelo ni de tamaño de contexto. Partir las PR traslada el trabajo al desarrollador sin mejorar el sistema. El consenso de tres pasadas suprimiría bugs reales que solo se detectan de forma intermitente."
+  },
+  {
+    stem: "Un desarrollador reanuda una sesión de Claude Code tras modificar 3 ficheros de un codebase de 50. El agente da consejos contradictorios: recomienda cambios ya hechos y cita código que ya no existe. ¿Enfoque más apropiado?",
+    opts: [
+      "Reanudar la sesión y pedirle que relea los 3 ficheros modificados, manteniendo el resto del historial por continuidad",
+      "Usar fork_session para ramificar la sesión existente e incorporar los cambios en una línea de trabajo aparte",
+      "Sesión nueva con un resumen inyectado de los hallazgos previos, indicando los 3 ficheros modificados para reanálisis dirigido",
+      "Sesión nueva sin nada de contexto y reanalizar los 50 ficheros desde cero"
+    ],
+    ok: 2,
+    why: "Reanudar deja los tool results obsoletos dentro del historial: el modelo puede seguir razonando desde ellos aunque relea los ficheros. Forkear hereda esa misma basura. Y reanalizar los 50 es tirar tiempo cuando solo 3 cambiaron."
+  },
+  {
+    stem: "Tres tools MCP devuelven fechas en timestamps Unix, ISO 8601 y DD/MM/YYYY, y estados como códigos numéricos, strings en inglés y caracteres sueltos. El agente interpreta mal los datos de forma intermitente. ¿Solución?",
+    opts: [
+      "Un PostToolUse que normalice fechas a ISO 8601 y estados a strings legibles antes de que el modelo procese el resultado",
+      "Instrucciones en el system prompt explicando el formato que devuelve cada tool",
+      "Un PreToolUse que reescriba los parámetros de entrada para pedir un formato uniforme",
+      "Dejar que el modelo normalice: tiene contexto suficiente para inferir cada formato"
+    ],
+    ok: 0,
+    why: "Normalización = transformar el resultado después de ejecutar, que es exactamente PostToolUse. Confiar en que el modelo normalice introduce justo la inconsistencia que quieres eliminar; el hook garantiza datos limpios en todas las iteraciones."
+  },
+  {
+    stem: "Estás diseñando un agente que debe añadir tests exhaustivos a un codebase legacy que nadie conoce bien. ¿Qué estrategia de descomposición eliges?",
+    opts: [
+      "Un pipeline secuencial fijo: extraer funciones, generar tests, ejecutar, reportar",
+      "Descomposición dinámica adaptativa: mapear estructura, identificar zonas de alto impacto y replanificar según van apareciendo dependencias",
+      "Una sola pasada con toda la información del codebase en contexto",
+      "Un pipeline fijo por fichero, sin pasada de integración"
+    ],
+    ok: 1,
+    why: "Tarea abierta con alcance desconocido de partida: el plan tiene que evolucionar. Descubrir que el Módulo A depende del B sin tests obliga a repriorizar, y un pipeline fijo no puede reaccionar a hallazgos intermedios."
+  },
+  {
+    stem: "El agente escala a un humano. ¿Qué debe contener el resumen de handoff?",
+    opts: [
+      "Un enlace a la transcripción completa para que el humano lea el contexto",
+      "Customer ID, resumen de la conversación, análisis de causa raíz, importe del reembolso si aplica y acción recomendada",
+      "El último mensaje del cliente y el motivo del escalado",
+      "Los resultados en crudo de todas las tools llamadas durante la sesión"
+    ],
+    ok: 1,
+    why: "El agente humano no tiene acceso a la transcripción: el resumen es lo único que recibe, así que debe ser autocontenido y con los cinco campos. Si falta alguno, el humano tiene que hacer repetir todo al cliente."
+  },
+  {
+    stem: "Un coordinador tiene sus subagentes bien definidos, con descripciones, system prompts y tools acotadas, pero en ejecución no consigue lanzar ninguno. ¿Qué revisas primero?",
+    opts: [
+      "Que las descripciones de los subagentes sean lo bastante específicas para que el coordinador sepa cuándo invocarlos",
+      "Que allowedTools del coordinador incluya \"Task\"",
+      "Que los subagentes tengan al menos una tool asignada en su AgentDefinition",
+      "Que el system prompt del coordinador mencione explícitamente a cada subagente"
+    ],
+    ok: 1,
+    why: "Es una puerta binaria: sin \"Task\" (o \"Agent\", su nombre actual) en allowedTools, el coordinador no tiene mecanismo físico para lanzar subagentes, por muy bien definidos que estén. Las descripciones afectan a cuál elige, no a si puede."
+  },
+  {
+    stem: "Has terminado de analizar un codebase y quieres comparar dos estrategias de refactor partiendo de ese mismo análisis, sin que una contamine a la otra. ¿Qué usas?",
+    opts: [
+      "--resume sobre la sesión de análisis, evaluando las dos estrategias en la misma conversación",
+      "fork_session para crear dos ramas independientes desde la línea base compartida",
+      "Dos sesiones nuevas con el resumen del análisis inyectado en cada una",
+      "Dos subagentes en paralelo, uno por estrategia, coordinados desde la sesión actual"
+    ],
+    ok: 1,
+    why: "Fork es exactamente esto: exploración divergente desde una base común, donde cada rama sigue su camino sin ver a la otra. Resume mezclaría ambas líneas en un mismo hilo. Las sesiones nuevas con resumen se reservan para cuando el contexto previo está obsoleto, que no es el caso."
+  },
+  {
+    stem: "Un hook debe validar que el output de un subagente cumpla el esquema esperado y, si no, hacer que siga trabajando en lugar de dejarle terminar. ¿Cuál usas?",
+    opts: [
+      "SubagentStart, para inyectar el esquema al arrancar y garantizar el formato",
+      "SubagentStop, devolviendo decision \"block\" con el motivo",
+      "Un PostToolUse sobre la tool Agent, reescribiendo el output con updatedToolOutput",
+      "Un PreToolUse sobre la tool Agent, denegando la invocación si el esquema no cuadra"
+    ],
+    ok: 1,
+    why: "SubagentStop es el único que puede frenar la finalización y devolver al subagente a trabajar. SubagentStart solo observa. PostToolUse sí reescribiría el output, pero eso es transformarlo, no exigir que el subagente lo rehaga."
+  }
+];
+
+function renderQuiz(id, data, label){
+  const root = document.getElementById(id);
+  const state = {answered:0, right:0};
+  data.forEach((q,i)=>{
+    const div = document.createElement('div');
+    div.className='q';
+    const num = document.createElement('span');
+    num.className='num'; num.textContent = label+' '+(i+1)+' / '+data.length;
+    const stem = document.createElement('p');
+    stem.className='stem'; stem.textContent=q.stem;
+    div.append(num, stem);
+
+    const why = document.createElement('div');
+    why.className='why';
+
+    q.opts.forEach((o,j)=>{
+      const b=document.createElement('button');
+      b.className='opt'; b.type='button'; b.textContent=o;
+      b.addEventListener('click',()=>{
+        const all=div.querySelectorAll('.opt');
+        all.forEach(x=>x.disabled=true);
+        all[q.ok].classList.add('good');
+        const hit = j===q.ok;
+        if(!hit) b.classList.add('bad');
+        why.className='why show '+(hit?'ok':'no');
+        why.innerHTML='<b>'+(hit?'Correcto.':'No es esa.')+'</b> '+q.why;
+        state.answered++; if(hit) state.right++;
+        score.innerHTML='Respondidas <b>'+state.answered+'/'+data.length+'</b> · Aciertos <b>'+state.right+'</b>';
+      });
+      div.appendChild(b);
+    });
+    div.appendChild(why);
+    root.appendChild(div);
+  });
+  const score=document.createElement('div');
+  score.className='score';
+  score.innerHTML='Respondidas <b>0/'+data.length+'</b> · Aciertos <b>0</b>';
+  root.appendChild(score);
+}
+
+renderQuiz('quizA', QUIZ_A, 'Check');
+renderQuiz('quizB', QUIZ_B, 'Pregunta');
+</script>
+</body>
+</html>
