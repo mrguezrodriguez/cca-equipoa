@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz 30 · Domain 3 Claude Code Config — CCAR-F</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#E7ECF1; --panel:#FAFBFC; --ink:#0F1A26; --ink-soft:#4A5A6B;
+  --line:#C9D3DC; --det:#0C6D78; --anti:#A62347;
+  --display:'Space Grotesk',system-ui,sans-serif;
+  --body:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16.5px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:760px;margin:0 auto;padding:0 22px}
+header{padding:48px 0 28px}
+.eyebrow{font-family:var(--mono);font-size:12.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--det)}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(1.9rem,5.5vw,2.6rem);line-height:1.08;letter-spacing:-.025em;margin:.3em 0 .35em}
+.lede{color:var(--ink-soft);margin:0 0 18px;max-width:60ch}
+.dist{display:flex;flex-wrap:wrap;gap:7px}
+.dist span{font-family:var(--mono);font-size:11.5px;border:1px solid var(--line);background:var(--panel);padding:4px 9px;border-radius:100px;color:var(--ink-soft)}
+.bar-wrap{position:sticky;top:0;z-index:10;background:rgba(231,236,241,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:11px 0}
+.bar-inner{display:flex;align-items:center;gap:14px}
+.track{flex:1;height:5px;background:#D3DCE4;border-radius:3px;overflow:hidden}
+.fill{height:100%;width:0;background:var(--det);transition:width .25s ease}
+.counter{font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);white-space:nowrap}
+.counter b{color:var(--ink)}
+main{padding:6px 0 20px}
+.sec{font-family:var(--display);font-weight:700;font-size:1.12rem;letter-spacing:-.01em;margin:32px 0 2px;padding-bottom:7px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.sec .cnt{font-family:var(--mono);font-size:11.5px;font-weight:400;color:var(--ink-soft)}
+.q{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:18px 20px 16px;margin:14px 0}
+.num{font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;color:var(--det)}
+.stem{font-weight:600;line-height:1.45;margin:5px 0 12px}
+.opt{display:block;width:100%;text-align:left;font:inherit;font-size:.95rem;line-height:1.45;background:#fff;border:1px solid var(--line);border-radius:5px;padding:10px 13px;margin-bottom:7px;cursor:pointer;transition:border-color .12s,background .12s}
+.opt:hover:not(:disabled){border-color:var(--ink-soft)}
+.opt:disabled{cursor:default}
+.opt .letter{font-family:var(--mono);font-size:12px;color:var(--ink-soft);margin-right:9px;font-weight:600}
+.opt.good{border-color:var(--det);background:#E6F1F2;box-shadow:inset 3px 0 0 var(--det)}
+.opt.good .letter{color:var(--det)}
+.opt.bad{border-color:var(--anti);background:#FBF0F3;box-shadow:inset 3px 0 0 var(--anti)}
+.opt.bad .letter{color:var(--anti)}
+.hintbtn{font-family:var(--mono);font-size:11.5px;color:var(--ink-soft);background:none;border:none;padding:3px 0;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.hintbtn:hover{color:var(--ink)}
+.hinttext{font-size:.9rem;color:var(--ink-soft);font-style:italic;margin:2px 0 10px;display:none}
+.hinttext.show{display:block}
+.why{font-size:.93rem;margin-top:10px;padding:12px 14px;border-radius:5px;background:#F0F3F6;border:1px solid var(--line);display:none}
+.why.show{display:block}
+.why b{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.08em}
+.why.ok b{color:var(--det)}
+.why.no b{color:var(--anti)}
+.result{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--det);border-radius:0 8px 8px 0;padding:24px;margin:30px 0 10px;display:none}
+.result.show{display:block}
+.result h2{font-family:var(--display);font-weight:700;font-size:1.35rem;margin:0 0 .35em}
+.big{font-family:var(--mono);font-size:2.2rem;font-weight:600;color:var(--det);line-height:1}
+.verdict{margin:.7em 0 1.2em;color:var(--ink-soft)}
+table{width:100%;border-collapse:collapse;font-size:.92rem;margin-top:6px}
+th,td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--line)}
+th{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);font-weight:600}
+td.sc{font-family:var(--mono);white-space:nowrap}
+td.sc.weak{color:var(--anti);font-weight:600}
+td.sc.strong{color:var(--det)}
+.reset{font-family:var(--mono);font-size:12.5px;background:var(--ink);color:var(--panel);border:none;border-radius:5px;padding:9px 16px;margin-top:18px;cursor:pointer}
+.reset:hover{background:var(--det)}
+footer{padding:26px 0 56px;font-size:.88rem;color:var(--ink-soft)}
+:focus-visible{outline:2px solid var(--det);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+@media (max-width:560px){body{font-size:16px}header{padding:34px 0 22px}}
+</style>
+</head>
+<body>
+
+<header><div class="wrap">
+  <span class="eyebrow">CCAR-F · Domain 3 · 20% del examen</span>
+  <h1>30 preguntas: configuración y flujos de Claude Code</h1>
+  <p class="lede">Cinco por task statement. Hay varias donde el examen y el producto actual divergen: en esas, la explicación te dice qué contestar en el examen y qué verás en tu terminal.</p>
+  <div class="dist"><span>3.1 · 5</span><span>3.2 · 5</span><span>3.3 · 5</span><span>3.4 · 5</span><span>3.5 · 5</span><span>3.6 · 5</span></div>
+</div></header>
+
+<div class="bar-wrap"><div class="wrap bar-inner">
+  <div class="track"><div class="fill" id="fill"></div></div>
+  <span class="counter" id="counter">Respondidas <b>0</b>/30 · Aciertos <b>0</b></span>
+</div></div>
+
+<main><div class="wrap" id="quiz"></div>
+<div class="wrap"><div class="result" id="result"></div></div></main>
+
+<footer><div class="wrap">Preguntas propias basadas en el temario del Domain 3 y en los objetivos del Exam Guide v1.0 (julio 2026). No reproducen las preguntas de muestra oficiales.</div></footer>
+
+<script>
+const SECTIONS=[
+ {ts:"3.1",title:"Jerarquía de CLAUDE.md",qs:[
+  {stem:"El Claude Code de A sigue las convenciones del equipo; el de B, que entró la semana pasada, no. Mismo repo, misma rama. ¿Causa raíz?",
+   hint:"¿Qué es lo único que no viaja al clonar?",
+   opts:["B no ha instalado el servidor MCP que sirve las reglas","Las convenciones están en el CLAUDE.md de usuario de A (~/.claude/CLAUDE.md) en vez de en el de proyecto","B no ha ejecutado /memory para cargar la configuración","Las convenciones están en un .claude/rules/ que el setup de B no soporta"],
+   ok:1,why:"«Compañero nuevo» + «comportamiento inconsistente» apunta siempre a dónde vive la configuración. El nivel usuario no se comparte por git. Y /memory diagnostica, nunca carga."},
+  {stem:"Dos CLAUDE.md aplicables se contradicen. ¿Cuál gana?",
+   opts:["El de alcance más específico, siempre","El de usuario, que anula al de proyecto","Ninguno lo tiene garantizado: se concatenan y Claude puede elegir arbitrariamente; si la regla debe cumplirse siempre, va a settings.json o a un hook","El que se cargue primero"],
+   ok:2,why:"Precedencia estricta la tiene settings.json, no CLAUDE.md, que se entrega como mensaje de usuario y sin garantía de cumplimiento. «Gana el más específico» y «el de usuario anula» son paráfrasis que la documentación nunca hace."},
+  {stem:"Quieres reducir el contexto por sesión y partes de un CLAUDE.md de 600 líneas. Proponen dividirlo en seis ficheros importados con @. ¿Funciona?",
+   opts:["Sí: solo se carga el import correspondiente a lo que edites","No: los imports cargan eager y el contexto pesa lo mismo; para reducirlo por sesión, .claude/rules/ con frontmatter de rutas","Sí, siempre que uses la palabra clave @import","No: los imports no están soportados en CLAUDE.md de proyecto"],
+   ok:1,why:"Dividir mejora la mantenibilidad del fuente, no el consumo de contexto. Y no existe @import: la directiva es @ seguido de la ruta, en su propia línea."},
+  {stem:"¿Qué hace exactamente /memory?",
+   opts:["Carga los ficheros de configuración en la sesión actual","Muestra qué ficheros de memoria están ya cargados: es diagnóstico, no activación","Fusiona los CLAUDE.md de todos los niveles en uno","Limpia la memoria acumulada de la sesión"],
+   ok:1,why:"La configuración se carga sola según su nivel y ubicación. En el examen, /memory es el comando que muestra lo cargado; en el Claude Code actual, /memory lista y abre ficheros y /context confirma lo que realmente entró en la sesión. Ninguno dispara la carga."},
+  {stem:"Tras un /compact, una instrucción que estaba en un CLAUDE.md de subdirectorio parece haber desaparecido, mientras que la del CLAUDE.md raíz sigue ahí. ¿Por qué?",
+   opts:["El raíz tiene prioridad sobre los anidados en la compactación","El raíz se relee de disco y se reinyecta tras compactar; los anidados y las rules con paths cargan bajo demanda y vuelven la próxima vez que Claude lea un fichero que encaje","El compactado elimina siempre la configuración de subdirectorio","Los CLAUDE.md anidados solo se cargan al inicio de sesión"],
+   ok:1,why:"No es privilegio, es mecánica: las instrucciones del raíz nunca formaron parte del historial, así que no había nada que resumir. Lo condicional reaparece cuando vuelve a ser relevante."}
+ ]},
+
+ {ts:"3.2",title:"Slash commands y skills",qs:[
+  {stem:"Creas .claude/skills/review.md con tu checklist y /review no aparece. ¿Por qué?",
+   opts:["Falta el frontmatter description","Las skills son directorios con un SKILL.md dentro: un fichero plano solo funciona bajo .claude/commands/","Hay que reiniciar Claude Code para descubrir skills nuevas","El nombre review está reservado"],
+   ok:1,why:"Las dos rutas crean los mismos comandos pero con estructura distinta. Tendría que ser .claude/skills/review/SKILL.md, o bien .claude/commands/review.md."},
+  {stem:"Una skill de análisis llena la conversación principal de listados y extractos, y las respuestas posteriores empeoran. ¿Qué frontmatter añades?",
+   opts:["allowed-tools con Read, Grep y Glob","context: fork","argument-hint indicando el módulo a analizar","disable-model-invocation: true"],
+   ok:1,why:"context: fork ejecuta la skill en un subagente aislado: la salida verbosa se queda dentro y la principal recibe solo el resumen."},
+  {stem:"El equipo quiere un /review disponible para todos al clonar, y tú quieres un /brainstorm personal y verboso. ¿Dónde va cada uno?",
+   opts:["Los dos en ~/.claude/commands/ y una nota en el README para que cada uno los copie","/review en .claude/ del repositorio; /brainstorm en ~/.claude/skills/brainstorm/SKILL.md con context: fork","Los dos en .claude/commands/, dando a brainstorm el context: fork","/review en CLAUDE.md como procedimiento documentado; /brainstorm en .claude/skills/"],
+   ok:1,why:"Patrón de scoping: proyecto para lo compartido, usuario para lo personal. Y el verboso necesita fork para no contaminar la conversación."},
+  {stem:"Las convenciones de nomenclatura de API deben aplicarse a toda generación de código, sin que nadie invoque nada. ¿Dónde van?",
+   opts:["En una skill de .claude/skills/ con una buena description","En CLAUDE.md o en .claude/rules/: carga automática en cada sesión, sin paso de invocación","En un command de .claude/commands/ que se ejecute al abrir el proyecto","En el argument-hint de la skill de generación"],
+   ok:1,why:"La regla es clara en las dos direcciones: no metas procedimientos de tarea en CLAUDE.md, y no metas material siempre-activo en una skill. Las skills cargan bajo demanda."},
+  {stem:"Añades allowed-tools con Read, Grep y Glob a una skill. ¿Qué contestas si el examen pregunta qué hace?",
+   hint:"Aquí el examen y el producto actual no dicen lo mismo.",
+   opts:["Restringe la skill a esas tres tools: es la respuesta del exam guide","Preaprueba esas tres y bloquea el resto permanentemente","Obliga a Claude a usar las tres en cada ejecución","Documenta qué tools usa la skill, sin efecto funcional"],
+   ok:0,why:"El exam guide la describe como restricción y esa es la respuesta esperada. En el Claude Code actual preaprueba (evita el prompt de permiso) y el límite real se pone con disallowed-tools o reglas deny. La intención es la misma: una skill de análisis no debería usar Write ni Bash."}
+ ]},
+
+ {ts:"3.3",title:"Reglas por ruta",qs:[
+  {stem:"Los tests viven junto a su fuente en más de 50 directorios y deben seguir las mismas convenciones. ¿Enfoque más mantenible?",
+   opts:["Añadirlas al CLAUDE.md raíz","Un fichero en .claude/rules/ con paths: [\"**/*.test.tsx\", \"**/*.test.ts\"]","Un CLAUDE.md en cada directorio con tests","Una skill que los desarrolladores invoquen antes de escribir tests"],
+   ok:1,why:"Un fichero, un patrón, cobertura universal. Los 50 CLAUDE.md derivan; el raíz gasta tokens en cada sesión; la skill requiere invocación."},
+  {stem:"¿Por qué las reglas por ruta son más eficientes en tokens que el CLAUDE.md raíz?",
+   opts:["Porque se comprimen antes de entrar en contexto","Porque cargan solo al editar ficheros que encajan con sus globs, en vez de en cada sesión","Porque el modelo las lee en paralelo","Porque tienen un límite de tamaño más estricto"],
+   ok:1,why:"Tus convenciones de Terraform no deberían gastar tokens mientras editas componentes React. En proyectos grandes con muchas categorías de convención, la diferencia es sustancial."},
+  {stem:"Tienes convenciones REST que aplican solo al paquete /packages/api/ y a nada más. ¿Dónde las pones?",
+   opts:["En .claude/rules/ con paths: [\"packages/api/**/*\"]","En un CLAUDE.md dentro de /packages/api/ — o en rules con ese glob: ambas valen, y para un único directorio el CLAUDE.md de directorio es lo más directo","En el CLAUDE.md raíz con un encabezado por paquete","En una skill invocable desde ese directorio"],
+   ok:1,why:"El CLAUDE.md de directorio existe justo para convenciones de un paquete concreto. Las rules con globs ganan cuando el tipo de fichero está repartido por muchos directorios."},
+  {stem:"¿Qué diferencia a una rule con paths de una skill con paths, si ambas se autoactivan?",
+   opts:["Ninguna: son sintaxis alternativas de lo mismo","Las rules se quedan en contexto como guía de fondo mientras Claude trabaja en ficheros que encajan; las skills cargan bajo demanda como flujos de trabajo","Las skills son de proyecto y las rules de usuario","Las rules solo admiten un glob y las skills varios"],
+   ok:1,why:"Si la pregunta habla de convenciones automáticas y siempre-activas para un tipo de fichero, la respuesta es reglas por ruta."},
+  {stem:"¿Qué pasa con un fichero de .claude/rules/ que no lleva frontmatter paths?",
+   opts:["No se carga nunca","Se carga en todas las sesiones, como el CLAUDE.md","Da error de configuración","Solo se carga si se invoca explícitamente"],
+   ok:1,why:"El frontmatter de rutas es opcional. Sin él, el fichero de rules se comporta como contexto siempre-activo; es el paths lo que lo vuelve condicional."}
+ ]},
+
+ {ts:"3.4",title:"Plan mode vs ejecución directa",qs:[
+  {stem:"Tres tareas: (1) monolito a microservicios, (2) null pointer en una función con stack trace claro, (3) migrar de librería de logging en 30 ficheros. ¿Qué modo para cada una?",
+   opts:["Plan mode para las tres","Plan mode para (1) y (3); ejecución directa para (2)","Ejecución directa para las tres con instrucciones detalladas","Plan mode solo para (1)"],
+   ok:1,why:"(2) es el caso de libro de directo: problema, ubicación y solución conocidos. (3) además es el híbrido: planificar el patrón de migración y luego ejecutarlo fichero a fichero."},
+  {stem:"¿Qué determina la elección entre plan mode y ejecución directa?",
+   hint:"No es lo que parece a primera vista.",
+   opts:["La dificultad técnica de la tarea","La ambigüedad: cuántos enfoques válidos hay y cuánto hay que explorar antes de decidir","El número de líneas que se van a modificar","El tiempo disponible para la tarea"],
+   ok:1,why:"Un bug difícil pero bien definido es directo. Una petición que suena sencilla pero admite tres implementaciones y toca varios módulos es plan mode."},
+  {stem:"Los requisitos dicen explícitamente «reestructurar el monolito en microservicios». Alguien propone empezar en directo y pasar a plan mode si aparece complejidad. ¿Qué falla?",
+   opts:["Nada: es un enfoque incremental razonable","La complejidad ya está declarada en los requisitos, no va a emerger después: plan mode desde el principio","Habría que usar el subagente Explore en lugar de plan mode","Plan mode no se puede activar a mitad de una sesión"],
+   ok:1,why:"Trampa explícita del examen. Esperar sorpresas cuando la complejidad está escrita en el enunciado arriesga un rehacer caro al descubrir dependencias tarde."},
+  {stem:"En una tarea multi-fase, la fase de descubrimiento genera listados de ficheros y grafos de dependencias que llenan el contexto. ¿Qué usas?",
+   opts:["El subagente Explore, que corre la exploración aislada y devuelve resúmenes","/compact después de cada fase de descubrimiento","Plan mode, que no consume contexto","Un CLAUDE.md que limite la verbosidad de la exploración"],
+   ok:0,why:"Explore mantiene la salida verbosa fuera de la conversación principal y devuelve solo lo que la implementación necesita, preservando la calidad de las respuestas posteriores."},
+  {stem:"¿Qué caracteriza a plan mode frente a la ejecución directa, en cuanto a efectos?",
+   opts:["Ejecuta los cambios pero permite deshacerlos","Lee el codebase, analiza dependencias y propone un enfoque sin modificar ningún fichero","Modifica solo los ficheros que marques como seguros","Genera un commit separado con los cambios propuestos"],
+   ok:1,why:"Exploración y diseño seguros antes de comprometerse. Es lo que permite evaluar varios enfoques sin pagar el coste de rehacer."}
+ ]},
+
+ {ts:"3.5",title:"Refinamiento iterativo",qs:[
+  {stem:"Describes una transformación en prosa y Claude Code la interpreta distinto cada vez. ¿Qué pruebas primero?",
+   opts:["Reescribir la prosa con lenguaje más preciso y terminología técnica","Dar 2-3 ejemplos concretos de entrada y salida esperada","Escribir una batería de tests e iterar compartiendo los fallos","Usar el patrón entrevista"],
+   ok:1,why:"Una prosa más precisa sigue dependiendo de la interpretación; los ejemplos la eliminan. Ante interpretación inconsistente, la respuesta es siempre ejemplos primero."},
+  {stem:"Vas a construir una capa de caché para una API y no dominas el tema. ¿Qué técnica?",
+   opts:["Dar ejemplos de entrada y salida de la caché","El patrón entrevista: pedirle que haga preguntas sobre requisitos, casos límite y restricciones antes de implementar","Escribir los tests primero","Feedback secuencial sobre la primera implementación"],
+   ok:1,why:"La entrevista es para dominios desconocidos: saca a la luz invalidación, TTL, requisitos de consistencia y modos de fallo, cosas que un experto abordaría y tú podrías pasar por alto."},
+  {stem:"Tres problemas: el manejo de errores, el formato de log y las definiciones de tipo del SDK, y arreglar el primero afecta a los otros dos. ¿Cómo das el feedback?",
+   opts:["Uno cada vez, empezando por el manejo de errores","Todo en un solo mensaje, para que el modelo vea todas las restricciones a la vez y produzca un arreglo coherente","En dos mensajes: primero los dos que más interactúan","Como tests que fallen, sin describir los problemas"],
+   ok:1,why:"Cuando los arreglos interactúan, secuenciarlos hace que cada uno entre en conflicto con el siguiente. Agrupar es correcto justo aquí; con problemas independientes, agrupar confunde sobre a qué parte aplica cada comentario."},
+  {stem:"Tienes una transformación compleja con muchos casos límite (nulos, entradas vacías, límites). ¿Técnica más efectiva?",
+   opts:["Diez ejemplos de entrada y salida que cubran cada caso","Iteración guiada por tests: escribir la batería primero y compartir los fallos","El patrón entrevista sobre los casos límite","Prosa muy detallada enumerando cada caso"],
+   ok:1,why:"«Expected X, got Y» no deja espacio a la interpretación. Y con ejemplos, además, no se trata de acumular: dos o tres bien elegidos bastan para que el modelo generalice el patrón."},
+  {stem:"Hay dos problemas independientes: la nomenclatura de funciones y la indentación. ¿Cómo los abordas?",
+   opts:["En un solo mensaje, para ahorrar iteraciones","Secuencialmente, uno cada vez","En un mensaje pero numerados por prioridad","Como ejemplos de entrada y salida"],
+   ok:1,why:"Agrupar problemas independientes confunde al modelo sobre qué comentario aplica a qué parte del código. Agrupar solo cuando los arreglos se afectan entre sí."}
+ ]},
+
+ {ts:"3.6",title:"Integración en CI/CD",qs:[
+  {stem:"Un script de CI ejecuta claude con un prompt y el job se cuelga. Los logs muestran a Claude esperando entrada interactiva. ¿Arreglo?",
+   opts:["Definir CLAUDE_HEADLESS=true antes de ejecutar","Añadir la flag --batch","Añadir la flag -p para modo print no interactivo","Redirigir stdin desde /dev/null"],
+   ok:2,why:"-p (o --print) es el método documentado: procesa el prompt, escribe en stdout y sale. --batch y CLAUDE_HEADLESS no existen. Es el dato más directamente evaluable del dominio."},
+  {stem:"Ejecutas claude -p con --output-format json y --json-schema. ¿De dónde extraes los datos validados?",
+   opts:["Del nivel superior del JSON devuelto","Del campo structured_output del sobre, con jq '.structured_output'","De stderr","De un fichero que genera --json-schema"],
+   ok:1,why:"--output-format json envuelve la ejecución en un sobre con texto del resultado, session ID y metadatos de coste y uso. Lo conforme al esquema vive dentro, en structured_output."},
+  {stem:"Tu pipeline genera código y le pide revisarlo en la misma invocación. Los humanos encuentran cosas que se le escaparon. ¿Por qué?",
+   opts:["Se agota el límite de tokens antes de la revisión","La sesión conserva el contexto de razonamiento de la generación y es menos probable que cuestione decisiones que ya se justificó","La revisión necesita un modelo distinto","Falta --verbose para que reporte todos los hallazgos"],
+   ok:1,why:"El arreglo es una invocación independiente, sin acceso al razonamiento previo, que evalúe el código por sus méritos."},
+  {stem:"Las revisiones automáticas repiten los mismos cinco comentarios en cada push y el equipo ha dejado de leerlos. ¿Qué implementas?",
+   opts:["Reducir el número máximo de hallazgos por ejecución","Incluir los hallazgos previos en el contexto e instruir a Claude para reportar solo lo nuevo o lo que sigue sin resolver","Ejecutar la revisión solo antes del merge","Subir el umbral de severidad"],
+   ok:1,why:"Un re-escaneo sin contexto no distingue un problema nuevo de uno que el desarrollador vio y decidió no cambiar. Las otras opciones reducen ruido perdiendo señal."},
+  {stem:"Necesitas que Claude Code siga siendo un asistente de código en tu pipeline, cumpliendo además tres reglas internas. ¿Qué flag?",
+   opts:["--system-prompt con el texto completo de tus reglas","--append-system-prompt, que conserva la guía de tools, las instrucciones de seguridad y las convenciones por defecto","--bare, para partir de un estado mínimo","--permission-mode bypassPermissions"],
+   ok:1,why:"Añadir conserva el prompt por defecto y solo aporta lo que difiere. Sustituir es para cuando la identidad o el modelo de permisos son distintos, y entonces te quedas dueña de todo lo que la tarea siga necesitando."}
+ ]}
+];
+
+const LETTERS=['A','B','C','D'];
+const root=document.getElementById('quiz');
+const fill=document.getElementById('fill');
+const counter=document.getElementById('counter');
+const result=document.getElementById('result');
+const TOTAL=SECTIONS.reduce((n,s)=>n+s.qs.length,0);
+const stats={};
+SECTIONS.forEach(s=>stats[s.ts]={right:0,total:s.qs.length,title:s.title});
+let answered=0,right=0,n=0;
+
+SECTIONS.forEach(sec=>{
+  const h=document.createElement('div');
+  h.className='sec';
+  h.innerHTML='<span>'+sec.ts+' · '+sec.title+'</span><span class="cnt">'+sec.qs.length+' preguntas</span>';
+  root.appendChild(h);
+  sec.qs.forEach(q=>{
+    n++; const idx=n;
+    const card=document.createElement('div'); card.className='q';
+    const num=document.createElement('span'); num.className='num'; num.textContent='PREGUNTA '+idx+' / '+TOTAL;
+    const stem=document.createElement('p'); stem.className='stem'; stem.textContent=q.stem;
+    card.append(num,stem);
+    if(q.hint){
+      const hb=document.createElement('button'); hb.className='hintbtn'; hb.type='button'; hb.textContent='Ver pista';
+      const ht=document.createElement('p'); ht.className='hinttext'; ht.textContent=q.hint;
+      hb.addEventListener('click',()=>{ht.classList.add('show');hb.remove();});
+      card.append(hb,ht);
+    }
+    const why=document.createElement('div'); why.className='why';
+    q.opts.forEach((o,j)=>{
+      const b=document.createElement('button'); b.className='opt'; b.type='button';
+      b.innerHTML='<span class="letter">'+LETTERS[j]+'</span>';
+      b.appendChild(document.createTextNode(o));
+      b.addEventListener('click',()=>{
+        card.querySelectorAll('.opt').forEach(x=>x.disabled=true);
+        card.querySelectorAll('.opt')[q.ok].classList.add('good');
+        const hit=j===q.ok;
+        if(!hit) b.classList.add('bad'); else {right++;stats[sec.ts].right++;}
+        why.className='why show '+(hit?'ok':'no');
+        why.innerHTML='<b>'+(hit?'Correcto.':'No es esa.')+'</b> '+q.why;
+        answered++; update();
+      });
+      card.appendChild(b);
+    });
+    card.appendChild(why); root.appendChild(card);
+  });
+});
+
+function update(){
+  fill.style.width=(answered/TOTAL*100)+'%';
+  counter.innerHTML='Respondidas <b>'+answered+'</b>/'+TOTAL+' · Aciertos <b>'+right+'</b>';
+  if(answered===TOTAL) finish();
+}
+function finish(){
+  const pct=Math.round(right/TOTAL*100);
+  let verdict;
+  if(pct>=90) verdict='Domain 3 controlado. Puedes pasar al siguiente.';
+  else if(pct>=75) verdict='Buen nivel. Repasa las task statements flojas y repite dentro de unos días.';
+  else if(pct>=60) verdict='Justo. Este dominio pesa un 20%: merece otra vuelta a la guía.';
+  else verdict='Toca releer la guía entera antes de repetir el test.';
+  let rows='';
+  Object.keys(stats).forEach(ts=>{
+    const s=stats[ts]; const p=Math.round(s.right/s.total*100);
+    const cls=p<75?'weak':(p===100?'strong':'');
+    rows+='<tr><td>'+ts+' · '+s.title+'</td><td class="sc '+cls+'">'+s.right+'/'+s.total+' · '+p+'%</td></tr>';
+  });
+  result.innerHTML='<h2>Resultado</h2><span class="big">'+right+'/'+TOTAL+' · '+pct+'%</span><p class="verdict">'+verdict+'</p><table><tr><th>Task statement</th><th>Aciertos</th></tr>'+rows+'</table><button class="reset" type="button" onclick="location.reload()">Volver a empezar</button>';
+  result.classList.add('show');
+  result.scrollIntoView({behavior:'smooth',block:'center'});
+}
+</script>
+</body>
+</html>

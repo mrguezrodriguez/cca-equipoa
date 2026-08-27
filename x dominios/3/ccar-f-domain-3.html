@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Domain 3 · Claude Code Configuration &amp; Workflows — CCAR-F</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#E7ECF1; --panel:#FAFBFC; --ink:#0F1A26; --ink-soft:#4A5A6B;
+  --line:#C9D3DC; --det:#0C6D78; --anti:#A62347; --now:#9C6600;
+  --display:'Space Grotesk',system-ui,sans-serif;
+  --body:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:70px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16.5px;line-height:1.62;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:0 22px}
+
+nav{position:sticky;top:0;z-index:20;background:rgba(231,236,241,.93);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;gap:2px;overflow-x:auto;padding-top:9px;padding-bottom:9px;scrollbar-width:none}
+nav .wrap::-webkit-scrollbar{display:none}
+nav a{font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);text-decoration:none;padding:4px 9px;border-radius:4px;white-space:nowrap}
+nav a:hover,nav a:focus-visible{background:var(--ink);color:var(--panel)}
+
+header{padding:56px 0 40px;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:var(--mono);font-size:12.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--det)}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(2.1rem,6vw,3.1rem);line-height:1.06;letter-spacing:-.025em;margin:.28em 0 .3em}
+.lede{font-size:1.09rem;color:var(--ink-soft);max-width:60ch;margin:0}
+.hero-meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.pill{font-family:var(--mono);font-size:12px;border:1px solid var(--line);background:var(--panel);padding:5px 10px;border-radius:100px}
+.pill b{color:var(--det);font-weight:600}
+
+figure{margin:34px 0 0;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:20px 18px 14px}
+figure svg{width:100%;height:auto;display:block}
+figcaption{font-family:var(--mono);font-size:12px;color:var(--ink-soft);margin-top:12px;text-align:center}
+
+section{padding:46px 0;border-bottom:1px solid var(--line)}
+.tag{font-family:var(--mono);font-size:12.5px;color:var(--det);letter-spacing:.06em}
+h2{font-family:var(--display);font-weight:700;font-size:1.62rem;letter-spacing:-.018em;margin:.18em 0 .55em;line-height:1.18}
+h3{font-family:var(--display);font-weight:500;font-size:1.06rem;margin:1.9em 0 .5em;letter-spacing:-.01em}
+p{margin:0 0 1em}
+ul,ol{margin:0 0 1em;padding-left:1.15em}
+li{margin-bottom:.42em}
+strong{font-weight:600}
+
+.k{font-family:var(--mono);font-size:.88em;background:#DCE7E9;color:#08525A;padding:1px 5px;border-radius:3px;font-weight:600;white-space:nowrap}
+.key{border-left:3px solid var(--det);background:var(--panel);padding:14px 16px;margin:20px 0;border-radius:0 6px 6px 0}
+.key .lbl{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--det);display:block;margin-bottom:5px}
+.key p:last-child{margin-bottom:0}
+.trap{border-left:3px solid var(--anti);background:#FBF3F5;padding:14px 16px;margin:20px 0;border-radius:0 6px 6px 0}
+.trap .lbl{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--anti);display:block;margin-bottom:5px}
+.trap ul{margin-bottom:0}
+.trap p:last-child{margin-bottom:0}
+.now{border-left:3px solid var(--now);background:#FBF6EC;padding:14px 16px;margin:20px 0;border-radius:0 6px 6px 0}
+.now .lbl{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--now);display:block;margin-bottom:5px}
+.now p:last-child{margin-bottom:0}
+.case{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:15px 17px;margin:20px 0}
+.case .lbl{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-soft);display:block;margin-bottom:6px}
+.case p:last-child,.case ul:last-child,.case ol:last-child{margin-bottom:0}
+
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:.93rem;background:var(--panel)}
+th,td{text-align:left;padding:9px 11px;border:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);font-weight:600;background:#F0F3F6}
+td code,li code,p code{font-family:var(--mono);font-size:.87em;background:#E3E9EE;padding:1px 4px;border-radius:3px}
+pre{background:#F0F3F6;border:1px solid var(--line);border-radius:6px;padding:13px 15px;overflow-x:auto;font-family:var(--mono);font-size:.83rem;line-height:1.5;margin:16px 0}
+
+.quiz{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:22px 20px;margin:26px 0}
+.q{padding:16px 0;border-top:1px solid var(--line)}
+.q:first-of-type{border-top:none;padding-top:6px}
+.q .num{font-family:var(--mono);font-size:11.5px;color:var(--det);letter-spacing:.08em}
+.q .stem{margin:5px 0 11px;font-weight:600;line-height:1.45}
+.opt{display:block;width:100%;text-align:left;font:inherit;font-size:.95rem;line-height:1.45;background:#fff;border:1px solid var(--line);border-radius:5px;padding:9px 12px;margin-bottom:7px;cursor:pointer;transition:border-color .12s,background .12s}
+.opt:hover:not(:disabled){border-color:var(--ink-soft)}
+.opt:disabled{cursor:default}
+.opt.good{border-color:var(--det);background:#E6F1F2;box-shadow:inset 3px 0 0 var(--det)}
+.opt.bad{border-color:var(--anti);background:#FBF0F3;box-shadow:inset 3px 0 0 var(--anti)}
+.why{font-size:.92rem;margin-top:9px;padding:11px 13px;border-radius:5px;background:#F0F3F6;border:1px solid var(--line);display:none}
+.why.show{display:block}
+.why b{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.08em}
+.why.ok b{color:var(--det)}
+.why.no b{color:var(--anti)}
+.score{font-family:var(--mono);font-size:13px;margin-top:18px;padding-top:14px;border-top:1px solid var(--line);color:var(--ink-soft)}
+.score b{color:var(--ink);font-size:15px}
+
+footer{padding:40px 0 60px;font-size:.9rem;color:var(--ink-soft)}
+footer a{color:var(--det)}
+:focus-visible{outline:2px solid var(--det);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+@media (max-width:560px){body{font-size:16px}header{padding:36px 0 30px}section{padding:36px 0}}
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <a href="#top">Domain 3</a>
+  <a href="#s31">3.1 CLAUDE.md</a>
+  <a href="#s32">3.2 Skills</a>
+  <a href="#s33">3.3 Rules</a>
+  <a href="#check">Check</a>
+  <a href="#s34">3.4 Plan mode</a>
+  <a href="#s35">3.5 Refinamiento</a>
+  <a href="#s36">3.6 CI/CD</a>
+  <a href="#chuleta">Chuleta</a>
+  <a href="#final">Examen</a>
+</div></nav>
+
+<header id="top"><div class="wrap">
+  <span class="eyebrow">Claude Certified Architect · Foundations · CCAR-F</span>
+  <h1>Domain 3<br>Configuración y flujos de Claude Code</h1>
+  <p class="lede">Un patrón se repite en todo el dominio: <code>.claude/</code> es del proyecto y viaja por git; <code>~/.claude/</code> es tuyo y no sale de tu máquina. Memorízalo y media docena de preguntas se contestan solas.</p>
+  <div class="hero-meta">
+    <span class="pill"><b>20%</b> del examen</span>
+    <span class="pill">6 task statements</span>
+    <span class="pill">~12 de 60 preguntas</span>
+    <span class="pill">Escenarios 2, 4 y 5</span>
+  </div>
+
+  <figure>
+    <svg viewBox="0 0 700 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagrama del scoping en Claude Code: la carpeta .claude del repositorio viaja por git a todo el equipo, mientras que ~/.claude se queda en la máquina de cada persona">
+      <g font-family="IBM Plex Mono, monospace" font-size="12">
+        <rect x="18" y="24" width="300" height="204" rx="7" fill="#fff" stroke="#0C6D78" stroke-width="1.6"/>
+        <text x="34" y="48" fill="#08525A" font-size="13" font-weight="600">.claude/ — proyecto</text>
+        <text x="34" y="67" fill="#4A5A6B" font-size="11">viaja por git · lo recibe todo el equipo</text>
+        <line x1="34" y1="78" x2="302" y2="78" stroke="#C9D3DC"/>
+        <text x="34" y="99" fill="#0F1A26">CLAUDE.md</text>
+        <text x="34" y="119" fill="#0F1A26">rules/*.md</text>
+        <text x="34" y="139" fill="#0F1A26">skills/&lt;n&gt;/SKILL.md</text>
+        <text x="34" y="159" fill="#0F1A26">commands/&lt;n&gt;.md</text>
+        <text x="34" y="179" fill="#0F1A26">.mcp.json</text>
+        <text x="34" y="207" fill="#0C6D78" font-size="11">estándares del equipo, comandos compartidos</text>
+
+        <rect x="382" y="24" width="300" height="204" rx="7" fill="#fff" stroke="#9C6600" stroke-width="1.6" stroke-dasharray="5 4"/>
+        <text x="398" y="48" fill="#9C6600" font-size="13" font-weight="600">~/.claude/ — usuario</text>
+        <text x="398" y="67" fill="#4A5A6B" font-size="11">se queda en tu máquina · nadie más lo ve</text>
+        <line x1="398" y1="78" x2="666" y2="78" stroke="#C9D3DC"/>
+        <text x="398" y="99" fill="#0F1A26">CLAUDE.md</text>
+        <text x="398" y="119" fill="#0F1A26">skills/&lt;n&gt;/SKILL.md</text>
+        <text x="398" y="139" fill="#0F1A26">commands/&lt;n&gt;.md</text>
+        <text x="398" y="159" fill="#0F1A26">~/.claude.json</text>
+        <text x="398" y="207" fill="#9C6600" font-size="11">preferencias propias, servidores experimentales</text>
+
+        <path d="M330 126 H370" stroke="#A62347" stroke-width="1.6" fill="none"/>
+        <path d="M340 116 L330 126 L340 136" stroke="#A62347" stroke-width="1.6" fill="none"/>
+        <path d="M360 116 L370 126 L360 136" stroke="#A62347" stroke-width="1.6" fill="none"/>
+        <text x="350" y="106" text-anchor="middle" fill="#A62347" font-size="11">no</text>
+        <text x="350" y="152" text-anchor="middle" fill="#A62347" font-size="11">cruzan</text>
+      </g>
+    </svg>
+    <figcaption>Confundir estos dos lados es la trampa favorita del dominio.</figcaption>
+  </figure>
+</div></header>
+
+<!-- ============ 3.1 ============ -->
+<section id="s31"><div class="wrap">
+  <span class="tag">Task Statement 3.1</span>
+  <h2>Jerarquía y organización de CLAUDE.md</h2>
+
+  <table>
+    <tr><th>Nivel</th><th>Ruta</th><th>Alcance</th><th>Para qué</th></tr>
+    <tr><td><strong>Usuario</strong></td><td><code>~/.claude/CLAUDE.md</code></td><td>Solo tú. Fuera del repo, no viaja por git.</td><td>Preferencias personales: verbosidad, estilo de salida, atajos propios.</td></tr>
+    <tr><td><strong>Proyecto</strong></td><td><code>.claude/CLAUDE.md</code> o <code>CLAUDE.md</code> en la raíz</td><td>Todo el equipo. Versionado.</td><td>Estándares compartidos: nomenclatura, manejo de errores, testing, decisiones de arquitectura.</td></tr>
+    <tr><td><strong>Directorio</strong></td><td><code>CLAUDE.md</code> en un subdirectorio</td><td>Solo al trabajar ahí.</td><td>Convenciones de un paquete concreto que el resto no necesita.</td></tr>
+  </table>
+  <p>Las dos rutas de proyecto son válidas y el examen puede presentar cualquiera de las dos.</p>
+
+  <div class="case">
+    <span class="lbl">Caso de uso · el compañero nuevo (la trampa estrella del 3.1)</span>
+    <p>La desarrolladora A lleva meses en el equipo y Claude Code sigue todas las convenciones a la perfección. El desarrollador B se incorpora, clona el repositorio y obtiene resultados inconsistentes que ignoran las convenciones. Mismo repo, misma rama.</p>
+    <p><strong>La causa raíz es siempre la misma:</strong> las convenciones están en la configuración de usuario de A (<code>~/.claude/CLAUDE.md</code>) en vez de en la de proyecto. La de usuario no se comparte por git, así que B nunca las recibió. <strong>El arreglo:</strong> mover las instrucciones de nivel usuario a nivel proyecto.</p>
+    <p>Diagnóstico a primera vista: «compañero nuevo» + «comportamiento inconsistente» → mira dónde vive la configuración.</p>
+  </div>
+
+  <h3>Orden de carga, no cadena de precedencia</h3>
+  <p>Aquí es donde el examen puede pillarte con un distractor que suena razonable. Los CLAUDE.md <strong>no</strong> son una configuración con precedencia estricta: todos los ficheros aplicables se concatenan en el mismo contexto, ninguno sustituye a otro.</p>
+  <p>Sí existe un <strong>orden de carga</strong> documentado: de alcance más amplio a más específico, de la raíz del sistema de ficheros hacia tu directorio de trabajo, y dentro de cada nivel el <code>CLAUDE.local.md</code> se añade después del <code>CLAUDE.md</code>. Pero leer el último no gana una contradicción. La documentación es tajante: si dos reglas se contradicen, Claude puede elegir cualquiera de las dos arbitrariamente.</p>
+
+  <div class="key">
+    <span class="lbl">La consecuencia práctica</span>
+    <p>Si una regla <strong>tiene que</strong> cumplirse en cada ejecución —una tool bloqueada, un formateador obligatorio, una política de permisos— no te apoyes en el scoping de CLAUDE.md. Ponla en <code>settings.json</code> (que el cliente impone al margen de lo que decida el modelo) o en un hook (que se dispara en un punto fijo del ciclo de vida). CLAUDE.md se entrega como mensaje de usuario, no como parte del system prompt, y no hay garantía de cumplimiento estricto.</p>
+  </div>
+
+  <div class="trap">
+    <span class="lbl">No confundas CLAUDE.md con settings.json</span>
+    <p><code>settings.json</code> sí tiene cadena de precedencia estricta (política gestionada &gt; local &gt; proyecto &gt; usuario, y la gestionada gana siempre). CLAUDE.md no. Si una pregunta plantea «¿qué CLAUDE.md gana ante un conflicto?», la respuesta honesta con la documentación es «ninguno lo tiene garantizado: mueve la regla a settings.json o a un hook». Sospecha de los distractores que afirman «gana el alcance más específico» o «el de usuario anula al de proyecto»: son paráfrasis que la documentación oficial nunca hace.</p>
+  </div>
+
+  <h3>Modularidad con imports <code>@</code></h3>
+  <pre># .claude/CLAUDE.md
+
+Estándares de código:
+
+@./standards/naming-conventions.md
+@./standards/error-handling.md
+@./standards/testing-requirements.md</pre>
+  <p>La directiva es <code>@</code> seguido de una ruta. <strong>No existe la palabra clave <code>@import</code></strong>, por mucho que la mitad de los ejemplos que encuentres por ahí la escriban así. Cada línea inlinea ese fichero dentro del CLAUDE.md al cargar, así que cada paquete puede importar solo los estándares que le aplican, sin duplicar.</p>
+
+  <div class="now">
+    <span class="lbl">Matiz que la documentación no destaca</span>
+    <p>Los imports cargan de forma <strong>eager</strong>: el fichero referenciado se inlinea en cuanto Claude lee tu CLAUDE.md, exactamente como si lo hubieras pegado. Partir un CLAUDE.md de 600 líneas en seis imports de 100 hace el fuente más manejable, pero el contexto que Claude ve pesa lo mismo. Para reducir contexto por sesión, la herramienta es <code>.claude/rules/</code> con frontmatter de rutas (el 3.3).</p>
+  </div>
+
+  <h3><code>CLAUDE.local.md</code></h3>
+  <p>Vive junto a un <code>CLAUDE.md</code> en cualquier nivel y carga igual, con tres diferencias: se añade después del <code>CLAUDE.md</code> de ese nivel (orden de carga, no precedencia), se suele poner en <code>.gitignore</code> por convención, y es para tus manías en <em>este</em> repo. Piénsalo como una versión con alcance de proyecto de tu <code>~/.claude/CLAUDE.md</code>. Si lo estás usando para expresar una regla del equipo, esa regla va en <code>CLAUDE.md</code>.</p>
+
+  <h3><code>/memory</code></h3>
+  <div class="key">
+    <span class="lbl">Key concept</span>
+    <p><code>/memory</code> <strong>no carga</strong> ficheros de configuración: revela cuáles están ya cargados. La configuración se carga automáticamente según su nivel y ubicación. Es una herramienta de diagnóstico, no de activación.</p>
+  </div>
+
+  <div class="now">
+    <span class="lbl">Matiz: /memory lista, /context confirma</span>
+    <p>La guía v1.0 trata <code>/memory</code> como el comando que muestra qué ficheros están cargados, y eso es lo que hay que contestar en el examen. El Claude Code actual reparte el trabajo: <code>/memory</code> lista tus CLAUDE.md, CLAUDE.local.md y ubicaciones de memoria automática, y te los abre en el editor; <code>/context</code> informa de lo que realmente se cargó en esta sesión, bajo «Memory files». Ninguno de los dos dispara la carga, que es la parte que el examen evalúa.</p>
+  </div>
+
+  <h3>Qué sobrevive a <code>/compact</code></h3>
+  <p>El <code>CLAUDE.md</code> de la raíz vuelve intacto, no por privilegio sino porque Claude lo relee de disco tras compactar y lo reinyecta; tus instrucciones nunca formaron parte del historial, así que no había nada que resumir. Lo que <strong>no</strong> vuelve automáticamente: los <code>CLAUDE.md</code> anidados en subdirectorios y los <code>.claude/rules/</code> con frontmatter <code>paths:</code>. Los dos cargan bajo demanda, así que reaparecen la próxima vez que Claude lea un fichero que encaje.</p>
+</div></section>
+
+<!-- ============ 3.2 ============ -->
+<section id="s32"><div class="wrap">
+  <span class="tag">Task Statement 3.2</span>
+  <h2>Slash commands y skills</h2>
+
+  <p>Comandos y skills se han fusionado en un <strong>sistema unificado de Skills</strong>. Las dos ubicaciones crean <code>/comandos</code> que se comportan igual, pero <strong>la estructura de fichero es distinta</strong>:</p>
+
+  <table>
+    <tr><th>Forma</th><th>Ruta</th><th>Crea</th></tr>
+    <tr><td><strong>Skill</strong> = directorio con <code>SKILL.md</code> dentro</td><td><code>.claude/skills/deploy/SKILL.md</code></td><td><code>/deploy</code></td></tr>
+    <tr><td><strong>Command</strong> = fichero markdown plano</td><td><code>.claude/commands/deploy.md</code></td><td><code>/deploy</code></td></tr>
+  </table>
+
+  <div class="trap">
+    <span class="lbl">La trampa de la estructura</span>
+    <p>Un fichero plano metido directamente en <code>.claude/skills/</code> (por ejemplo <code>.claude/skills/review.md</code>) <strong>no crea ningún comando</strong>. Las skills son directorios con su <code>SKILL.md</code> dentro; los ficheros planos solo funcionan bajo <code>.claude/commands/</code>.</p>
+  </div>
+
+  <p><code>.claude/skills/</code> es la ubicación canónica y añade cosas que el alias no tiene: un directorio para ficheros de apoyo junto al SKILL.md, descubrimiento automático (Claude puede cargar la skill cuando encaja con tu intención) y precedencia si una skill y un command comparten nombre (gana la skill). <code>.claude/commands/</code> sigue funcionando por retrocompatibilidad y admite el mismo frontmatter.</p>
+
+  <div class="key">
+    <span class="lbl">El patrón de scoping, otra vez</span>
+    <p><code>.claude/</code> es de proyecto y se comparte por git. <code>~/.claude/</code> es de usuario y es personal. Aplica a CLAUDE.md, a commands/skills y a rules. Es el patrón que más se repite en todo el Domain 3.</p>
+  </div>
+
+  <h3>Las tres opciones de frontmatter que evalúa el examen</h3>
+  <pre>---
+description: "Analiza un área del codebase y reporta estructura,
+               patrones y riesgos"
+context: fork
+allowed-tools:
+  - Read
+  - Grep
+  - Glob
+argument-hint: "Indica la ruta del módulo a analizar (p.ej. src/api/auth)"
+---</pre>
+
+  <p><strong><code>context: fork</code></strong> — ejecuta la skill en un contexto de subagente aislado. Toda la salida verbosa se queda dentro del fork y la conversación principal se mantiene limpia. Imprescindible para análisis de codebase (listados de ficheros, extractos de código), brainstorming (muchas alternativas y evaluaciones) y cualquier tarea exploratoria ruidosa. Sin esto, la salida de la skill entra en la conversación principal y consume ventana de contexto, lo que degrada las respuestas siguientes.</p>
+
+  <p><strong><code>allowed-tools</code></strong> — preaprueba las tools listadas para que Claude las use sin pedir permiso mientras la skill está activa.</p>
+
+  <p><strong><code>argument-hint</code></strong> — pide al desarrollador los parámetros necesarios cuando invoca la skill sin argumentos.</p>
+
+  <div class="now">
+    <span class="lbl">Matiz importante en allowed-tools</span>
+    <p>La guía del examen describe <code>allowed-tools</code> como algo que <em>restringe</em> a qué tools accede la skill, y esa es la respuesta esperada en el examen. En el Claude Code actual no restringe: preaprueba. Todas las demás tools siguen siendo invocables y tus ajustes de permisos habituales siguen mandando sobre lo que no esté en la lista. El límite real se pone con <code>disallowed-tools</code> o con reglas deny en los permisos.</p>
+    <p>Y el campo que más trabajo hace en la práctica ni siquiera está en la lista de los tres: <strong><code>description</code></strong>. Es lo que Claude lee para decidir si una skill aplica a lo que acabas de pedir, así que una skill sin descripción útil solo se ejecuta cuando escribes <code>/nombre</code> tú misma.</p>
+  </div>
+
+  <h3>Skills vs CLAUDE.md</h3>
+  <table>
+    <tr><th></th><th>Skills</th><th>CLAUDE.md</th></tr>
+    <tr><td><strong>Carga</strong></td><td>Bajo demanda. Las descripciones están siempre en contexto para que Claude sepa que existen, pero el cuerpo solo se carga al invocarla.</td><td>Siempre. Automático en cada sesión, sin paso de invocación.</td></tr>
+    <tr><td><strong>Invocación</strong></td><td>Explícita (<code>/nombre</code>) o automática si la <code>description</code> encaja con la intención.</td><td>Ninguna: ya está ahí.</td></tr>
+    <tr><td><strong>Para qué</strong></td><td>Flujos de trabajo puntuales y específicos de una tarea.</td><td>Estándares universales, siempre aplicables.</td></tr>
+  </table>
+  <p>La regla: no metas procedimientos específicos de una tarea en CLAUDE.md, y no metas material de referencia siempre-activo en una skill. Las convenciones de nomenclatura de API que deben aplicar a toda generación de código van en CLAUDE.md o en <code>.claude/rules/</code>. Un flujo de análisis multi-paso que se lanza de vez en cuando va en una skill.</p>
+
+  <h3>Personalización sin molestar al equipo</h3>
+  <p>Si el equipo tiene una skill estándar <code>/analyse</code> y tú prefieres una versión más verbosa, crea la tuya en <code>~/.claude/skills/</code> <strong>con otro nombre</strong> (por ejemplo <code>/deep-analyse</code>). No entra en conflicto ni sustituye a la del equipo.</p>
+</div></section>
+
+<!-- ============ 3.3 ============ -->
+<section id="s33"><div class="wrap">
+  <span class="tag">Task Statement 3.3</span>
+  <h2>Reglas por ruta</h2>
+
+  <p>Las reglas por ruta aplican convenciones condicionalmente según qué ficheros estés editando. Resuelven algo que ni el CLAUDE.md raíz ni el de directorio manejan bien: convenciones para un tipo de fichero repartido por muchos directorios.</p>
+
+  <pre>---
+paths: ["**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts"]
+---
+# Convenciones de test
+
+- Bloques describe/it con nombres que se lean como frases
+- Cada fichero necesita al menos un caso feliz y uno de error
+- Factory functions para los datos de test, no literales inline
+- Mockea servicios externos en la frontera del módulo</pre>
+
+  <p>Editas un fichero que encaja con el patrón y las reglas se cargan solas. Editas un componente React o un handler de API y no. Las reglas se mantienen invisibles hasta que son relevantes.</p>
+
+  <div class="case">
+    <span class="lbl">Caso de uso · tests repartidos por 50 directorios</span>
+    <p>Los tests viven al lado de su fuente: <code>Button.test.tsx</code> junto a <code>Button.tsx</code>, y así por todo el proyecto. El equipo quiere que todos sigan las mismas convenciones.</p>
+    <p><strong>Con CLAUDE.md de directorio:</strong> más de 50 copias de lo mismo, una nueva por cada directorio que estrene tests, y cualquier cambio obliga a tocar 50 ficheros. Deriva garantizada.</p>
+    <p><strong>Con reglas por ruta:</strong> un fichero, un patrón, cobertura universal.</p>
+  </div>
+
+  <div class="key">
+    <span class="lbl">Key concept</span>
+    <p>Las reglas por ruta son <strong>más eficientes en tokens</strong> que el CLAUDE.md raíz porque cargan SOLO al editar ficheros que encajan. El raíz carga en cada sesión sin importar qué toques: tus convenciones de Terraform gastan tokens mientras editas componentes React.</p>
+  </div>
+
+  <table>
+    <tr><th>Escenario</th><th>Mejor opción</th></tr>
+    <tr><td>Estándares universales para todo el código</td><td>CLAUDE.md raíz</td></tr>
+    <tr><td>Convenciones de un paquete concreto</td><td>CLAUDE.md de directorio</td></tr>
+    <tr><td>Convenciones de un tipo de fichero repartido por muchos directorios</td><td>Reglas por ruta con globs</td></tr>
+    <tr><td>Flujos puntuales invocados a demanda</td><td>Skills en <code>.claude/skills/</code></td></tr>
+  </table>
+
+  <div class="trap">
+    <span class="lbl">Skills vs rules para aplicación automática</span>
+    <p>Las dos pueden autoactivarse con frontmatter <code>paths</code>, pero hacen cosas distintas. Las <strong>rules</strong> se quedan en contexto como guía de fondo mientras Claude trabaja en ficheros que encajan, así que moldean cada edición. Las <strong>skills</strong> cargan bajo demanda como flujos de trabajo. Si la pregunta habla de carga automática y siempre-activa de convenciones para un tipo de fichero, la respuesta es reglas por ruta.</p>
+  </div>
+</div></section>
+
+<!-- ============ CHECKPOINT ============ -->
+<section id="check"><div class="wrap">
+  <span class="tag">Punto de control</span>
+  <h2>Chequeo rápido: 3.1 – 3.3</h2>
+  <div class="quiz" id="quizA"></div>
+</div></section>
+
+<!-- ============ 3.4 ============ -->
+<section id="s34"><div class="wrap">
+  <span class="tag">Task Statement 3.4</span>
+  <h2>Plan mode vs. ejecución directa</h2>
+
+  <div class="key">
+    <span class="lbl">La clave que decide casi todas las preguntas</span>
+    <p>La decisión no va de <strong>dificultad</strong>, va de <strong>ambigüedad</strong>. Un bug difícil pero bien definido (stack trace claro, una función, causa conocida) es ejecución directa. Una petición que suena sencilla pero se puede implementar de tres formas y toca varios módulos es plan mode.</p>
+  </div>
+
+  <h3>Plan mode</h3>
+  <ul>
+    <li><strong>Cambios a gran escala:</strong> reestructurar un monolito en microservicios, reorganizar un sistema de módulos, refactorizar una abstracción central.</li>
+    <li><strong>Varios enfoques válidos:</strong> cuando hay distintas maneras de resolverlo (por ejemplo arquitecturas de integración con requisitos de infraestructura distintos) hay que evaluarlas antes de comprometerse.</li>
+    <li><strong>Decisiones arquitectónicas:</strong> fronteras de servicio, dependencias entre módulos, contratos de API. Planificar evita rehacer.</li>
+    <li><strong>Modificaciones multi-fichero:</strong> una migración de librería que toca 45+ ficheros necesita estrategia consistente.</li>
+    <li><strong>Exploración necesaria:</strong> entender dependencias o trazar flujos antes de cambiar nada.</li>
+  </ul>
+  <p>En plan mode Claude lee el codebase, analiza dependencias y propone un enfoque <strong>sin modificar ningún fichero</strong>.</p>
+
+  <h3>Ejecución directa</h3>
+  <p>Para cambios bien acotados y entendidos: un bug de un fichero con stack trace claro, añadir una validación de fecha, actualizar un valor de configuración. Sabes qué cambiar, dónde y cómo; no hay decisión de diseño que tomar. Planificar no aporta nada.</p>
+
+  <h3>El subagente Explore</h3>
+  <p>Mantiene la salida verbosa del descubrimiento fuera de la conversación principal. En tareas multi-fase, explorar el codebase genera mucho ruido: listados, grafos de dependencias, extractos, notas. Si todo eso entra en la conversación principal, llena la ventana de contexto y arrastra la calidad de las respuestas posteriores. El subagente Explore corre la exploración aislada, produce resúmenes, los devuelve y deja el contexto principal limpio para la implementación.</p>
+
+  <h3>El híbrido: planificar y luego ejecutar</h3>
+  <div class="case">
+    <span class="lbl">Caso de uso · migración de librería de logging en 30 ficheros</span>
+    <p><strong>Fase de plan:</strong> identificar todos los ficheros que importan la librería vieja, mapear las diferencias de API entre vieja y nueva, diseñar el patrón de migración, detectar casos límite.</p>
+    <p><strong>Fase de ejecución:</strong> aplicar el patrón fichero a fichero con la estrategia ya decidida.</p>
+    <p>Es plan <strong>Y LUEGO</strong> directo, no plan <strong>O</strong> directo. El examen espera que reconozcas el patrón.</p>
+  </div>
+
+  <div class="trap">
+    <span class="lbl">Trampas de examen</span>
+    <ul>
+      <li>Ejecución directa por defecto para cambios arquitectónicos multi-fichero.</li>
+      <li>Plan mode para un bug de un fichero con stack trace claro.</li>
+      <li>No reconocer el patrón híbrido plan-luego-ejecuta.</li>
+      <li><strong>Empezar en directo y cambiar a plan mode cuando aparezca la complejidad.</strong> Si los requisitos ya dicen que la tarea es compleja («reestructurar el monolito en microservicios»), la complejidad no va a emerger más tarde: está ahí escrita. Esperar sorpresas es la jugada equivocada.</li>
+    </ul>
+  </div>
+</div></section>
+
+<!-- ============ 3.5 ============ -->
+<section id="s35"><div class="wrap">
+  <span class="tag">Task Statement 3.5</span>
+  <h2>Técnicas de refinamiento iterativo</h2>
+
+  <p>No todas las técnicas valen lo mismo. Hay un orden claro.</p>
+
+  <h3>1. Ejemplos concretos de entrada/salida</h3>
+  <p>Cuando describes una transformación en prosa y Claude Code la interpreta distinto cada vez, el arreglo <strong>no es más prosa</strong>. Son ejemplos.</p>
+  <pre>Entrada:
+  getUserData(userId: string): Promise&lt;UserData&gt;
+Salida esperada:
+  getUserData(userId: string): Promise&lt;Result&lt;UserData, ApiError&gt;&gt;
+
+Entrada:
+  fetchOrders(customerId: string): Promise&lt;Order[]&gt;
+Salida esperada:
+  fetchOrders(customerId: string): Promise&lt;Result&lt;Order[], ApiError&gt;&gt;</pre>
+  <p>Dos o tres ejemplos concretos fijan el patrón y el modelo lo generaliza a casos nuevos con más fiabilidad que con cualquier descripción en prosa. Y no se trata de acumular ejemplos: dos o tres bien elegidos que cubran el caso estándar y un caso límite clave bastan.</p>
+
+  <h3>2. Iteración guiada por tests</h3>
+  <p>Escribe los tests primero, cubriendo caso feliz, casos límite (nulos, entradas vacías, límites) y requisitos de rendimiento si aplican. Después comparte los fallos:</p>
+  <pre>FAIL: testMigrationHandlesNullValues
+  Expected: null preservado en el JSON de salida
+  Actual:   null sustituido por cadena vacía ""</pre>
+  <p>Ese mensaje le dice exactamente qué arreglar. No queda espacio para la interpretación cuando la salida del test dice «esperaba X, obtuve Y».</p>
+
+  <h3>3. Patrón entrevista</h3>
+  <p>Cuando trabajas en un dominio donde no eres experta, haz que Claude pregunte antes de implementar. En vez de «constrúyeme una capa de caché para la API», di «necesito una capa de caché para la API; antes de implementar, hazme preguntas sobre requisitos, casos límite y restricciones que debería considerar». Saldrán cosas como estrategias de invalidación, políticas de TTL, requisitos de consistencia y modos de fallo: lo que un experto sabría abordar y tú podrías pasar por alto.</p>
+
+  <div class="key">
+    <span class="lbl">No los confundas</span>
+    <p>El <strong>patrón entrevista</strong> es para dominios desconocidos donde podrías perderte consideraciones importantes. Los <strong>ejemplos concretos</strong> son para cuando sabes exactamente qué transformación quieres pero el modelo la interpreta de forma inconsistente. Problemas distintos, soluciones distintas.</p>
+  </div>
+
+  <h3>Batch vs. secuencial</h3>
+  <table>
+    <tr><th>Situación</th><th>Cómo dar el feedback</th></tr>
+    <tr><td>Los arreglos <strong>interactúan</strong> entre sí (cambiar el manejo de errores afecta al formato de log y a la estructura de respuesta)</td><td>Todo en un solo mensaje: el modelo necesita ver todas las restricciones a la vez para producir un arreglo coherente.</td></tr>
+    <tr><td>Los problemas son <strong>independientes</strong> (nomenclatura por un lado, indentación por otro)</td><td>Uno cada vez. Agrupar cosas independientes confunde al modelo sobre a qué parte del código aplica cada comentario.</td></tr>
+  </table>
+
+  <table>
+    <tr><th>Situación</th><th>Técnica</th></tr>
+    <tr><td>La prosa se interpreta distinto cada vez</td><td>Ejemplos concretos entrada/salida</td></tr>
+    <tr><td>Transformación compleja con muchos casos límite</td><td>Iteración guiada por tests</td></tr>
+    <tr><td>Dominio desconocido</td><td>Patrón entrevista</td></tr>
+    <tr><td>Varios problemas que se afectan</td><td>Feedback agrupado</td></tr>
+    <tr><td>Varios problemas independientes</td><td>Feedback secuencial</td></tr>
+  </table>
+
+  <div class="trap">
+    <span class="lbl">La trampa principal</span>
+    <p>Elegir «reescribir la prosa con lenguaje más preciso» cuando el modelo interpreta de forma inconsistente. Una prosa más precisa <strong>sigue dependiendo de la interpretación</strong>. Los ejemplos la eliminan. Ante interpretación inconsistente, la respuesta es siempre ejemplos primero.</p>
+  </div>
+</div></section>
+
+<!-- ============ 3.6 ============ -->
+<section id="s36"><div class="wrap">
+  <span class="tag">Task Statement 3.6</span>
+  <h2>Integración en CI/CD</h2>
+
+  <div class="key">
+    <span class="lbl">El dato más directamente evaluable de todo el Domain 3</span>
+    <p>La flag <span class="k">-p</span> (o <code>--print</code>). Claude Code arranca en modo interactivo y espera entrada de teclado; un pipeline de CI no tiene teclado, así que el job se cuelga para siempre. Con <code>-p</code> procesa el prompt, escribe el resultado en stdout y sale.</p>
+    <p>Cuando veas un job colgado y logs de Claude esperando input, la respuesta es <code>-p</code>. <strong>No</strong> es <code>CLAUDE_HEADLESS=true</code> (no existe), <strong>no</strong> es <code>--batch</code> (no existe) y <strong>no</strong> es redirigir stdin desde <code>/dev/null</code>.</p>
+  </div>
+
+  <h3>Salida estructurada</h3>
+  <p>En CI nadie lee la salida: la procesan sistemas automáticos. Dos flags trabajan juntas: <code>--output-format json</code> envuelve la ejecución en un sobre JSON (texto del resultado, session ID, metadatos de coste y uso) y <code>--json-schema</code> valida la salida final contra un esquema.</p>
+  <pre>claude -p \
+  --output-format json \
+  --json-schema '{"type":"object","properties":{"findings":{...}}}' \
+  "Revisa esta PR buscando problemas de seguridad"</pre>
+  <p><strong>Detalle que importa:</strong> los datos conformes al esquema aterrizan en el campo <code>structured_output</code> del sobre. Se extraen con <code>jq '.structured_output'</code>, no del nivel superior.</p>
+
+  <h3>Aislamiento de contexto entre sesiones</h3>
+  <p>La misma sesión que generó el código es <strong>menos eficaz</strong> revisándolo. No es una preocupación teórica: al generar, Claude acumula contexto de razonamiento (por qué eligió ese enfoque, qué alternativas descartó). Si le pides revisar en la misma sesión, conserva todo eso y es menos probable que cuestione decisiones que ya se justificó a sí mismo. El arreglo es una invocación independiente para la revisión, sin acceso al razonamiento de la generación.</p>
+
+  <h3>Contexto de revisión incremental</h3>
+  <div class="case">
+    <span class="lbl">Caso de uso · los cinco comentarios de siempre</span>
+    <p>Las revisiones automáticas corren en cada push. Sin contexto de revisiones previas, cada ejecución analiza la PR desde cero y vuelve a derivar los mismos hallazgos. Un problema realmente corregido desaparece solo, porque el código ya no lo dispara. Los que vuelven una y otra vez son los que el desarrollador vio y decidió deliberadamente no cambiar, y un re-escaneo sin contexto no puede distinguirlos de un problema nuevo.</p>
+    <p><strong>El arreglo:</strong> incluir los hallazgos previos en el contexto e instruir a Claude para reportar solo lo nuevo o lo que sigue sin resolverse. Los comentarios duplicados erosionan la confianza: si cada push genera los mismos cinco comentarios hagas lo que hagas, la gente deja de leerlos.</p>
+  </div>
+
+  <h3>CLAUDE.md como contexto de CI</h3>
+  <p>Claude Code lee los CLAUDE.md en CI igual que en interactivo, así que es tu vía para darle contexto de proyecto a una ejecución automatizada: estándares de testing, fixtures disponibles, criterios de revisión (qué es crítico y qué es estilo menor) y cobertura ya existente para no sugerir tests duplicados. Sin eso, la generación de tests en CI produce boilerplate de poco valor.</p>
+
+  <h3>Flags que conviene tener fichadas</h3>
+  <table>
+    <tr><th>Flag</th><th>Efecto</th></tr>
+    <tr><td><code>--system-prompt</code> / <code>--system-prompt-file</code></td><td><strong>Sustituye</strong> el system prompt por completo</td></tr>
+    <tr><td><code>--append-system-prompt</code> / <code>--append-system-prompt-file</code></td><td><strong>Añade</strong> al prompt por defecto</td></tr>
+    <tr><td><code>--max-turns &lt;n&gt;</code></td><td>Limita los turnos agénticos y sale</td></tr>
+    <tr><td><code>--allowedTools</code> / <code>--disallowedTools</code></td><td>Sin prompt de permiso / reglas deny (un nombre a secas saca la tool del contexto)</td></tr>
+    <tr><td><code>--permission-mode</code></td><td><code>default</code>, <code>acceptEdits</code>, <code>plan</code>, <code>auto</code>, <code>dontAsk</code>, <code>bypassPermissions</code></td></tr>
+    <tr><td><code>--bare</code></td><td>Modo mínimo: se salta el autodescubrimiento de hooks, skills, plugins, servidores MCP y CLAUDE.md</td></tr>
+  </table>
+  <p><strong>Añadir</strong> cuando Claude deba seguir siendo un asistente de código que además cumple tus reglas: conservas la guía de tools, las instrucciones de seguridad y las convenciones por defecto. <strong>Sustituir</strong> cuando la identidad o el modelo de permisos sean distintos, como un agente no-programador en un pipeline sin supervisión: al reemplazar te quedas dueña de todo lo que la tarea siga necesitando.</p>
+
+  <h3>Batch API vs. tiempo real</h3>
+  <table>
+    <tr><th>Flujo</th><th>API</th><th>Motivo</th></tr>
+    <tr><td>Checks pre-merge (bloqueantes)</td><td>Tiempo real</td><td>La gente está esperando para poder mergear</td></tr>
+    <tr><td>Informe de deuda técnica nocturno</td><td>Batch</td><td>No es sensible a latencia; 50% de ahorro</td></tr>
+    <tr><td>Auditoría semanal de código</td><td>Batch</td><td>Programada y tolerante a latencia</td></tr>
+    <tr><td>Generación de tests nocturna</td><td>Batch</td><td>Corre de noche, se revisa por la mañana</td></tr>
+  </table>
+  <p>La Batch API ofrece un 50% de ahorro pero con procesamiento de hasta 24 horas y sin SLA de latencia. Eso la descarta para cualquier flujo bloqueante.</p>
+</div></section>
+
+<!-- ============ CHULETA ============ -->
+<section id="chuleta"><div class="wrap">
+  <span class="tag">Repaso</span>
+  <h2>Chuleta de desambiguación</h2>
+
+  <table>
+    <tr><th>Si dudas entre…</th><th>Quédate con esto</th></tr>
+    <tr><td><code>.claude/</code> vs <code>~/.claude/</code></td><td>Proyecto (git, todo el equipo) vs usuario (personal, no sale de tu máquina). Aplica a CLAUDE.md, skills, commands y MCP.</td></tr>
+    <tr><td>Skill vs command</td><td>Skill = <strong>directorio</strong> con SKILL.md dentro. Command = fichero <strong>plano</strong> .md. Un .md suelto en skills/ no crea nada.</td></tr>
+    <tr><td>CLAUDE.md vs skill</td><td>Siempre cargado y universal vs bajo demanda y específico de tarea.</td></tr>
+    <tr><td>Rules por ruta vs CLAUDE.md de directorio</td><td>¿El tipo de fichero está repartido por muchos directorios? Rules con globs. ¿Es un paquete concreto? CLAUDE.md de directorio.</td></tr>
+    <tr><td>CLAUDE.md vs settings.json</td><td>Precedencia estricta solo en settings.json. Si la regla debe cumplirse siempre, no la dejes en CLAUDE.md.</td></tr>
+    <tr><td>Plan mode vs directo</td><td><strong>Ambigüedad, no dificultad.</strong> Y si la complejidad ya está en los requisitos, plan mode desde el principio.</td></tr>
+    <tr><td>Ejemplos vs entrevista</td><td>Sé qué quiero pero lo interpreta mal → ejemplos. No sé qué debería considerar → entrevista.</td></tr>
+    <tr><td>Batch vs secuencial</td><td>¿Los arreglos se afectan entre sí? Un solo mensaje. ¿Independientes? De uno en uno.</td></tr>
+  </table>
+
+  <h3>Cinco frases que valen puntos</h3>
+  <ul>
+    <li><code>-p</code> para CI. Ni <code>--batch</code> ni <code>CLAUDE_HEADLESS</code> existen.</li>
+    <li><code>/memory</code> diagnostica, no carga.</li>
+    <li>Los imports <code>@</code> cargan eager: modularizan el fuente, no reducen el contexto.</li>
+    <li>La sesión que generó el código es peor revisándolo.</li>
+    <li>Los tests repartidos por el codebase son siempre reglas por ruta con globs.</li>
+  </ul>
+</div></section>
+
+<!-- ============ FINAL ============ -->
+<section id="final"><div class="wrap">
+  <span class="tag">Simulacro</span>
+  <h2>Examen del Domain 3</h2>
+  <div class="quiz" id="quizB"></div>
+</div></section>
+
+<footer><div class="wrap">
+  <p>Guía de estudio del Domain 3 (20%) para el <strong>Claude Certified Architect — Foundations</strong> (CCAR-F), elaborada a partir del temario de <a href="https://claudecertificationguide.com/learn/3-claude-code-config">claudecertificationguide.com</a> y del Exam Guide oficial v1.0 (julio 2026).</p>
+</div></footer>
+
+<script>
+const QUIZ_A = [
+  {
+    stem:"El Claude Code de la desarrolladora A sigue las convenciones de nomenclatura del equipo. El del desarrollador B, que entró la semana pasada, no. Mismo repo, misma rama. ¿Causa raíz más probable?",
+    opts:[
+      "B no ha instalado el servidor MCP que sirve las reglas de nomenclatura",
+      "Las convenciones están en el CLAUDE.md de usuario de A (~/.claude/CLAUDE.md) en vez de en la configuración de proyecto",
+      "B no ha ejecutado /memory para cargar los ficheros de configuración en su sesión",
+      "Las convenciones están en un .claude/rules/ que el setup local de B no soporta"
+    ],
+    ok:1,
+    why:"«Compañero nuevo» + «comportamiento inconsistente» apunta siempre a dónde vive la configuración. El nivel usuario no viaja por git, así que B nunca recibió esas instrucciones. Y ojo: /memory diagnostica, no carga."
+  },
+  {
+    stem:"Los tests viven junto a su fuente en más de 50 directorios y el equipo quiere que todos sigan las mismas convenciones. ¿Enfoque más mantenible?",
+    opts:[
+      "Añadir las convenciones al CLAUDE.md raíz",
+      "Un fichero en .claude/rules/ con frontmatter paths: [\"**/*.test.tsx\", \"**/*.test.ts\"]",
+      "Un CLAUDE.md en cada directorio que contenga tests",
+      "Una skill en .claude/skills/ que los desarrolladores invoquen antes de escribir tests"
+    ],
+    ok:1,
+    why:"Un fichero, un patrón, cobertura universal. El CLAUDE.md por directorio son 50 copias que derivan. El raíz gastaría tokens en cada sesión aunque estés editando otra cosa. Y una skill requiere invocación, no es automática."
+  },
+  {
+    stem:"Creas .claude/skills/review.md con tu checklist de revisión y el comando /review no aparece. ¿Por qué?",
+    opts:[
+      "Falta el frontmatter description",
+      "Las skills son directorios con un SKILL.md dentro: un fichero plano solo funciona bajo .claude/commands/",
+      "Hay que reiniciar Claude Code para que descubra skills nuevas",
+      "El nombre review está reservado por el sistema"
+    ],
+    ok:1,
+    why:"Las dos rutas crean los mismos comandos pero con estructura de fichero distinta. Un .md suelto dentro de .claude/skills/ no se recoge; tendría que ser .claude/skills/review/SKILL.md."
+  },
+  {
+    stem:"Una skill de análisis de codebase llena la conversación principal con listados de ficheros y extractos, y las respuestas posteriores empeoran. ¿Qué frontmatter añades?",
+    opts:[
+      "allowed-tools con Read, Grep y Glob",
+      "context: fork",
+      "argument-hint indicando el módulo a analizar",
+      "disable-model-invocation: true"
+    ],
+    ok:1,
+    why:"context: fork ejecuta la skill en un subagente aislado: la salida verbosa se queda dentro y la conversación principal recibe solo el resumen. Es exactamente el escenario que el examen plantea."
+  }
+];
+
+const QUIZ_B = [
+  {
+    stem:"Un script de CI ejecuta claude con un prompt y el job se cuelga indefinidamente. Los logs muestran a Claude Code esperando entrada interactiva. ¿Arreglo?",
+    opts:[
+      "Definir la variable de entorno CLAUDE_HEADLESS=true antes de ejecutar",
+      "Añadir la flag --batch para activar el modo de procesamiento por lotes",
+      "Añadir la flag -p para que corra en modo print no interactivo",
+      "Redirigir stdin desde /dev/null"
+    ],
+    ok:2,
+    why:"-p (o --print) es el método documentado: procesa el prompt, escribe en stdout y sale. Las otras dos flags no existen, y la redirección de stdin no aborda el modo interactivo de Claude Code."
+  },
+  {
+    stem:"Tres tareas: (1) reestructurar un monolito en microservicios, (2) arreglar un null pointer en una función con stack trace claro, (3) migrar de una librería de logging a otra en 30 ficheros. ¿Qué modo para cada una?",
+    opts:[
+      "Plan mode para las tres, porque todas implican cambios de código",
+      "Plan mode para (1) y (3); ejecución directa para (2)",
+      "Ejecución directa para las tres con instrucciones detalladas de entrada",
+      "Plan mode solo para (1); directo para el resto"
+    ],
+    ok:1,
+    why:"(2) es el caso de libro de ejecución directa: problema, ubicación y solución conocidos. (1) y (3) necesitan estrategia previa; (3) además es el híbrido: planificar el patrón de migración y luego ejecutarlo fichero a fichero."
+  },
+  {
+    stem:"Describes una transformación de código en prosa y Claude Code la interpreta distinto en cada ejecución. ¿Qué pruebas primero?",
+    opts:[
+      "Reescribir la prosa con lenguaje más preciso y terminología técnica",
+      "Dar 2-3 ejemplos concretos de entrada y salida esperada",
+      "Escribir una batería de tests e iterar compartiendo los fallos",
+      "Usar el patrón entrevista para que Claude pregunte antes de implementar"
+    ],
+    ok:1,
+    why:"Una prosa más precisa sigue dependiendo de la interpretación; los ejemplos la eliminan. Los tests son la técnica para transformaciones complejas con muchos casos límite, y la entrevista es para dominios que no dominas."
+  },
+  {
+    stem:"Quieres reducir el contexto que se carga en cada sesión y partes de un CLAUDE.md de 600 líneas. Alguien propone dividirlo en seis ficheros importados con @. ¿Funciona?",
+    opts:[
+      "Sí: solo se carga el import que corresponda a lo que estés editando",
+      "No: los imports cargan eager, así que el contexto pesa lo mismo. Para reducirlo por sesión, .claude/rules/ con frontmatter de rutas",
+      "Sí, siempre que uses la palabra clave @import en cada línea",
+      "No: los imports no están soportados en CLAUDE.md de proyecto"
+    ],
+    ok:1,
+    why:"Dividir mejora la mantenibilidad del fuente, no el consumo de contexto: el fichero se inlinea en cuanto Claude lee el CLAUDE.md. Y no existe la palabra clave @import: la directiva es @ seguido de la ruta."
+  },
+  {
+    stem:"Dos CLAUDE.md aplicables se contradicen. ¿Cuál gana?",
+    opts:[
+      "El de alcance más específico, siempre",
+      "El de usuario, que anula al de proyecto",
+      "Ninguno lo tiene garantizado: los ficheros se concatenan y Claude puede elegir arbitrariamente. Si la regla debe cumplirse siempre, va a settings.json o a un hook",
+      "El que se cargue primero, por orden de lectura"
+    ],
+    ok:2,
+    why:"Es la trampa del 3.1. Precedencia estricta la tiene settings.json, no CLAUDE.md, que además se entrega como mensaje de usuario y sin garantía de cumplimiento estricto. Las opciones A y B son paráfrasis que la documentación nunca hace."
+  },
+  {
+    stem:"Tu pipeline genera código con Claude Code y después le pide revisarlo en la misma invocación. Los revisores humanos encuentran problemas que se le escaparon. ¿Por qué?",
+    opts:[
+      "El modelo tiene un límite de tokens que se agota antes de la revisión",
+      "La sesión conserva el contexto de razonamiento de la generación, así que es menos probable que cuestione decisiones que ya se justificó",
+      "La revisión necesita un modelo distinto al de generación",
+      "Falta la flag --verbose para que reporte todos los hallazgos"
+    ],
+    ok:1,
+    why:"El arreglo es una invocación independiente para la revisión, sin acceso al razonamiento previo. Evalúa el código por sus méritos, sin el sesgo de la justificación anterior."
+  },
+  {
+    stem:"El equipo quiere reducir costes de API. Hay dos flujos: un check pre-merge bloqueante y un informe de deuda técnica que se genera de noche. Proponen pasar los dos a la Batch API por el 50% de ahorro. ¿Qué respondes?",
+    opts:[
+      "Batch para los dos, con polling para comprobar la finalización",
+      "Batch solo para el informe nocturno; tiempo real para el check pre-merge",
+      "Tiempo real para los dos, para evitar problemas de orden en los resultados",
+      "Batch para los dos con fallback a tiempo real si tardan demasiado"
+    ],
+    ok:1,
+    why:"La Batch API tiene hasta 24 horas de procesamiento sin SLA de latencia: inservible para un flujo bloqueante donde la gente espera para mergear, ideal para uno nocturno. El fallback añade complejidad innecesaria."
+  },
+  {
+    stem:"Las revisiones automáticas repiten los mismos cinco comentarios en cada push y el equipo ha dejado de leerlos. ¿Qué implementas?",
+    opts:[
+      "Reducir el número máximo de hallazgos por ejecución",
+      "Incluir los hallazgos de la revisión previa en el contexto e instruir a Claude para reportar solo lo nuevo o lo que sigue sin resolverse",
+      "Ejecutar la revisión solo en el último push antes del merge",
+      "Subir el umbral de severidad para que se reporte menos"
+    ],
+    ok:1,
+    why:"Sin contexto previo, cada ejecución analiza desde cero y no distingue un problema nuevo de uno que el desarrollador vio y decidió no cambiar. Las otras opciones reducen ruido perdiendo señal."
+  },
+  {
+    stem:"Ejecutas claude -p con --output-format json y --json-schema. ¿De dónde extraes los datos validados contra el esquema?",
+    opts:[
+      "Del nivel superior del JSON devuelto",
+      "Del campo structured_output del sobre, por ejemplo con jq '.structured_output'",
+      "De stderr, que es donde va la salida estructurada",
+      "Del fichero que --json-schema genera en el directorio de trabajo"
+    ],
+    ok:1,
+    why:"--output-format json envuelve la ejecución en un sobre con texto del resultado, session ID y metadatos de coste. Los datos conformes al esquema viven dentro, en structured_output."
+  },
+  {
+    stem:"Necesitas que Claude Code siga siendo un asistente de código en tu pipeline, pero cumpliendo además tres reglas internas del equipo. ¿Qué flag usas?",
+    opts:[
+      "--system-prompt con el texto completo de tus reglas",
+      "--append-system-prompt con tus reglas, para conservar la guía de tools, las instrucciones de seguridad y las convenciones por defecto",
+      "--bare, para partir de un estado mínimo y añadir solo lo tuyo",
+      "--permission-mode bypassPermissions"
+    ],
+    ok:1,
+    why:"Añadir conserva todo el prompt por defecto y solo aporta lo que difiere. Sustituir es para cuando la identidad o el modelo de permisos son distintos de los de Claude Code, y te deja dueña de todo lo que la tarea siga necesitando."
+  }
+];
+
+const LETTERS=['A','B','C','D'];
+function renderQuiz(id,data,label){
+  const root=document.getElementById(id);
+  const st={a:0,r:0};
+  data.forEach((q,i)=>{
+    const d=document.createElement('div'); d.className='q';
+    const n=document.createElement('span'); n.className='num'; n.textContent=label+' '+(i+1)+' / '+data.length;
+    const s=document.createElement('p'); s.className='stem'; s.textContent=q.stem;
+    d.append(n,s);
+    const w=document.createElement('div'); w.className='why';
+    q.opts.forEach((o,j)=>{
+      const b=document.createElement('button'); b.className='opt'; b.type='button';
+      b.innerHTML='<span style="font-family:var(--mono);font-size:12px;color:var(--ink-soft);margin-right:9px;font-weight:600">'+LETTERS[j]+'</span>';
+      b.appendChild(document.createTextNode(o));
+      b.addEventListener('click',()=>{
+        const all=d.querySelectorAll('.opt');
+        all.forEach(x=>x.disabled=true);
+        all[q.ok].classList.add('good');
+        const hit=j===q.ok;
+        if(!hit) b.classList.add('bad');
+        w.className='why show '+(hit?'ok':'no');
+        w.innerHTML='<b>'+(hit?'Correcto.':'No es esa.')+'</b> '+q.why;
+        st.a++; if(hit) st.r++;
+        sc.innerHTML='Respondidas <b>'+st.a+'/'+data.length+'</b> · Aciertos <b>'+st.r+'</b>';
+      });
+      d.appendChild(b);
+    });
+    d.appendChild(w); root.appendChild(d);
+  });
+  const sc=document.createElement('div'); sc.className='score';
+  sc.innerHTML='Respondidas <b>0/'+data.length+'</b> · Aciertos <b>0</b>';
+  root.appendChild(sc);
+}
+renderQuiz('quizA',QUIZ_A,'Check');
+renderQuiz('quizB',QUIZ_B,'Pregunta');
+</script>
+</body>
+</html>

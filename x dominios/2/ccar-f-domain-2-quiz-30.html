@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz 30 · Domain 2 Tool Design &amp; MCP — CCAR-F</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#E7ECF1; --panel:#FAFBFC; --ink:#0F1A26; --ink-soft:#4A5A6B;
+  --line:#C9D3DC; --det:#0C6D78; --anti:#A62347;
+  --display:'Space Grotesk',system-ui,sans-serif;
+  --body:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16.5px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:760px;margin:0 auto;padding:0 22px}
+header{padding:48px 0 28px}
+.eyebrow{font-family:var(--mono);font-size:12.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--det)}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(1.9rem,5.5vw,2.6rem);line-height:1.08;letter-spacing:-.025em;margin:.3em 0 .35em}
+.lede{color:var(--ink-soft);margin:0 0 18px;max-width:60ch}
+.dist{display:flex;flex-wrap:wrap;gap:7px}
+.dist span{font-family:var(--mono);font-size:11.5px;border:1px solid var(--line);background:var(--panel);padding:4px 9px;border-radius:100px;color:var(--ink-soft)}
+.bar-wrap{position:sticky;top:0;z-index:10;background:rgba(231,236,241,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:11px 0}
+.bar-inner{display:flex;align-items:center;gap:14px}
+.track{flex:1;height:5px;background:#D3DCE4;border-radius:3px;overflow:hidden}
+.fill{height:100%;width:0;background:var(--det);transition:width .25s ease}
+.counter{font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);white-space:nowrap}
+.counter b{color:var(--ink)}
+main{padding:6px 0 20px}
+.sec{font-family:var(--display);font-weight:700;font-size:1.12rem;letter-spacing:-.01em;margin:32px 0 2px;padding-bottom:7px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.sec .cnt{font-family:var(--mono);font-size:11.5px;font-weight:400;color:var(--ink-soft)}
+.q{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:18px 20px 16px;margin:14px 0}
+.num{font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;color:var(--det)}
+.stem{font-weight:600;line-height:1.45;margin:5px 0 12px}
+.opt{display:block;width:100%;text-align:left;font:inherit;font-size:.95rem;line-height:1.45;background:#fff;border:1px solid var(--line);border-radius:5px;padding:10px 13px;margin-bottom:7px;cursor:pointer;transition:border-color .12s,background .12s}
+.opt:hover:not(:disabled){border-color:var(--ink-soft)}
+.opt:disabled{cursor:default}
+.opt .letter{font-family:var(--mono);font-size:12px;color:var(--ink-soft);margin-right:9px;font-weight:600}
+.opt.good{border-color:var(--det);background:#E6F1F2;box-shadow:inset 3px 0 0 var(--det)}
+.opt.good .letter{color:var(--det)}
+.opt.bad{border-color:var(--anti);background:#FBF0F3;box-shadow:inset 3px 0 0 var(--anti)}
+.opt.bad .letter{color:var(--anti)}
+.hintbtn{font-family:var(--mono);font-size:11.5px;color:var(--ink-soft);background:none;border:none;padding:3px 0;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.hintbtn:hover{color:var(--ink)}
+.hinttext{font-size:.9rem;color:var(--ink-soft);font-style:italic;margin:2px 0 10px;display:none}
+.hinttext.show{display:block}
+.why{font-size:.93rem;margin-top:10px;padding:12px 14px;border-radius:5px;background:#F0F3F6;border:1px solid var(--line);display:none}
+.why.show{display:block}
+.why b{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.08em}
+.why.ok b{color:var(--det)}
+.why.no b{color:var(--anti)}
+.result{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--det);border-radius:0 8px 8px 0;padding:24px;margin:30px 0 10px;display:none}
+.result.show{display:block}
+.result h2{font-family:var(--display);font-weight:700;font-size:1.35rem;margin:0 0 .35em}
+.big{font-family:var(--mono);font-size:2.2rem;font-weight:600;color:var(--det);line-height:1}
+.verdict{margin:.7em 0 1.2em;color:var(--ink-soft)}
+table{width:100%;border-collapse:collapse;font-size:.92rem;margin-top:6px}
+th,td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--line)}
+th{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);font-weight:600}
+td.sc{font-family:var(--mono);white-space:nowrap}
+td.sc.weak{color:var(--anti);font-weight:600}
+td.sc.strong{color:var(--det)}
+.reset{font-family:var(--mono);font-size:12.5px;background:var(--ink);color:var(--panel);border:none;border-radius:5px;padding:9px 16px;margin-top:18px;cursor:pointer}
+.reset:hover{background:var(--det)}
+footer{padding:26px 0 56px;font-size:.88rem;color:var(--ink-soft)}
+:focus-visible{outline:2px solid var(--det);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+@media (max-width:560px){body{font-size:16px}header{padding:34px 0 22px}}
+</style>
+</head>
+<body>
+
+<header><div class="wrap">
+  <span class="eyebrow">CCAR-F · Domain 2 · 18% del examen</span>
+  <h1>30 preguntas: diseño de tools e integración MCP</h1>
+  <p class="lede">Cobertura completa de las cinco task statements. Ojo al bloque 2.3: es donde el examen te obliga a distinguir tres arreglos distintos para el mismo síntoma.</p>
+  <div class="dist"><span>2.1 · 6</span><span>2.2 · 6</span><span>2.3 · 7</span><span>2.4 · 5</span><span>2.5 · 6</span></div>
+</div></header>
+
+<div class="bar-wrap"><div class="wrap bar-inner">
+  <div class="track"><div class="fill" id="fill"></div></div>
+  <span class="counter" id="counter">Respondidas <b>0</b>/30 · Aciertos <b>0</b></span>
+</div></div>
+
+<main><div class="wrap" id="quiz"></div>
+<div class="wrap"><div class="result" id="result"></div></div></main>
+
+<footer><div class="wrap">Preguntas propias basadas en el temario del Domain 2 y en los objetivos del Exam Guide v1.0 (julio 2026). No reproducen las preguntas de muestra oficiales.</div></footer>
+
+<script>
+const SECTIONS=[
+ {ts:"2.1",title:"Diseño de la interfaz de tools",qs:[
+  {stem:"Los logs muestran que el agente llama a get_customer cuando el usuario pregunta por un pedido. Ambas descripciones son de una línea. Solo hay cinco tools. ¿Primer paso?",
+   hint:"Cuenta las tools antes de elegir remedio.",
+   opts:["Añadir 5-8 few-shot examples con el enrutado correcto","Ampliar cada descripción con formatos, ejemplos, casos límite y fronteras frente a la otra","Unificar ambas en una tool lookup_entity que acepte cualquier identificador","Montar una capa de enrutado que preseleccione la tool por keywords"],
+   ok:1,why:"Con cinco tools es un problema de descripciones, no de sobrecarga. Menos esfuerzo, más palanca. Los few-shot añaden tokens sin tocar la causa; el clasificador es sobreingeniería; consolidar cuesta mucho más."},
+  {stem:"¿Cuáles son los cinco elementos de una descripción de tool de producción?",
+   opts:["Nombre, versión, autor, esquema y ejemplos","Propósito, inputs esperados, consultas de ejemplo, casos límite y fronteras frente a tools similares","Propósito, coste, latencia, permisos y formato de salida","Propósito, esquema JSON, tests, logs y política de reintentos"],
+   ok:1,why:"Los tres últimos son los que marcan la diferencia: sin ejemplos, casos límite y —sobre todo— fronteras explícitas («NO la uses para X»), el modelo no tiene con qué desambiguar."},
+  {stem:"Tienes una tool analyze_document que resume, extrae campos y verifica afirmaciones. El agente la usa mal a menudo. ¿Qué haces?",
+   opts:["Ampliar su descripción para cubrir los tres usos con ejemplos de cada uno","Dividirla en extract_data_points, summarize_content y verify_claim_against_source, con contratos definidos","Forzar su llamada con tool_choice para que al menos se use siempre","Añadir un parámetro mode con tres valores posibles"],
+   ok:1,why:"Una tool genérica con responsabilidad amplia crea ambigüedad por diseño. Dividir en tools específicas con contratos de entrada y salida definidos deja que el modelo elija según lo que el usuario necesita de verdad."},
+  {stem:"Después de reescribir las descripciones, el agente sigue enrutando mal las consultas de cliente. ¿Qué revisas?",
+   opts:["El orden en que registras las tools","El system prompt, por instrucciones sensibles a keywords que crean asociaciones no intencionadas","La temperatura del modelo","El esquema de entrada de cada tool"],
+   ok:1,why:"Modo de fallo sutil que el examen prueba: una frase como «comprueba siempre los datos del cliente» puede anular descripciones bien escritas."},
+  {stem:"Dos tools tienen nombres confusamente parecidos: analyze_content y analyze_document. ¿Arreglo más directo a nivel de interfaz?",
+   opts:["Renombrar una de ellas (por ejemplo a extract_web_results) y darle una descripción específica de su ámbito","Fusionarlas en una sola tool","Documentar la diferencia en el system prompt","Eliminar la menos usada"],
+   ok:0,why:"Renombrar arregla el solape en la interfaz sin tocar la implementación. El propósito pasa a ser inequívoco desde el nombre."},
+  {stem:"¿Qué principio general sigue el examen al elegir entre arreglos posibles para un problema de selección de tools?",
+   opts:["El más robusto a largo plazo, aunque requiera infraestructura","El de menos esfuerzo y más palanca: descripciones antes que clasificadores, acceso acotado antes que total, comunidad antes que build propio","El que menos tokens consuma en tiempo de ejecución","El que menos dependa del modelo concreto"],
+   ok:1,why:"Es el patrón transversal del dominio. Cuando dudes entre dos opciones correctas, gana la proporcionada al problema."}
+ ]},
+
+ {ts:"2.2",title:"Respuestas de error estructuradas",qs:[
+  {stem:"Una tool devuelve un array vacío al buscar un cliente. El agente reintenta tres veces y escala. La cuenta no existe. ¿Causa raíz?",
+   opts:["El límite de reintentos es demasiado bajo","El umbral de escalado es demasiado agresivo","La tool no distingue entre fallo de acceso y resultado vacío válido","El system prompt debería prohibir reintentar búsquedas de cliente"],
+   ok:2,why:"La tool funcionó: consultó y no encontró nada. El problema es que su respuesta se parece a la de un fallo. Un vacío válido va con isError: false y resultCount: 0."},
+  {stem:"Un reembolso supera el límite de política. ¿Cómo responde la tool?",
+   opts:["errorCategory business, isRetryable false y una descripción que explique el límite y sugiera escalar","errorCategory transient con isRetryable true, por si la política cambia","isError false con resultCount 0","Un mensaje genérico de «Operation failed»"],
+   ok:0,why:"Los errores de negocio nunca se resuelven reintentando: la misma violación aplica siempre. La descripción amigable permite al agente comunicárselo bien al cliente."},
+  {stem:"Transient y validation comparten isRetryable: true. ¿En qué se diferencian a la hora de recuperarse?",
+   hint:"El flag dice si un reintento puede funcionar; la categoría dice cómo.",
+   opts:["En nada: ambas se reenvían idénticas tras una espera","Transient se reenvía tal cual; validation solo después de que el agente corrija el input","Transient necesita otras credenciales; validation necesita esperar","Validation no debería llevar isRetryable true"],
+   ok:1,why:"isRetryable responde a «¿existe algún camino al éxito reintentando?». El cómo lo da errorCategory: reenviar, autocorregir, escalar o buscar otra ruta."},
+  {stem:"Un subagente de búsqueda sufre un timeout en una de las cinco fuentes que consulta. ¿Qué debe hacer?",
+   opts:["Propagar el timeout al coordinador inmediatamente","Recuperarse localmente primero y, si no lo resuelve, propagar incluyendo resultados parciales y qué se intentó","Devolver vacío marcado como éxito para no interrumpir el flujo","Terminar el workflow completo"],
+   ok:1,why:"Recuperación local con propagación selectiva. Devolver vacío como éxito y matar el workflow por un fallo único son los dos antipatrones: ambos dejan al coordinador a ciegas."},
+  {stem:"¿Para qué sirve exactamente el flag isError del protocolo MCP?",
+   opts:["Para que el cliente reintente automáticamente la llamada","Para comunicar al agente que la ejecución falló, de modo que razone sobre la recuperación en vez de tratar el texto como resultado normal","Para que la tool no aparezca en la lista hasta que se resuelva","Para escribir la entrada correspondiente en el log de errores"],
+   ok:1,why:"Sin él, el modelo puede leer «Operation failed» como si fuera el resultado legítimo de la consulta y seguir razonando sobre esa cadena."},
+  {stem:"Un error de permisos devuelve isRetryable: false. ¿Por qué, si el acceso podría concederse más tarde?",
+   opts:["Porque los permisos nunca cambian durante una sesión","Porque ningún reintento con el mismo principal funciona: hace falta una cuenta con el acceso adecuado, no una llamada reformulada","Porque los errores de permisos son siempre definitivos","Porque el agente no debe conocer la política de accesos"],
+   ok:1,why:"Es el motivo espejo del error de negocio: el flag responde a si un reintento puede funcionar, y aquí lo que hace falta es otro principal o un escalado, no repetir."}
+ ]},
+
+ {ts:"2.3",title:"Distribución de tools y tool_choice",qs:[
+  {stem:"Un servidor de datos expone 22 tools: tres de consulta y diecinueve transformaciones. La selección es poco fiable. ¿Qué haces?",
+   hint:"¿Son trabajos distintos o variaciones del mismo?",
+   opts:["Reescribir las 22 descripciones con formatos, ejemplos y fronteras","Consolidar las diecinueve transformaciones en una tool transform_data con un enum transform_type","Repartir las tools entre dos servidores MCP","Crear un agente de transformación y darle las diecinueve"],
+   ok:1,why:"Comparten forma: datos dentro, una operación, datos fuera. Colapsan en una tool parametrizada. Reescribir descripciones no reduce la complejidad de decisión, y dividir por rol traslada el problema un nivel abajo."},
+  {stem:"Alguien propone mover la mitad de las tools a un segundo servidor MCP para aligerar la lista. ¿Funciona?",
+   opts:["Sí: cada servidor presenta su propio conjunto y el modelo elige dentro de cada uno","No: las fronteras entre servidores son invisibles para el modelo, que recibe todas las tools como una lista plana","Sí, siempre que los servidores usen prefijos de nombre distintos","Solo si el segundo servidor es de scope de usuario"],
+   ok:1,why:"El cliente entrega al modelo todas las tools de todos los servidores conectados juntas. Un problema de 22 tools repartido en dos servidores sigue siendo un problema de 22 tools."},
+  {stem:"Necesitas extraer datos de documentos de tipo desconocido, con varios esquemas posibles. ¿Qué tool_choice?",
+   opts:["\"auto\", para que el modelo decida si encaja en algún esquema","\"any\": obliga a llamar a una tool y le deja elegir el esquema","Forzar un esquema concreto y descartar el resto","\"auto\" con instrucciones que prohíban responder en texto"],
+   ok:1,why:"Con \"auto\" el modelo puede devolver texto conversacional. \"any\" garantiza la llamada dejándole elegir, que es justo lo que necesitas si no sabes el tipo de documento."},
+  {stem:"Quieres que extract_metadata se ejecute siempre antes que cualquier tool de enriquecimiento. ¿Cómo?",
+   opts:["tool_choice \"any\" en la primera llamada","tool_choice forzado a esa tool en la primera llamada, y \"auto\" en los turnos siguientes","Ponerla la primera en el array de tools","Una instrucción en el system prompt con el orden obligatorio"],
+   ok:1,why:"La selección forzada es el mecanismo para imponer un primer paso: el modelo no puede saltárselo ni reordenarlo. \"any\" solo garantiza que llame a alguna."},
+  {stem:"El agente de síntesis devuelve el control al coordinador para verificar datos: 2-3 saltos por tarea, 40% más de latencia, y el 85% son comprobaciones simples. ¿Solución?",
+   opts:["Darle acceso a todas las tools de búsqueda web","Una tool verify_fact acotada para las simples, dejando las complejas por el coordinador","Cachear todas las verificaciones en el coordinador","Eliminar el paso de verificación del flujo"],
+   ok:1,why:"Mínimo privilegio: lo justo para el caso común, conservando el patrón de coordinación para el 15% complejo. Darle todas las tools de búsqueda sobreaprovisiona y rompe la separación de responsabilidades."},
+  {stem:"¿Por qué un agente de síntesis no debe tener tools de búsqueda web, más allá del número total de tools?",
+   opts:["Porque las búsquedas son lentas y encarecen la síntesis","Porque tenderá a usarlas mal: se pondrá a buscar por su cuenta en vez de usar los resultados que ya le pasaron, duplicando trabajo y gastando contexto","Porque el coordinador no podría loguear esas llamadas","Porque el protocolo MCP no permite compartir tools entre agentes"],
+   ok:1,why:"La relevancia pesa tanto como la cantidad. Tools fuera de la especialización de un agente se acaban usando mal."},
+  {stem:"Un subagente necesita cargar documentos de la web. ¿Le das fetch_url o load_document?",
+   opts:["fetch_url, más flexible por si aparecen otros recursos","load_document, que valida que sean URLs de documento: previene el mal uso y hace el propósito más claro","fetch_url con una instrucción en el prompt que limite su uso","Ninguna: que pase por el coordinador siempre"],
+   ok:1,why:"Mínimo privilegio aplicado al diseño de tools. Y ojo a la tensión del dominio: constreñir reduce hasta dónde llega cada tool, mientras que consolidar reduce entre cuántas elige el agente. Las dos cosas conviven."}
+ ]},
+
+ {ts:"2.4",title:"Integración de servidores MCP",qs:[
+  {stem:"Tu equipo comparte servidores de GitHub y Jira, y tú pruebas uno experimental propio. ¿Dónde va cada configuración?",
+   opts:["Todo en .mcp.json, marcando el experimental con un comentario","GitHub y Jira en .mcp.json del repositorio; el experimental en ~/.claude.json","Todo en ~/.claude.json y que cada uno replique","GitHub y Jira en ~/.claude.json; el experimental en .mcp.json"],
+   ok:1,why:"El patrón de scoping de todo Claude Code: el proyecto se comparte por git, el usuario es personal."},
+  {stem:"El equipo necesita integrar Jira. Un desarrollador propone construir un servidor MCP propio. ¿Primer paso?",
+   opts:["Evaluar los servidores de la comunidad y construir a medida solo si no cubren los flujos específicos del equipo","Construir el propio exponiendo exactamente los endpoints que usan","Añadirlo a ~/.claude.json para que cada uno configure el suyo","Llamar a la API REST desde Bash y ahorrarse el servidor"],
+   ok:0,why:"Jira es una integración estándar con servidores mantenidos. El examen premia la opción pragmática: a medida solo cuando el escenario describe requisitos que lo público no cubre."},
+  {stem:"¿Qué consigue la sintaxis ${GITHUB_TOKEN} en .mcp.json?",
+   opts:["Que el token se cifre dentro del fichero","Que el fichero se pueda commitear sin secretos: cada persona pone su token en local y rotarlo no toca la configuración","Que el servidor pida el token interactivamente al arrancar","Que el token se comparta automáticamente con el equipo"],
+   ok:1,why:"El fichero referencia nombres de variable, no valores. Config compartida, credenciales personales, historial del repo limpio."},
+  {stem:"¿Qué son los MCP resources y para qué sirven?",
+   opts:["Tools de solo lectura con permisos restringidos","Catálogos de contenido (esquemas de BD, jerarquías de documentación, listados de incidencias) que dan visibilidad al agente sin tool calls exploratorias","Ficheros de configuración del servidor","Límites de cuota por servidor"],
+   ok:1,why:"Sin resources, un agente llamaría a list_tables y luego a describe_table por cada tabla solo para orientarse. Los resources enseñan qué datos hay; las tools permiten actuar sobre ellos."},
+  {stem:"Tu servidor MCP tiene una búsqueda semántica de código más potente que Grep, pero el agente sigue usando Grep. ¿Por qué?",
+   opts:["Las built-in tienen prioridad de ejecución por diseño","La descripción MCP es escasa y el modelo tiene mejor contexto sobre las built-in, cuyas descripciones son ricas","Las tools MCP solo se activan con invocación explícita","Hay un conflicto de nombres y el cliente descarta la MCP"],
+   ok:1,why:"El modelo prefiere lo que entiende mejor. El arreglo es una descripción detallada que explique capacidades, salidas y cuándo usarla en lugar de Grep."}
+ ]},
+
+ {ts:"2.5",title:"Tools integradas",qs:[
+  {stem:"Necesitas encontrar todos los ficheros que llaman a processLegacyOrder() y también los tests de esos llamantes. ¿Secuencia?",
+   hint:"Contenido, rutas, contenido otra vez.",
+   opts:["Glob por **/*processLegacyOrder* y luego Grep dentro de ese conjunto","Grep por el nombre de la función, y después Glob por el test hermano de cada llamante","Read de todos los fuentes y luego de todos los tests","Bash con find y xargs grep en una tubería"],
+   ok:1,why:"Grep encuentra las referencias directas, incluidos los tests que la importan. Glob pilla los tests hermanos que la ejercitan a través del módulo sin nombrarla. Glob no puede buscar dentro de ficheros."},
+  {stem:"Edit falla informando de que old_string coincide en tres sitios. ¿Siguiente paso?",
+   opts:["Read del fichero completo y Write con el contenido modificado","Ampliar old_string con más contexto hasta que apunte a un solo sitio, o usar replace_all si quieres cambiarlas todas","Dividir el fichero para que el texto sea único","Usar Bash con sed"],
+   ok:1,why:"La recuperación documentada mantiene el trabajo en Edit y no cuesta casi contexto. Read + Write carga el fichero entero para lo que suele ser una línea: último recurso, no paso siguiente."},
+  {stem:"Vas a explorar un codebase de 200 ficheros que no conoces. ¿Cómo empiezas?",
+   opts:["Read de todos los ficheros para tener visibilidad completa antes de decidir","Grep para localizar puntos de entrada, luego Read solo de lo que ese resultado justifique, y Grep otra vez para rastrear uso","Glob de toda la estructura y Read por orden alfabético","Bash con tree y luego Read de los directorios más grandes"],
+   ok:1,why:"Leer todo de entrada se traga la ventana de contexto con ficheros irrelevantes. Ningún otro error de exploración cuesta tanto. Descubrimiento incremental: empezar estrecho y ampliar solo cuando haga falta."},
+  {stem:"Una función se define en un módulo, se re-exporta a través de un wrapper y se consume con el nombre del wrapper. Un Grep del nombre original no encuentra esos consumidores. ¿Qué haces?",
+   opts:["Grep con expresión regular más amplia sobre el nombre original","Grep la definición, Read el fichero que la define para ver los nombres exportados, y Grep cada nombre exportado por el codebase","Glob de todos los index.ts del proyecto","Read de todos los ficheros que importan del mismo directorio"],
+   ok:1,why:"El rastreo multi-paso caza consumidores indirectos que un solo Grep se deja. Si hay barrel file, además hay que buscar el nombre del módulo barrel."},
+  {stem:"Quieres localizar todos los ficheros de test de un proyecto, que siguen el patrón *.test.tsx. ¿Tool?",
+   opts:["Grep buscando la cadena \".test.tsx\"","Glob con el patrón **/*.test.tsx","Bash con ls recursivo","Read del directorio raíz"],
+   ok:1,why:"Buscar por nombre de fichero es exactamente el trabajo de Glob. Grep podría encontrar la cadena mencionada dentro de algún fichero, pero es la herramienta equivocada y el examen lo penaliza."},
+  {stem:"¿Cuál es la diferencia entre Grep y Glob, en una frase?",
+   opts:["Grep es más rápido; Glob es más exhaustivo","Grep busca lo que hay dentro de los ficheros; Glob encuentra ficheros por su nombre","Grep funciona en ficheros de texto; Glob en binarios también","Grep devuelve líneas; Glob devuelve el contenido completo"],
+   ok:1,why:"Es la distinción que más pesa del 2.5. Buscar llamantes de una función es Grep, siempre; buscar ficheros por extensión o convención de nombres es Glob, siempre."}
+ ]}
+];
+
+const LETTERS=['A','B','C','D'];
+const root=document.getElementById('quiz');
+const fill=document.getElementById('fill');
+const counter=document.getElementById('counter');
+const result=document.getElementById('result');
+const TOTAL=SECTIONS.reduce((n,s)=>n+s.qs.length,0);
+const stats={};
+SECTIONS.forEach(s=>stats[s.ts]={right:0,total:s.qs.length,title:s.title});
+let answered=0,right=0,n=0;
+
+SECTIONS.forEach(sec=>{
+  const h=document.createElement('div');
+  h.className='sec';
+  h.innerHTML='<span>'+sec.ts+' · '+sec.title+'</span><span class="cnt">'+sec.qs.length+' preguntas</span>';
+  root.appendChild(h);
+  sec.qs.forEach(q=>{
+    n++; const idx=n;
+    const card=document.createElement('div'); card.className='q';
+    const num=document.createElement('span'); num.className='num'; num.textContent='PREGUNTA '+idx+' / '+TOTAL;
+    const stem=document.createElement('p'); stem.className='stem'; stem.textContent=q.stem;
+    card.append(num,stem);
+    if(q.hint){
+      const hb=document.createElement('button'); hb.className='hintbtn'; hb.type='button'; hb.textContent='Ver pista';
+      const ht=document.createElement('p'); ht.className='hinttext'; ht.textContent=q.hint;
+      hb.addEventListener('click',()=>{ht.classList.add('show');hb.remove();});
+      card.append(hb,ht);
+    }
+    const why=document.createElement('div'); why.className='why';
+    q.opts.forEach((o,j)=>{
+      const b=document.createElement('button'); b.className='opt'; b.type='button';
+      b.innerHTML='<span class="letter">'+LETTERS[j]+'</span>';
+      b.appendChild(document.createTextNode(o));
+      b.addEventListener('click',()=>{
+        card.querySelectorAll('.opt').forEach(x=>x.disabled=true);
+        card.querySelectorAll('.opt')[q.ok].classList.add('good');
+        const hit=j===q.ok;
+        if(!hit) b.classList.add('bad'); else {right++;stats[sec.ts].right++;}
+        why.className='why show '+(hit?'ok':'no');
+        why.innerHTML='<b>'+(hit?'Correcto.':'No es esa.')+'</b> '+q.why;
+        answered++; update();
+      });
+      card.appendChild(b);
+    });
+    card.appendChild(why); root.appendChild(card);
+  });
+});
+
+function update(){
+  fill.style.width=(answered/TOTAL*100)+'%';
+  counter.innerHTML='Respondidas <b>'+answered+'</b>/'+TOTAL+' · Aciertos <b>'+right+'</b>';
+  if(answered===TOTAL) finish();
+}
+function finish(){
+  const pct=Math.round(right/TOTAL*100);
+  let verdict;
+  if(pct>=90) verdict='Domain 2 controlado. Puedes pasar al siguiente.';
+  else if(pct>=75) verdict='Buen nivel. Repasa las task statements flojas y repite dentro de unos días.';
+  else if(pct>=60) verdict='Justo. Merece otra vuelta a la guía antes de seguir.';
+  else verdict='Toca releer la guía entera antes de repetir el test.';
+  let rows='';
+  Object.keys(stats).forEach(ts=>{
+    const s=stats[ts]; const p=Math.round(s.right/s.total*100);
+    const cls=p<75?'weak':(p===100?'strong':'');
+    rows+='<tr><td>'+ts+' · '+s.title+'</td><td class="sc '+cls+'">'+s.right+'/'+s.total+' · '+p+'%</td></tr>';
+  });
+  result.innerHTML='<h2>Resultado</h2><span class="big">'+right+'/'+TOTAL+' · '+pct+'%</span><p class="verdict">'+verdict+'</p><table><tr><th>Task statement</th><th>Aciertos</th></tr>'+rows+'</table><button class="reset" type="button" onclick="location.reload()">Volver a empezar</button>';
+  result.classList.add('show');
+  result.scrollIntoView({behavior:'smooth',block:'center'});
+}
+</script>
+</body>
+</html>

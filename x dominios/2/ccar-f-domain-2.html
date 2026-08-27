@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Domain 2 · Tool Design &amp; MCP Integration — CCAR-F</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#E7ECF1; --panel:#FAFBFC; --ink:#0F1A26; --ink-soft:#4A5A6B;
+  --line:#C9D3DC; --det:#0C6D78; --anti:#A62347; --now:#9C6600;
+  --display:'Space Grotesk',system-ui,sans-serif;
+  --body:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:70px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16.5px;line-height:1.62;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:0 22px}
+
+nav{position:sticky;top:0;z-index:20;background:rgba(231,236,241,.93);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;gap:2px;overflow-x:auto;padding-top:9px;padding-bottom:9px;scrollbar-width:none}
+nav .wrap::-webkit-scrollbar{display:none}
+nav a{font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);text-decoration:none;padding:4px 9px;border-radius:4px;white-space:nowrap}
+nav a:hover,nav a:focus-visible{background:var(--ink);color:var(--panel)}
+
+header{padding:56px 0 40px;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:var(--mono);font-size:12.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--det)}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(2.1rem,6vw,3.1rem);line-height:1.06;letter-spacing:-.025em;margin:.28em 0 .3em}
+.lede{font-size:1.09rem;color:var(--ink-soft);max-width:60ch;margin:0}
+.hero-meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.pill{font-family:var(--mono);font-size:12px;border:1px solid var(--line);background:var(--panel);padding:5px 10px;border-radius:100px}
+.pill b{color:var(--det);font-weight:600}
+
+figure{margin:34px 0 0;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:20px 18px 14px}
+figure svg{width:100%;height:auto;display:block}
+figcaption{font-family:var(--mono);font-size:12px;color:var(--ink-soft);margin-top:12px;text-align:center}
+
+section{padding:46px 0;border-bottom:1px solid var(--line)}
+.tag{font-family:var(--mono);font-size:12.5px;color:var(--det);letter-spacing:.06em}
+h2{font-family:var(--display);font-weight:700;font-size:1.62rem;letter-spacing:-.018em;margin:.18em 0 .55em;line-height:1.18}
+h3{font-family:var(--display);font-weight:500;font-size:1.06rem;margin:1.9em 0 .5em;letter-spacing:-.01em}
+p{margin:0 0 1em}
+ul,ol{margin:0 0 1em;padding-left:1.15em}
+li{margin-bottom:.42em}
+strong{font-weight:600}
+
+.k{font-family:var(--mono);font-size:.88em;background:#DCE7E9;color:#08525A;padding:1px 5px;border-radius:3px;font-weight:600;white-space:nowrap}
+.key{border-left:3px solid var(--det);background:var(--panel);padding:14px 16px;margin:20px 0;border-radius:0 6px 6px 0}
+.key .lbl{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--det);display:block;margin-bottom:5px}
+.key p:last-child{margin-bottom:0}
+.trap{border-left:3px solid var(--anti);background:#FBF3F5;padding:14px 16px;margin:20px 0;border-radius:0 6px 6px 0}
+.trap .lbl{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--anti);display:block;margin-bottom:5px}
+.trap ul{margin-bottom:0}
+.trap p:last-child{margin-bottom:0}
+.now{border-left:3px solid var(--now);background:#FBF6EC;padding:14px 16px;margin:20px 0;border-radius:0 6px 6px 0}
+.now .lbl{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--now);display:block;margin-bottom:5px}
+.now p:last-child{margin-bottom:0}
+.case{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:15px 17px;margin:20px 0}
+.case .lbl{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-soft);display:block;margin-bottom:6px}
+.case p:last-child,.case ul:last-child{margin-bottom:0}
+
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:.93rem;background:var(--panel)}
+th,td{text-align:left;padding:9px 11px;border:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);font-weight:600;background:#F0F3F6}
+td code,li code,p code{font-family:var(--mono);font-size:.87em;background:#E3E9EE;padding:1px 4px;border-radius:3px}
+pre{background:#F0F3F6;border:1px solid var(--line);border-radius:6px;padding:13px 15px;overflow-x:auto;font-family:var(--mono);font-size:.83rem;line-height:1.5;margin:16px 0}
+
+.quiz{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:22px 20px;margin:26px 0}
+.q{padding:16px 0;border-top:1px solid var(--line)}
+.q:first-of-type{border-top:none;padding-top:6px}
+.q .num{font-family:var(--mono);font-size:11.5px;color:var(--det);letter-spacing:.08em}
+.q .stem{margin:5px 0 11px;font-weight:600;line-height:1.45}
+.opt{display:block;width:100%;text-align:left;font:inherit;font-size:.95rem;line-height:1.45;background:#fff;border:1px solid var(--line);border-radius:5px;padding:9px 12px;margin-bottom:7px;cursor:pointer;transition:border-color .12s,background .12s}
+.opt:hover:not(:disabled){border-color:var(--ink-soft)}
+.opt:disabled{cursor:default}
+.opt.good{border-color:var(--det);background:#E6F1F2;box-shadow:inset 3px 0 0 var(--det)}
+.opt.bad{border-color:var(--anti);background:#FBF0F3;box-shadow:inset 3px 0 0 var(--anti)}
+.why{font-size:.92rem;margin-top:9px;padding:11px 13px;border-radius:5px;background:#F0F3F6;border:1px solid var(--line);display:none}
+.why.show{display:block}
+.why b{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.08em}
+.why.ok b{color:var(--det)}
+.why.no b{color:var(--anti)}
+.score{font-family:var(--mono);font-size:13px;margin-top:18px;padding-top:14px;border-top:1px solid var(--line);color:var(--ink-soft)}
+.score b{color:var(--ink);font-size:15px}
+
+footer{padding:40px 0 60px;font-size:.9rem;color:var(--ink-soft)}
+footer a{color:var(--det)}
+:focus-visible{outline:2px solid var(--det);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+@media (max-width:560px){body{font-size:16px}header{padding:36px 0 30px}section{padding:36px 0}}
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <a href="#top">Domain 2</a>
+  <a href="#s21">2.1 Descripciones</a>
+  <a href="#s22">2.2 Errores</a>
+  <a href="#check">Check</a>
+  <a href="#s23">2.3 Distribución</a>
+  <a href="#s24">2.4 MCP</a>
+  <a href="#s25">2.5 Built-in</a>
+  <a href="#chuleta">Chuleta</a>
+  <a href="#final">Examen</a>
+</div></nav>
+
+<header id="top"><div class="wrap">
+  <span class="eyebrow">Claude Certified Architect · Foundations · CCAR-F</span>
+  <h1>Domain 2<br>Diseño de tools e integración MCP</h1>
+  <p class="lede">La descripción de una tool no es metadato: es el mecanismo con el que el modelo elige. Y cuando la selección falla, el examen quiere que cuentes las tools antes de decidir el remedio.</p>
+  <div class="hero-meta">
+    <span class="pill"><b>18%</b> del examen</span>
+    <span class="pill">5 task statements</span>
+    <span class="pill">~11 de 60 preguntas</span>
+    <span class="pill">Escenarios 1, 3 y 4</span>
+  </div>
+
+  <figure>
+    <svg viewBox="0 0 700 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagrama diagnóstico: ante misrouting, contar las tools decide si el arreglo son mejores descripciones, dividir por rol o consolidar">
+      <defs>
+        <marker id="a2" markerWidth="9" markerHeight="9" refX="7" refY="3.2" orient="auto"><path d="M0,0 L7,3.2 L0,6.4 z" fill="#4A5A6B"/></marker>
+        <marker id="a2t" markerWidth="9" markerHeight="9" refX="7" refY="3.2" orient="auto"><path d="M0,0 L7,3.2 L0,6.4 z" fill="#0C6D78"/></marker>
+      </defs>
+      <g font-family="IBM Plex Mono, monospace" font-size="12.5">
+        <rect x="16" y="104" width="136" height="52" rx="5" fill="#fff" stroke="#A62347" stroke-width="1.5"/>
+        <text x="84" y="126" text-anchor="middle" fill="#A62347">el agente elige</text>
+        <text x="84" y="142" text-anchor="middle" fill="#A62347">la tool que no es</text>
+
+        <path d="M154 130 H206" stroke="#4A5A6B" stroke-width="1.4" marker-end="url(#a2)" fill="none"/>
+
+        <polygon points="286,86 366,130 286,174 206,130" fill="#DCE7E9" stroke="#0C6D78" stroke-width="1.6"/>
+        <text x="286" y="126" text-anchor="middle" fill="#08525A" font-weight="600">¿cuántas</text>
+        <text x="286" y="141" text-anchor="middle" fill="#08525A" font-weight="600">tools?</text>
+
+        <path d="M286 84 V34 H438" stroke="#0C6D78" stroke-width="1.5" fill="none" marker-end="url(#a2t)"/>
+        <text x="330" y="26" fill="#0C6D78">4-5, dos se parecen</text>
+        <rect x="440" y="10" width="246" height="46" rx="5" fill="#fff" stroke="#0C6D78" stroke-width="1.4"/>
+        <text x="563" y="38" text-anchor="middle" fill="#08525A">afina las descripciones (2.1)</text>
+
+        <path d="M368 130 H438" stroke="#0C6D78" stroke-width="1.5" fill="none" marker-end="url(#a2t)"/>
+        <text x="372" y="122" fill="#0C6D78">trabajos distintos</text>
+        <rect x="440" y="107" width="246" height="46" rx="5" fill="#fff" stroke="#0C6D78" stroke-width="1.4"/>
+        <text x="563" y="135" text-anchor="middle" fill="#08525A">divide por rol, 4-5 cada uno</text>
+
+        <path d="M286 176 V226 H438" stroke="#0C6D78" stroke-width="1.5" fill="none" marker-end="url(#a2t)"/>
+        <text x="316" y="218" fill="#0C6D78">19 variantes del mismo trabajo</text>
+        <rect x="440" y="203" width="246" height="46" rx="5" fill="#fff" stroke="#0C6D78" stroke-width="1.4"/>
+        <text x="563" y="231" text-anchor="middle" fill="#08525A">consolida con un enum</text>
+      </g>
+    </svg>
+    <figcaption>Mismo síntoma, tres enfermedades. Cuenta las tools antes de elegir el remedio.</figcaption>
+  </figure>
+</div></header>
+
+<!-- ============ 2.1 ============ -->
+<section id="s21"><div class="wrap">
+  <span class="tag">Task Statement 2.1</span>
+  <h2>Diseño de la interfaz de tools</h2>
+
+  <p>Las descripciones de las tools son el mecanismo <strong>primario</strong> con el que un LLM selecciona. No son metadato de apoyo ni documentación para humanos. Cuando el modelo recibe un conjunto de tools, lee las descripciones para decidir cuál llamar. Si dicen «Recupera información del cliente», no tiene con qué distinguir entre dos tools que se solapan.</p>
+
+  <h3>Los cinco elementos de una descripción de producción</h3>
+  <ol>
+    <li><strong>Qué hace</strong> — su propósito, sin ambigüedad.</li>
+    <li><strong>Qué inputs espera</strong> — tipos, formatos, restricciones, campos obligatorios y opcionales.</li>
+    <li><strong>Consultas de ejemplo</strong> que maneja bien — casos concretos que anclan la comprensión del modelo.</li>
+    <li><strong>Casos límite y limitaciones</strong> — qué NO hace y qué pasa fuera del rango esperado.</li>
+    <li><strong>Fronteras explícitas</strong> — cuándo usar esta tool y no las parecidas.</li>
+  </ol>
+
+  <pre>MÍNIMA (provoca misrouting)
+get_customer:  "Recupera información del cliente"
+lookup_order:  "Recupera detalles del pedido"
+
+DE PRODUCCIÓN (selección fiable)
+get_customer:  "Busca una cuenta de cliente por email, teléfono
+                o customer ID. Devuelve perfil (nombre, contacto,
+                estado de cuenta, nivel de fidelidad).
+                Úsala para verificar quién es el cliente.
+                NO la uses para consultas sobre pedidos:
+                para eso, lookup_order."</pre>
+
+  <p>La segunda versión le da al modelo desambiguación explícita: qué identificadores acepta cada una, qué devuelve y —lo importante— cuándo <em>no</em> usarla.</p>
+
+  <div class="key">
+    <span class="lbl">Key concept</span>
+    <p>Cuando el misrouting viene de descripciones flojas, mejorarlas es el primer arreglo. No few-shot examples, no clasificador de enrutado, no consolidar tools. El examen premia sistemáticamente lo de <strong>poco esfuerzo y mucha palanca</strong>: mejores descripciones antes que clasificadores, acceso acotado antes que acceso total, servidores de la comunidad antes que builds propios.</p>
+  </div>
+
+  <h3>Por qué esto es así</h3>
+  <p>El modelo no ejecuta un algoritmo de matching: lee lenguaje natural y razona. Un few-shot example enseña tres casos concretos y añade tokens; una descripción con fronteras enseña el criterio y sirve para casos que nadie enumeró. Por eso el orden importa: arreglas la causa (el modelo no sabe distinguirlas) en vez del síntoma (falló en estas tres consultas).</p>
+
+  <h3>Dividir tools genéricas</h3>
+  <p>Una tool genérica con responsabilidad amplia crea ambigüedad. <code>analyze_document: "Analiza un documento y devuelve resultados"</code> se divide en tres con contratos definidos: <code>extract_data_points</code> (extrae campos estructurados), <code>summarize_content</code> (resume argumentos y conclusiones) y <code>verify_claim_against_source</code> (comprueba si una afirmación se sostiene en el documento). Cada una hace un trabajo estrecho y bien descrito.</p>
+
+  <h3>Renombrar por claridad</h3>
+  <p>Cuando dos nombres se parecen demasiado, renombrar arregla el solape a nivel de interfaz sin tocar la implementación: <code>analyze_content</code> pasa a <code>extract_web_results</code> con una descripción específica de web, y el propósito deja de ser ambiguo.</p>
+
+  <div class="trap">
+    <span class="lbl">La trampa sutil: el system prompt</span>
+    <p>Las instrucciones sensibles a keywords en el system prompt pueden crear asociaciones no intencionadas que <strong>anulan descripciones bien escritas</strong>. Si tu system prompt dice «comprueba siempre los datos del cliente antes de continuar», el modelo puede enrutar cualquier consulta que mencione al cliente hacia <code>get_customer</code> por muy buenas que sean las descripciones. Después de actualizar descripciones, relee el system prompt buscando conflictos.</p>
+  </div>
+
+  <div class="now">
+    <span class="lbl">Condición importante — lee las dos mitades</span>
+    <p>Las descripciones son el arreglo cuando el agente tiene un número manejable de tools y simplemente no distingue dos. <strong>No</strong> lo son cuando el problema es el toolkit entero: pasadas ~4-5 tools por agente la selección se degrada solo por complejidad de decisión, y reescribir 22 descripciones no toca eso. Diagnostica cuál de los dos tienes. Lo desarrolla el 2.3.</p>
+  </div>
+</div></section>
+
+<!-- ============ 2.2 ============ -->
+<section id="s22"><div class="wrap">
+  <span class="tag">Task Statement 2.2</span>
+  <h2>Respuestas de error estructuradas</h2>
+
+  <p>Cuando una tool MCP falla, la respuesta que devuelve determina si el agente puede recuperarse con criterio o falla a ciegas. «Operation failed» no le dice nada: ni qué pasó, ni si reintentar, ni qué probar en su lugar.</p>
+  <p>El protocolo MCP incluye el flag <span class="k">isError</span> justo para esto. Marcado, el modelo sabe que la ejecución falló y puede razonar sobre la recuperación en vez de tratar el texto del error como un resultado normal.</p>
+
+  <h3>Las cuatro categorías de error</h3>
+  <table>
+    <tr><th>Categoría</th><th>Qué es</th><th><code>isRetryable</code></th><th>Recuperación</th></tr>
+    <tr><td><strong>Transient</strong></td><td>Timeouts, servicio caído, rate limits. La petición es válida, el sistema no está disponible.</td><td><code>true</code></td><td>Reintentar tal cual tras una espera.</td></tr>
+    <tr><td><strong>Validation</strong></td><td>Formato inválido, campos que faltan, valores fuera de rango. La petición está mal formada.</td><td><code>true</code></td><td>Corregir el input y reintentar.</td></tr>
+    <tr><td><strong>Business</strong></td><td>Violación de política, límite excedido. Técnicamente válida, pero choca con una regla de negocio.</td><td><code>false</code></td><td>Camino alternativo, normalmente escalado.</td></tr>
+    <tr><td><strong>Permission</strong></td><td>Acceso denegado, credenciales insuficientes.</td><td><code>false</code></td><td>Escalar o usar otras credenciales.</td></tr>
+  </table>
+
+  <pre>{
+  "isError": true,
+  "content": [{ "type": "text", "text": "Reembolso excede el límite" }],
+  "errorCategory": "business",
+  "isRetryable": false,
+  "description": "El importe de 750 € supera el límite de 500 € de
+                  reembolso automático. Requiere aprobación de un
+                  manager. Escala a un agente humano con los datos."
+}</pre>
+
+  <div class="key">
+    <span class="lbl">Qué señaliza isRetryable en realidad</span>
+    <p>Responde a una sola pregunta: <strong>¿existe algún camino al éxito reintentando?</strong> No promete que la misma petición funcione sin cambios. Transient y validation comparten <code>true</code> pero se recuperan distinto: la primera se reenvía igual, la segunda solo después de arreglar el input. Business y permission son <code>false</code> por el motivo espejo: ningún reintento ayuda —una regla bloquea la petición, o hace falta otro principal con acceso. Lee el flag como «¿puede funcionar un reintento?» y luego <code>errorCategory</code> para saber cómo.</p>
+  </div>
+
+  <h3>Fallo de acceso vs. resultado vacío válido</h3>
+  <p>De todo el dominio, esta es <em>la</em> distinción. El examen la pregunta directamente.</p>
+  <ul>
+    <li><strong>Fallo de acceso:</strong> la tool no pudo llegar a la fuente. Timeout, auth fallida, servicio caído. Los datos podrían existir, pero no se pudo comprobar. El agente tiene que decidir si reintenta.</li>
+    <li><strong>Resultado vacío válido:</strong> la tool consultó correctamente y no encontró coincidencias. La query se ejecutó bien: simplemente no hay datos. El agente <strong>no</strong> debe reintentar.</li>
+  </ul>
+
+  <div class="case">
+    <span class="lbl">Caso de uso · los tres reintentos inútiles</span>
+    <p>Una tool devuelve un array vacío tras buscar un cliente. El agente reintenta tres veces y escala a un humano. El análisis revela que la cuenta del cliente simplemente no existe.</p>
+    <p>La tool funcionó: consultó la base de datos, no encontró coincidencias y devolvió vacío correctamente. Pero como la respuesta no distingue entre «no pude llegar a la base de datos» y «llegué y no hay nada», el agente trata ambas igual. <strong>El arreglo:</strong> que un resultado vacío no se parezca en nada a un fallo — <code>isError: false</code> y <code>resultCount: 0</code>, frente a <code>isError: true</code> con su categoría.</p>
+  </div>
+
+  <h3>Propagación de errores en sistemas multiagente</h3>
+  <p>Recuperación local con propagación selectiva:</p>
+  <ol>
+    <li>Los subagentes se recuperan <strong>localmente</strong> de fallos transitorios. Si una búsqueda da timeout, el subagente reintenta antes de molestar al coordinador.</li>
+    <li>Solo se propaga lo que no se puede resolver localmente.</li>
+    <li>Se incluyen <strong>resultados parciales y qué se intentó</strong>: «busqué 3 de 5 fuentes; las 4 y 5 dieron timeout; aquí van los resultados de las 3 que sí».</li>
+  </ol>
+  <p>Esto evita dos antipatrones: suprimir errores en silencio (devolver vacío como éxito) y terminar el workflow entero por un fallo único. Los dos dejan al coordinador decidiendo a ciegas.</p>
+
+  <div class="trap">
+    <span class="lbl">Trampas de examen</span>
+    <ul>
+      <li>Reintentar ante un resultado vacío de una consulta que fue bien.</li>
+      <li>Mensajes genéricos sin <code>errorCategory</code>, <code>isRetryable</code> ni descripción.</li>
+      <li>Tratar errores de negocio como reintentables.</li>
+      <li>Suprimir errores del subagente devolviendo vacío como éxito.</li>
+    </ul>
+  </div>
+</div></section>
+
+<!-- ============ CHECKPOINT ============ -->
+<section id="check"><div class="wrap">
+  <span class="tag">Punto de control</span>
+  <h2>Chequeo rápido: 2.1 – 2.2</h2>
+  <p>Cuatro preguntas antes de seguir.</p>
+  <div class="quiz" id="quizA"></div>
+</div></section>
+
+<!-- ============ 2.3 ============ -->
+<section id="s23"><div class="wrap">
+  <span class="tag">Task Statement 2.3</span>
+  <h2>Distribución de tools y tool_choice</h2>
+
+  <h3>Sobrecarga de tools</h3>
+  <p>Dar 18 tools a un solo agente degrada la fiabilidad de selección. Cada tool añade complejidad de decisión y la tasa de error sube con el tamaño del toolkit. El rango óptimo es <strong>4-5 tools por agente</strong>, acotadas a su rol.</p>
+  <p>Y la cantidad no es todo: la relevancia pesa igual. Un agente de síntesis <em>no</em> debe tener tools de búsqueda web. Dale tools fuera de su especialización y tenderá a usarlas mal: un agente de síntesis con <code>web_search</code> se pondrá a buscar por su cuenta en vez de usar los resultados que ya le pasaron, duplicando trabajo y gastando contexto.</p>
+
+  <h3>Consolidar tools casi duplicadas</h3>
+  <p>Dividir por rol es la respuesta obvia a la sobrecarga. Y es la equivocada cuando todas las tools hacen el mismo tipo de trabajo.</p>
+  <p>Un servidor de datos con 22 tools: tres de consulta (una por fuente) y 19 de transformación —<code>pivot_table</code>, <code>calculate_percentile</code>, <code>normalise_currency</code>…—. Divídelo por rol y le entregas 19 tools a un agente de transformación: el problema original, un nivel más abajo. Esas 19 <strong>colapsan</strong> en una sola porque comparten forma (datos dentro, una operación, datos fuera):</p>
+
+  <pre>{
+  "name": "transform_data",
+  "description": "Aplica una transformación a un dataset.
+                  Usa transform_type para elegir la operación.",
+  "input_schema": {
+    "properties": {
+      "dataset":        { "type": "string" },
+      "transform_type": { "type": "string",
+                          "enum": ["pivot", "percentile",
+                                   "normalise_currency", "..."] },
+      "options":        { "type": "object" }
+    }
+  }
+}</pre>
+
+  <p>Veintidós tools se convierten en cuatro sin perder nada: cada transformación sigue siendo alcanzable, ahora como valor de enum dentro de una llamada en vez de una tool que hay que encontrar entre diecinueve descripciones casi idénticas. La precisión mejora porque la decisión difícil se hizo pequeña, no porque la capacidad se redujera.</p>
+
+  <table>
+    <tr><th>Las tools son…</th><th>El arreglo</th></tr>
+    <tr><td>Pocas y manejables, pero dos se parecen</td><td>Afinar las descripciones (2.1)</td></tr>
+    <tr><td>Trabajos distintos (consultar, transformar, exportar)</td><td>Dividir por rol, 4-5 cada uno</td></tr>
+    <tr><td>Variaciones de un mismo trabajo, con forma común</td><td>Consolidar en una tool parametrizada</td></tr>
+    <tr><td>Capaces de más de lo que el agente debería poder hacer</td><td>Constreñirlas</td></tr>
+  </table>
+
+  <div class="key">
+    <span class="lbl">La tensión que le encanta al examen</span>
+    <p><strong>Consolidar</strong> reduce entre cuántas tools elige el agente. <strong>Constreñir</strong> reduce hasta dónde llega cada tool. Colapsar 19 transformaciones en <code>transform_data</code> no le da poderes nuevos, así que no rompe el principio de mínimo privilegio. Sustituir <code>fetch_url</code> por <code>load_document</code> hace el trabajo contrario. Las dos pueden ser correctas en el mismo sistema.</p>
+  </div>
+
+  <div class="trap">
+    <span class="lbl">Un arreglo que no es arreglo</span>
+    <p>Mover tools a un segundo servidor MCP. Las fronteras entre servidores son <strong>invisibles para el modelo</strong>: el cliente le entrega todas las tools de todos los servidores conectados como una lista plana. Un problema de 22 tools repartido en dos servidores sigue siendo un problema de 22 tools.</p>
+  </div>
+
+  <h3>tool_choice: tres ajustes, tres trabajos</h3>
+  <table>
+    <tr><th>Valor</th><th>Qué obliga</th><th>Cuándo</th></tr>
+    <tr><td><span class="k">"auto"</span> (por defecto)</td><td>El modelo decide si llama a una tool o devuelve texto.</td><td>Operación general, cuando responder conversacionalmente es válido.</td></tr>
+    <tr><td><span class="k">"any"</span></td><td>DEBE llamar a una tool, pero elige cuál.</td><td>Salida estructurada garantizada cuando hay varios esquemas y no sabes el tipo de documento.</td></tr>
+    <tr><td><span class="k">{"type":"tool","name":"..."}</span></td><td>DEBE llamar a esa tool concreta.</td><td>Imponer un primer paso obligatorio: <code>extract_metadata</code> antes que cualquier tool de enriquecimiento.</td></tr>
+  </table>
+  <p>Tras la llamada forzada, los turnos siguientes pueden volver a <code>"auto"</code> para el resto de pasos.</p>
+
+  <h3>Tools cross-rol acotadas</h3>
+  <div class="case">
+    <span class="lbl">Caso de uso · el 85% que no merece un round trip</span>
+    <p>El agente de síntesis necesita verificar datos constantemente mientras genera el informe. El diseño ingenuo devuelve el control al coordinador, que delega en el agente de búsqueda, espera y devuelve. Eso son 2-3 saltos por petición y hasta un 40% más de latencia. El 85% de esas verificaciones son búsquedas simples de milisegundos.</p>
+    <p><strong>El arreglo:</strong> dar al agente de síntesis una tool <code>verify_fact</code> acotada que resuelva las simples directamente. El 15% complejo (varias fuentes, cross-referencing, juicio real) sigue pasando por el coordinador.</p>
+  </div>
+
+  <h3>Sustituir genéricas por constreñidas</h3>
+  <p>En vez de <code>fetch_url</code> (que puede traer cualquier cosa de cualquier sitio), dale <code>load_document</code>, que valida que sean URLs de documento. Previene el mal uso, hace el propósito más claro y reduce efectos colaterales. Es mínimo privilegio aplicado al diseño de tools.</p>
+
+  <h3>Cómo queda repartido</h3>
+  <table>
+    <tr><th>Agente</th><th>Tools (4-5 cada uno)</th></tr>
+    <tr><td>Búsqueda web</td><td><code>search_web</code>, <code>fetch_page</code>, <code>extract_links</code>, <code>save_snippet</code></td></tr>
+    <tr><td>Análisis documental</td><td><code>extract_metadata</code>, <code>extract_data_points</code>, <code>summarize_content</code>, <code>verify_claim</code></td></tr>
+    <tr><td>Síntesis</td><td><code>compile_report</code>, <code>verify_fact</code> (acotada), <code>format_citation</code>, <code>assess_coverage</code></td></tr>
+    <tr><td>Coordinador</td><td><code>Agent</code> (antes <code>Task</code>), <code>review_output</code>, <code>request_revision</code></td></tr>
+  </table>
+  <p>Fíjate en el coordinador: dirige el workflow sin tener ninguna tool de dominio.</p>
+</div></section>
+
+<!-- ============ 2.4 ============ -->
+<section id="s24"><div class="wrap">
+  <span class="tag">Task Statement 2.4</span>
+  <h2>Integración de servidores MCP</h2>
+
+  <h3>La jerarquía de scoping</h3>
+  <table>
+    <tr><th></th><th><span class="k">.mcp.json</span> (proyecto)</th><th><span class="k">~/.claude.json</span> (usuario)</th></tr>
+    <tr><td><strong>Dónde vive</strong></td><td>Raíz del repositorio</td><td>Directorio home</td></tr>
+    <tr><td><strong>Control de versiones</strong></td><td>Sí, se comparte por git</td><td>No, es personal</td></tr>
+    <tr><td><strong>Para qué</strong></td><td>Servidores que necesita todo el equipo: Jira, GitHub, conectores internos</td><td>Servidores experimentales, integraciones personales, pruebas antes de proponerlas</td></tr>
+  </table>
+
+  <div class="key">
+    <span class="lbl">Key concept</span>
+    <p>Todas las tools de todos los servidores configurados (de proyecto y de usuario) se descubren <strong>al conectar</strong> y están disponibles simultáneamente. No hay paso de activación manual: si un servidor está configurado y accesible, sus tools aparecen en el toolkit del agente.</p>
+  </div>
+
+  <h3>Expansión de variables de entorno</h3>
+  <pre>{
+  "mcpServers": {
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": { "GITHUB_TOKEN": "${GITHUB_TOKEN}" }
+    }
+  }
+}</pre>
+  <p>La sintaxis <code>${VARIABLE}</code> es lo que te permite compartir la configuración sin compartir las credenciales. Cada persona pone sus tokens en local; el fichero referencia nombres de variable, no valores. Resultado: el fichero se puede commitear sin riesgo, cada desarrollador se autentica con lo suyo, rotar un token no toca la config y no se filtra nada por el historial del repo.</p>
+
+  <h3>Recursos MCP</h3>
+  <p>Los <strong>resources</strong> exponen catálogos de contenido sin necesidad de tool calls exploratorias: resúmenes de incidencias, jerarquías de documentación, esquemas de base de datos. Sin ellos, un agente llamaría a <code>list_tables</code> y luego a <code>describe_table</code> por cada tabla, quemando llamadas solo para orientarse. Con un resource de esquema, lo sabe de entrada.</p>
+  <p>Regla mnemotécnica: <strong>los resources enseñan qué datos hay; las tools permiten actuar sobre ellos.</strong></p>
+
+  <h3>Construir o usar</h3>
+  <p>Usa servidores de la comunidad para integraciones estándar (Jira, GitHub, Slack, Linear, Notion): están mantenidos, probados y te ahorran desarrollo. Construye uno propio solo cuando el escenario describa explícitamente flujos específicos del equipo que los de la comunidad no cubren, lógica de negocio que debe vivir en la capa de tools, o sistemas internos propietarios sin servidor público.</p>
+
+  <div class="trap">
+    <span class="lbl">La trampa de la descripción escasa</span>
+    <p>Cuando una tool MCP tiene descripción pobre, el agente <strong>prefiere las built-in</strong> (como Grep) aunque la MCP sea más capaz: simplemente tiene mejor contexto sobre las built-in, cuyas descripciones son ricas. El arreglo es escribir descripciones MCP detalladas que expliquen capacidades y salidas, y que digan explícitamente cuándo usarla <em>en lugar de</em> la built-in.</p>
+  </div>
+</div></section>
+
+<!-- ============ 2.5 ============ -->
+<section id="s25"><div class="wrap">
+  <span class="tag">Task Statement 2.5</span>
+  <h2>Tools integradas</h2>
+
+  <p>Seis built-in: Read, Write, Edit, Bash, Grep y Glob. Usar la equivocada cuesta tiempo, tokens de contexto o ambos.</p>
+
+  <div class="key">
+    <span class="lbl">Grep vs Glob — en una frase</span>
+    <p><strong>Grep encuentra lo que hay DENTRO de los ficheros. Glob encuentra ficheros por su NOMBRE.</strong></p>
+  </div>
+
+  <table>
+    <tr><th>Grep — contenido</th><th>Glob — rutas</th></tr>
+    <tr><td>Quién llama a <code>processLegacyOrder()</code></td><td>Todos los ficheros de test: <code>**/*.test.tsx</code></td></tr>
+    <tr><td>Mensajes de error que contienen «timeout»</td><td>Ficheros de configuración: <code>**/config.*</code></td></tr>
+    <tr><td>Imports de un módulo concreto</td><td>Todos los MDX de un directorio</td></tr>
+  </table>
+
+  <h3>Read, Write y Edit</h3>
+  <p><strong>Edit</strong> hace modificaciones dirigidas mediante coincidencia única de texto. Es rápido y preciso porque toca solo lo que identificas.</p>
+  <p><strong>Cuando Edit falla</strong> porque el texto aparece varias veces, eso es un mecanismo de seguridad, no un bug: impide cambiar algo que no querías tocar. El orden documentado de recuperación:</p>
+  <ol>
+    <li>Prueba Edit con el ancla más corta que sea plausiblemente única.</li>
+    <li>Si la coincidencia no es única, <strong>amplía <code>old_string</code></strong> con más contexto alrededor hasta que apunte a un solo sitio, o pon <code>replace_all: true</code> si de verdad quieres cambiar todas las apariciones.</li>
+    <li>Solo si ninguna de esas dos desambigua, cae a Read + Write.</li>
+  </ol>
+
+  <div class="trap">
+    <span class="lbl">Dos trampas seguidas</span>
+    <p>El examen penaliza usar Read + Write como opción por defecto (quema contexto), <strong>y también</strong> saltar directamente a Read + Write en cuanto Edit reporta coincidencia múltiple. Ampliar el ancla o usar <code>replace_all</code> es la respuesta documentada; Read + Write es el último recurso, no el paso siguiente.</p>
+  </div>
+
+  <h3>Exploración incremental</h3>
+  <p><strong>Mal:</strong> leer todos los ficheros de entrada. Un codebase de 200 ficheros leído entero se traga la ventana de contexto, en su mayoría con ficheros que no tienen nada que ver con la tarea. Ningún otro error de exploración cuesta tanto.</p>
+  <p><strong>Bien:</strong> empezar estrecho y ampliar solo cuando haga falta. Grep para localizar puntos de entrada → Read para seguir imports y trazar flujos → Grep otra vez para rastrear uso → Read solo lo que el paso anterior justifique.</p>
+
+  <div class="case">
+    <span class="lbl">Caso de uso · la función deprecada</span>
+    <p>Hay que encontrar todos los ficheros que llaman a una función deprecada <em>y</em> los tests que la ejercitan. La secuencia correcta es <strong>Grep, luego Glob, luego Grep otra vez</strong>:</p>
+    <ol>
+      <li><strong>Grep</strong> por el nombre de la función: encuentra cada fichero que la referencia, incluidos los tests que la importan directamente.</li>
+      <li><strong>Glob</strong> por los tests hermanos: <code>**/OrderProcessor.test.*</code> pilla el test que acompaña a cada llamante por convención de nombres, aunque ese test nunca mencione la función porque la ejercita a través del módulo.</li>
+      <li><strong>Grep</strong> por nombres de wrapper: si un llamante expone la función bajo otro nombre, busca ese nombre para cazar los tests que la cubren transitivamente.</li>
+    </ol>
+    <p>Contenido para referencias directas, rutas para tests adyacentes, contenido otra vez para cobertura indirecta. <strong>No Glob primero.</strong></p>
+  </div>
+
+  <h3>Rastrear uso a través de wrappers</h3>
+  <p>Patrón común: una función se define en un módulo, se re-exporta a través de un wrapper y se consume con el nombre del wrapper. Un Grep simple del nombre original se deja fuera a todos esos consumidores. La secuencia: Grep la definición → Read el fichero que la define para ver los nombres exportados → Grep cada nombre exportado → si hay barrel file (<code>index.ts</code>), Grep el nombre del módulo barrel.</p>
+</div></section>
+
+<!-- ============ CHULETA ============ -->
+<section id="chuleta"><div class="wrap">
+  <span class="tag">Repaso</span>
+  <h2>Chuleta de desambiguación</h2>
+
+  <table>
+    <tr><th>Si dudas entre…</th><th>Quédate con esto</th></tr>
+    <tr><td>Descripciones vs dividir vs consolidar</td><td><strong>Cuenta las tools.</strong> Pocas y parecidas → descripciones. Trabajos distintos → dividir por rol. Variaciones del mismo trabajo → consolidar con enum.</td></tr>
+    <tr><td>Fallo de acceso vs vacío válido</td><td>¿La query llegó a ejecutarse? Sí y sin resultados → <code>isError: false</code>, no reintentar. No llegó → <code>isError: true</code>, decidir reintento.</td></tr>
+    <tr><td><code>isRetryable</code> true en transient y validation</td><td>Transient se reenvía igual; validation solo tras corregir el input. El flag dice «¿puede funcionar un reintento?», la categoría dice cómo.</td></tr>
+    <tr><td><code>"any"</code> vs forzar tool</td><td><code>"any"</code>: obligada a llamar, elige cuál (varios esquemas posibles). Forzada: obligada a llamar a <em>esa</em> (imponer un primer paso).</td></tr>
+    <tr><td>Grep vs Glob</td><td>Grep = dentro. Glob = nombre. Buscar llamantes es Grep, siempre.</td></tr>
+    <tr><td>Edit falla vs Read + Write</td><td>Amplía el ancla o <code>replace_all</code>. Read + Write es el último recurso, no el paso siguiente.</td></tr>
+    <tr><td>Consolidar vs constreñir</td><td>Consolidar reduce entre cuántas elige. Constreñir reduce hasta dónde llega cada una. Compatibles.</td></tr>
+  </table>
+
+  <h3>Cinco frases que valen puntos</h3>
+  <ul>
+    <li>Las descripciones son el <strong>mecanismo primario</strong> de selección, no metadato.</li>
+    <li>4-5 tools por agente, acotadas a su rol.</li>
+    <li>Un vacío válido nunca debe parecerse a un fallo.</li>
+    <li>Los errores de negocio <strong>nunca</strong> son reintentables.</li>
+    <li>Las fronteras entre servidores MCP son invisibles para el modelo.</li>
+  </ul>
+</div></section>
+
+<!-- ============ FINAL ============ -->
+<section id="final"><div class="wrap">
+  <span class="tag">Simulacro</span>
+  <h2>Examen del Domain 2</h2>
+  <p>Diez preguntas al estilo del examen.</p>
+  <div class="quiz" id="quizB"></div>
+</div></section>
+
+<footer><div class="wrap">
+  <p>Guía de estudio del Domain 2 (18%) para el <strong>Claude Certified Architect — Foundations</strong> (CCAR-F), elaborada a partir del temario de <a href="https://claudecertificationguide.com/learn/2-tool-design-mcp">claudecertificationguide.com</a> y del Exam Guide oficial v1.0 (julio 2026).</p>
+</div></footer>
+
+<script>
+const QUIZ_A = [
+  {
+    stem:"Los logs muestran que el agente llama a get_customer cuando el usuario pregunta por un pedido. Ambas tools tienen descripciones de una línea y aceptan identificadores parecidos. Solo hay cinco tools en total. ¿Primer paso?",
+    opts:[
+      "Añadir 5-8 few-shot examples al system prompt con el enrutado correcto",
+      "Ampliar cada descripción con formatos de entrada, ejemplos, casos límite y fronteras frente a la otra tool",
+      "Unificar ambas en una sola tool lookup_entity que acepte cualquier identificador",
+      "Montar una capa de enrutado que analice el input y preseleccione la tool"
+    ],
+    ok:1,
+    why:"Con cinco tools el problema es de descripciones, no de sobrecarga. Es el arreglo de menos esfuerzo y más palanca. Los few-shot añaden tokens sin tocar la causa; el clasificador es sobreingeniería como primer paso; consolidar es válido a largo plazo pero cuesta mucho más."
+  },
+  {
+    stem:"Una tool devuelve un array vacío al buscar un cliente. El agente reintenta tres veces y escala. La cuenta simplemente no existe. ¿Causa raíz?",
+    opts:[
+      "El límite de reintentos es bajo: con cinco intentos habría encontrado la cuenta",
+      "El umbral de escalado es demasiado agresivo",
+      "La tool no distingue entre fallo de acceso y resultado vacío válido, así que el agente trata «sin coincidencias» como fallo reintentable",
+      "El system prompt debería prohibir reintentar búsquedas de cliente"
+    ],
+    ok:2,
+    why:"La tool funcionó perfectamente. El problema es que su respuesta se parece a la de un fallo. Un vacío válido va con isError: false y resultCount: 0."
+  },
+  {
+    stem:"Un reembolso supera el límite de política. ¿Cómo debe responder la tool?",
+    opts:[
+      "errorCategory business con isRetryable: false y una descripción que explique el límite y sugiera escalar",
+      "errorCategory transient con isRetryable: true, por si la política cambia",
+      "isError: false con resultCount: 0, porque la operación no llegó a ejecutarse",
+      "Un mensaje genérico de «Operation failed» para no filtrar detalles de política al cliente"
+    ],
+    ok:0,
+    why:"Los errores de negocio nunca se resuelven reintentando: la misma violación de política aplica siempre. La descripción amigable es lo que permite al agente comunicárselo bien al cliente."
+  },
+  {
+    stem:"Después de reescribir las descripciones de tus tools, el agente sigue enrutando mal las consultas de cliente. ¿Qué revisas?",
+    opts:[
+      "El orden en que registras las tools en la petición",
+      "El system prompt, por si tiene instrucciones sensibles a keywords que crean asociaciones no intencionadas",
+      "La temperatura del modelo, que puede estar demasiado alta",
+      "El esquema JSON de entrada de cada tool"
+    ],
+    ok:1,
+    why:"Es el modo de fallo sutil del 2.1: una frase como «comprueba siempre los datos del cliente» puede anular descripciones bien escritas. Tras actualizar descripciones, relee el system prompt buscando conflictos."
+  }
+];
+
+const QUIZ_B = [
+  {
+    stem:"Un servidor de datos expone 22 tools: tres de consulta y diecinueve transformaciones (pivot, percentil, normalizar divisa…). La selección es poco fiable. ¿Qué haces?",
+    opts:[
+      "Reescribir las 22 descripciones con formatos, ejemplos y fronteras",
+      "Consolidar las diecinueve transformaciones en una tool transform_data con un enum transform_type",
+      "Repartir las tools entre dos servidores MCP para reducir la lista de cada uno",
+      "Crear un agente de transformación y darle las diecinueve tools"
+    ],
+    ok:1,
+    why:"Son variaciones del mismo trabajo, con la misma forma: colapsan en una tool parametrizada. Reescribir descripciones no reduce la complejidad de decisión. Dividir por rol traslada el problema un nivel abajo. Y los servidores son invisibles para el modelo: 22 tools en dos servidores siguen siendo 22."
+  },
+  {
+    stem:"Necesitas extraer datos estructurados de documentos de tipo desconocido, con varios esquemas posibles. ¿Qué tool_choice?",
+    opts:[
+      "\"auto\", para que el modelo decida si el documento encaja en algún esquema",
+      "\"any\": obliga a llamar a una tool, pero deja que el modelo elija el esquema adecuado",
+      "Forzar extract_invoice y descartar el resto de esquemas",
+      "\"auto\" con instrucciones en el prompt que prohíban responder en texto"
+    ],
+    ok:1,
+    why:"Con \"auto\" el modelo puede devolver texto conversacional en vez de estructura. \"any\" garantiza la llamada dejándole elegir el esquema, que es justo lo que necesitas cuando no sabes el tipo de documento."
+  },
+  {
+    stem:"El agente de síntesis devuelve el control al coordinador para verificar datos: 2-3 saltos por tarea y un 40% más de latencia. El 85% son comprobaciones simples. ¿Solución?",
+    opts:[
+      "Darle acceso a todas las tools de búsqueda web para que resuelva cualquier verificación",
+      "Una tool verify_fact acotada en el agente de síntesis para las simples, dejando las complejas por el coordinador",
+      "Cachear todas las verificaciones a nivel de coordinador",
+      "Eliminar el paso de verificación del flujo de síntesis"
+    ],
+    ok:1,
+    why:"Mínimo privilegio aplicado: le das lo justo para el caso común y conservas el patrón de coordinación para el 15% complejo. Darle todas las tools de búsqueda sobreaprovisiona y rompe la separación de responsabilidades."
+  },
+  {
+    stem:"El equipo necesita integrar Jira en su flujo de Claude Code. Un desarrollador propone construir un servidor MCP propio. ¿Primer paso?",
+    opts:[
+      "Evaluar los servidores MCP de la comunidad para Jira y construir uno propio solo si no cubren los flujos específicos del equipo",
+      "Construir el servidor propio exponiendo exactamente los endpoints que el equipo usa",
+      "Añadir la integración a ~/.claude.json para que cada desarrollador configure la suya",
+      "Llamar a la API REST de Jira desde comandos Bash y ahorrarse el servidor"
+    ],
+    ok:0,
+    why:"Jira es una integración estándar con servidores mantenidos por la comunidad. El examen premia la opción pragmática: construir a medida solo cuando el escenario describe requisitos específicos que lo público no cubre."
+  },
+  {
+    stem:"Un desarrollador necesita encontrar todos los ficheros que llaman a processLegacyOrder() y también los tests de esos llamantes. ¿Secuencia correcta?",
+    opts:[
+      "Glob por **/*processLegacyOrder* para localizar los llamantes y luego Grep dentro de ese conjunto",
+      "Grep por processLegacyOrder para los llamantes, y después Glob por el test hermano de cada uno (**/OrderProcessor.test.*)",
+      "Read de todos los ficheros fuente y luego de todos los de test, para no perder ninguno",
+      "Bash con find y xargs grep en una sola tubería"
+    ],
+    ok:1,
+    why:"Contenido primero (Grep encuentra las referencias, incluidos los tests que la importan), rutas después (Glob pilla los tests hermanos que la ejercitan a través del módulo sin nombrarla). Glob no puede buscar dentro de ficheros."
+  },
+  {
+    stem:"Edit falla informando de que old_string coincide en tres sitios. ¿Qué haces?",
+    opts:[
+      "Read del fichero completo y Write con el contenido modificado",
+      "Ampliar old_string con más contexto alrededor hasta que apunte a un solo sitio, o usar replace_all si quieres cambiarlas todas",
+      "Dividir el fichero en varios más pequeños para que el texto sea único",
+      "Usar Bash con sed para el reemplazo"
+    ],
+    ok:1,
+    why:"La recuperación documentada mantiene el trabajo en Edit y no cuesta casi contexto. Read + Write carga el fichero entero para lo que suele ser un cambio de una línea: es el último recurso, no el paso siguiente."
+  },
+  {
+    stem:"Tu equipo comparte servidores MCP de GitHub y Jira, y tú además pruebas uno experimental propio. ¿Dónde va cada configuración?",
+    opts:[
+      "Todo en .mcp.json, marcando el experimental con un comentario",
+      "GitHub y Jira en .mcp.json del repositorio; el experimental en ~/.claude.json",
+      "Todo en ~/.claude.json, y que cada uno replique la configuración",
+      "GitHub y Jira en ~/.claude.json; el experimental en .mcp.json para poder pedir feedback"
+    ],
+    ok:1,
+    why:"Es el patrón de scoping de todo Claude Code: el proyecto se comparte por git, el usuario es personal. Y las credenciales van con ${VARIABLE}, nunca literales."
+  },
+  {
+    stem:"Tu servidor MCP tiene una tool de búsqueda semántica de código más potente que Grep, pero el agente sigue usando Grep. ¿Por qué?",
+    opts:[
+      "Las built-in tienen prioridad de ejecución sobre las MCP por diseño",
+      "La descripción de la tool MCP es escasa y el modelo tiene mejor contexto sobre las built-in, cuyas descripciones son ricas",
+      "Las tools MCP solo se activan si se invocan explícitamente",
+      "Hay un conflicto de nombres que hace que el cliente descarte la tool MCP"
+    ],
+    ok:1,
+    why:"El modelo prefiere lo que entiende mejor. El arreglo es una descripción MCP detallada que explique capacidades, salidas y —explícitamente— cuándo usarla en lugar de Grep."
+  },
+  {
+    stem:"Quieres que el agente de análisis documental ejecute siempre extract_metadata antes que cualquier tool de enriquecimiento. ¿Cómo lo garantizas?",
+    opts:[
+      "tool_choice \"any\" en la primera llamada",
+      "tool_choice forzado a {\"type\":\"tool\",\"name\":\"extract_metadata\"} en la primera llamada, y \"auto\" en los turnos siguientes",
+      "Poner extract_metadata la primera en el array de tools",
+      "Una instrucción en el system prompt indicando el orden obligatorio"
+    ],
+    ok:1,
+    why:"La selección forzada es el mecanismo para imponer un primer paso obligatorio: el modelo no puede saltárselo. \"any\" solo garantiza que llame a alguna tool, no a esa. Y el orden del array no impone nada."
+  },
+  {
+    stem:"Un subagente de búsqueda web sufre un timeout puntual en una de las cinco fuentes que consulta. ¿Qué debe hacer?",
+    opts:[
+      "Propagar el timeout al coordinador inmediatamente, para que decida él",
+      "Intentar la recuperación local primero y, si no lo resuelve, propagar incluyendo resultados parciales y qué se intentó",
+      "Devolver un resultado vacío marcado como éxito para no interrumpir el workflow",
+      "Terminar el workflow completo, porque la investigación quedaría incompleta"
+    ],
+    ok:1,
+    why:"Recuperación local con propagación selectiva. Devolver vacío como éxito y terminar todo por un fallo único son los dos antipatrones: ambos dejan al coordinador decidiendo a ciegas."
+  }
+];
+
+const LETTERS=['A','B','C','D'];
+function renderQuiz(id,data,label){
+  const root=document.getElementById(id);
+  const st={a:0,r:0};
+  data.forEach((q,i)=>{
+    const d=document.createElement('div'); d.className='q';
+    const n=document.createElement('span'); n.className='num'; n.textContent=label+' '+(i+1)+' / '+data.length;
+    const s=document.createElement('p'); s.className='stem'; s.textContent=q.stem;
+    d.append(n,s);
+    const w=document.createElement('div'); w.className='why';
+    q.opts.forEach((o,j)=>{
+      const b=document.createElement('button'); b.className='opt'; b.type='button';
+      b.innerHTML='<span style="font-family:var(--mono);font-size:12px;color:var(--ink-soft);margin-right:9px;font-weight:600">'+LETTERS[j]+'</span>';
+      b.appendChild(document.createTextNode(o));
+      b.addEventListener('click',()=>{
+        const all=d.querySelectorAll('.opt');
+        all.forEach(x=>x.disabled=true);
+        all[q.ok].classList.add('good');
+        const hit=j===q.ok;
+        if(!hit) b.classList.add('bad');
+        w.className='why show '+(hit?'ok':'no');
+        w.innerHTML='<b>'+(hit?'Correcto.':'No es esa.')+'</b> '+q.why;
+        st.a++; if(hit) st.r++;
+        sc.innerHTML='Respondidas <b>'+st.a+'/'+data.length+'</b> · Aciertos <b>'+st.r+'</b>';
+      });
+      d.appendChild(b);
+    });
+    d.appendChild(w); root.appendChild(d);
+  });
+  const sc=document.createElement('div'); sc.className='score';
+  sc.innerHTML='Respondidas <b>0/'+data.length+'</b> · Aciertos <b>0</b>';
+  root.appendChild(sc);
+}
+renderQuiz('quizA',QUIZ_A,'Check');
+renderQuiz('quizB',QUIZ_B,'Pregunta');
+</script>
+</body>
+</html>
