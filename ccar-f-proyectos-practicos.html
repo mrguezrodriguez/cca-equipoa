@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cinco proyectos para preparar el CCAR-F</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#E7ECF1;--panel:#FAFBFC;--ink:#0F1A26;--ink-soft:#4A5A6B;--line:#C9D3DC;--det:#0C6D78;--anti:#A62347;--warn:#9C6600;--display:'Space Grotesk',system-ui,sans-serif;--body:'IBM Plex Sans',system-ui,-apple-system,sans-serif;--mono:'IBM Plex Mono',ui-monospace,Menlo,monospace}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:70px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16.5px;line-height:1.62;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:0 22px}
+
+nav{position:sticky;top:0;z-index:20;background:rgba(231,236,241,.93);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;gap:2px;overflow-x:auto;padding:9px 22px;scrollbar-width:none}
+nav .wrap::-webkit-scrollbar{display:none}
+nav a{font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);text-decoration:none;padding:4px 9px;border-radius:4px;white-space:nowrap}
+nav a:hover,nav a:focus-visible{background:var(--ink);color:var(--panel)}
+
+header{padding:56px 0 40px;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:var(--mono);font-size:12.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--det)}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(2rem,5.6vw,2.9rem);line-height:1.07;letter-spacing:-.025em;margin:.3em 0 .35em}
+.lede{font-size:1.08rem;color:var(--ink-soft);max-width:62ch;margin:0 0 22px}
+.hero-meta{display:flex;flex-wrap:wrap;gap:10px}
+.pill{font-family:var(--mono);font-size:12px;border:1px solid var(--line);background:var(--panel);padding:5px 10px;border-radius:100px}
+.pill b{color:var(--det);font-weight:600}
+
+section{padding:44px 0;border-bottom:1px solid var(--line)}
+.tag{font-family:var(--mono);font-size:12.5px;color:var(--det);letter-spacing:.06em}
+h2{font-family:var(--display);font-weight:700;font-size:1.55rem;letter-spacing:-.018em;margin:.18em 0 .5em;line-height:1.2}
+h3{font-family:var(--display);font-weight:500;font-size:1.02rem;margin:1.7em 0 .45em;letter-spacing:-.01em}
+p{margin:0 0 1em}
+ul,ol{margin:0 0 1em;padding-left:1.15em}
+li{margin-bottom:.42em}
+strong{font-weight:600}
+code{font-family:var(--mono);font-size:.87em;background:#E3E9EE;padding:1px 4px;border-radius:3px}
+
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 20px}
+.meta span{font-family:var(--mono);font-size:11.5px;border:1px solid var(--line);background:var(--panel);padding:4px 10px;border-radius:100px;color:var(--ink-soft)}
+.meta span.w{border-color:var(--det);color:var(--det)}
+
+.box{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:15px 17px;margin:20px 0}
+.box .lbl{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-soft);display:block;margin-bottom:6px}
+.box p:last-child,.box ul:last-child{margin-bottom:0}
+.check{border-left:3px solid var(--det);background:var(--panel);padding:14px 16px;margin:20px 0;border-radius:0 6px 6px 0}
+.check .lbl{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--det);display:block;margin-bottom:5px}
+.check p:last-child{margin-bottom:0}
+.warnbox{border-left:3px solid var(--warn);background:#FBF6EC;padding:14px 16px;margin:20px 0;border-radius:0 6px 6px 0}
+.warnbox .lbl{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--warn);display:block;margin-bottom:5px}
+.warnbox p:last-child{margin-bottom:0}
+
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:.93rem;background:var(--panel)}
+th,td{text-align:left;padding:9px 11px;border:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);font-weight:600;background:#F0F3F6}
+pre{background:#F0F3F6;border:1px solid var(--line);border-radius:6px;padding:13px 15px;overflow-x:auto;font-family:var(--mono);font-size:.83rem;line-height:1.5;margin:16px 0}
+
+.order{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:22px}
+.chain{font-family:var(--mono);font-size:1.3rem;color:var(--det);font-weight:600;letter-spacing:.06em;margin:0 0 14px}
+footer{padding:36px 0 60px;font-size:.9rem;color:var(--ink-soft)}
+:focus-visible{outline:2px solid var(--det);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+@media (max-width:560px){body{font-size:16px}header{padding:36px 0 30px}section{padding:34px 0}}
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <a href="#top">Inicio</a>
+  <a href="#p1">1 · Agente DTA</a>
+  <a href="#p2">2 · Servidor MCP</a>
+  <a href="#p3">3 · Claude Code</a>
+  <a href="#p4">4 · Extracción</a>
+  <a href="#p5">5 · Calibración</a>
+  <a href="#orden">Orden</a>
+</div></nav>
+
+<header id="top"><div class="wrap">
+  <span class="eyebrow">Claude Certified Architect — Foundations · CCAR-F</span>
+  <h1>Cinco proyectos para aterrizar la teoría</h1>
+  <p class="lede">Uno por dominio, montados sobre trabajo real en vez de ejercicios de laboratorio. La ventaja de anclarlos a proyectos que ya existen es que los casos límite te los da la realidad, y ahí es donde el examen pone las preguntas.</p>
+  <div class="hero-meta">
+    <span class="pill">5 proyectos</span>
+    <span class="pill">1 por dominio</span>
+    <span class="pill">Entre una tarde y dos por proyecto</span>
+  </div>
+</div></header>
+
+<!-- ============ 1 ============ -->
+<section id="p1"><div class="wrap">
+  <span class="tag">Proyecto 1</span>
+  <h2>Reescribir el flujo DTA→HubSpot como agente</h2>
+  <div class="meta">
+    <span class="w">Domain 1 · 27% del examen</span>
+    <span>Task statements 1.1, 1.4, 1.6</span>
+    <span>Agent SDK</span>
+  </div>
+
+  <p>Hoy ese flujo es un workflow de n8n con nodos fijos: webhook, Code node, búsqueda, If, actualización. Móntalo como <strong>agente con loop propio</strong> en un script aparte, con cuatro tools:</p>
+  <pre>get_candidato          → datos del candidato en Supabase
+lookup_submission      → la submission y sus respuestas
+update_hubspot_contact → escribe las propiedades en HubSpot
+flag_para_revision     → deja el caso para revisión manual</pre>
+
+  <h3>Qué ejercitas</h3>
+  <p>El <strong>loop agéntico de verdad</strong>: mandas la petición, miras <code>stop_reason</code>, ejecutas la tool que pida, añades el <code>tool_result</code> al historial y vuelves. Es la diferencia entre entender el ciclo y haberlo escrito.</p>
+
+  <p>Y sobre todo <strong>enforcement programático</strong>, porque hay dos reglas que no pueden fallar nunca:</p>
+  <ul>
+    <li>No actualizar HubSpot sin un match verificado del contacto.</li>
+    <li>Un candidato menor de 17 años queda no apto <em>independientemente</em> del score.</li>
+  </ul>
+  <p>La segunda es un caso de libro de <code>PreToolUse</code>: un prompt que diga «comprueba siempre la edad» acierta el 95% de las veces, y el 5% restante son admisiones incorrectas. El hook acierta el 100%.</p>
+
+  <div class="box">
+    <span class="lbl">El extra: handoff estructurado</span>
+    <p>Los casos donde el match devuelve <code>id: null</code> se revisan hoy a mano. Conviértelos en un <strong>resumen de handoff</strong> con los cinco campos: identificador, resumen de lo ocurrido, causa raíz, dato relevante y acción recomendada. Quien lo revise no tiene acceso a la traza, así que el resumen tiene que bastarse solo.</p>
+  </div>
+
+  <div class="check">
+    <span class="lbl">Señal de que lo has entendido</span>
+    <p>Si en algún momento te descubres escribiendo «asegúrate de comprobar la edad antes de marcar apto» dentro del system prompt, vuelve al 1.4. Esa instrucción no pinta nada en un prompt.</p>
+  </div>
+</div></section>
+
+<!-- ============ 2 ============ -->
+<section id="p2"><div class="wrap">
+  <span class="tag">Proyecto 2</span>
+  <h2>Un servidor MCP para Supabase y HubSpot</h2>
+  <div class="meta">
+    <span class="w">Domain 2 · 18% del examen</span>
+    <span>Task statements 2.1, 2.2, 2.3, 2.4</span>
+    <span>MCP</span>
+  </div>
+
+  <p>Cuatro o cinco tools, no más. Ese límite no es estético: pasadas 4-5 tools por agente, la fiabilidad de selección se degrada solo por complejidad de decisión.</p>
+  <pre>buscar_contacto_por_email
+buscar_contacto_por_nombre
+leer_submission
+actualizar_contacto</pre>
+
+  <h3>El par que provoca misrouting</h3>
+  <p>Las dos primeras aceptan identificadores parecidos y hacen cosas distintas: es exactamente el escenario que el examen usa para probar el 2.1. Escribe sus descripciones con los cinco elementos —propósito, formatos de entrada, ejemplos, casos límite y <strong>frontera explícita frente a la otra</strong>— y mide si el modelo deja de confundirlas.</p>
+
+  <h3>Errores estructurados con casos reales</h3>
+  <table>
+    <tr><th>Situación</th><th>Cómo se reporta</th><th>Por qué</th></tr>
+    <tr><td>La llamada se corta por timeout</td><td><code>isError: true</code>, <code>errorCategory: transient</code>, <code>isRetryable: true</code></td><td>La consulta no llegó a ejecutarse. Reintentar puede funcionar.</td></tr>
+    <tr><td>El email no existe en HubSpot</td><td><code>isError: false</code>, <code>resultCount: 0</code></td><td>La consulta se ejecutó bien y no hay coincidencias. <strong>Eso es la respuesta.</strong></td></tr>
+  </table>
+  <p>Si tu tool devuelve las dos igual, el agente reintentará tres veces algo que nunca va a funcionar y acabará escalando un caso que no lo necesitaba. Esta distinción es la que el temario marca como pregunta directa de examen.</p>
+
+  <div class="box">
+    <span class="lbl">Configuración con credenciales fuera del código</span>
+    <p>Monta el servidor en <code>.mcp.json</code> a nivel de proyecto, con expansión de variables de entorno para las claves:</p>
+    <pre>{
+  "mcpServers": {
+    "supabase": {
+      "command": "npx",
+      "args": ["-y", "@tu-org/mcp-server-supabase"],
+      "env": { "SUPABASE_SERVICE_KEY": "${SUPABASE_SERVICE_KEY}" }
+    }
+  }
+}</pre>
+    <p>El fichero se comparte por git sin secretos dentro, cada persona pone su clave en local y rotar un token no obliga a tocar la configuración. Es el ejercicio literal del 2.4, y de paso es la forma correcta de tener credenciales en cualquier integración.</p>
+  </div>
+
+  <div class="check">
+    <span class="lbl">Señal de que lo has entendido</span>
+    <p>Cuando alguien proponga «movemos la mitad de las tools a un segundo servidor MCP para acortar la lista», sabrás por qué no sirve de nada: las fronteras entre servidores son invisibles para el modelo, que recibe todas las tools de todos los servidores conectados como una única lista plana.</p>
+  </div>
+</div></section>
+
+<!-- ============ 3 ============ -->
+<section id="p3"><div class="wrap">
+  <span class="tag">Proyecto 3</span>
+  <h2>Configurar el repo de contenidos para el equipo</h2>
+  <div class="meta">
+    <span class="w">Domain 3 · 20% del examen</span>
+    <span>Task statements 3.1, 3.2, 3.3, 3.4</span>
+    <span>Claude Code</span>
+  </div>
+
+  <p>Es el proyecto con mejor encaje si el repositorio se comparte entre varias personas, porque el escenario que más repite el examen —el compañero nuevo que clona y obtiene comportamiento distinto— deja de ser hipotético.</p>
+
+  <h3>Las tres capas, cada una en su sitio</h3>
+  <table>
+    <tr><th>Qué</th><th>Dónde</th><th>Por qué ahí</th></tr>
+    <tr><td>Design system y convenciones de HTML autocontenido</td><td><code>.claude/CLAUDE.md</code></td><td>Aplica a todo y se comparte por git</td></tr>
+    <tr><td>Convenciones de los módulos por tipo de fichero</td><td><code>.claude/rules/</code> con <code>paths</code></td><td>Los módulos están repartidos por sprints: un glob los cubre todos sin duplicar</td></tr>
+    <tr><td>Generar un módulo nuevo</td><td><code>.claude/skills/modulo/SKILL.md</code></td><td>Es un flujo puntual, no material siempre activo</td></tr>
+    <tr><td>Preferencias personales de verbosidad</td><td><code>~/.claude/CLAUDE.md</code></td><td>No debe viajar al resto del equipo</td></tr>
+  </table>
+
+  <p>Al montar las reglas por ruta vas a ver en carne propia por qué un <code>CLAUDE.md</code> por directorio no vale cuando los ficheros del mismo tipo están repartidos: acabarías con una copia por sprint, y en cuanto cambies una convención tienes que tocarlas todas.</p>
+
+  <p>La skill lleva <code>context: fork</code>, porque generar un módulo produce muchísima salida verbosa —listados, extractos, iteraciones— y sin el fork todo eso entra en la conversación principal y degrada las respuestas siguientes.</p>
+
+  <div class="box">
+    <span class="lbl">Plan mode vs ejecución directa</span>
+    <p>Pruébalo con dos tareas de tamaños distintos: cambiar un color del design system en un módulo (ejecución directa, sabes qué, dónde y cómo) frente a reorganizar el builder compartido (plan mode, hay varias formas razonables y toca muchos ficheros). La decisión no va de dificultad, va de <strong>ambigüedad</strong>.</p>
+  </div>
+
+  <div class="check">
+    <span class="lbl">Señal de que lo has entendido</span>
+    <p>Que otra persona clone el repo y compruebe si le llegan las convenciones. Si a ella le funciona distinto que a ti, tienes algo en <code>~/.claude/</code> que debería estar en <code>.claude/</code>. Eso es el escenario favorito del 3.1, reproducido en tu propio repositorio.</p>
+  </div>
+</div></section>
+
+<!-- ============ 4 ============ -->
+<section id="p4"><div class="wrap">
+  <span class="tag">Proyecto 4</span>
+  <h2>Normalizar campos de formulario a las etiquetas de HubSpot</h2>
+  <div class="meta">
+    <span class="w">Domain 4 · 20% del examen</span>
+    <span>Task statements 4.2, 4.3, 4.4</span>
+    <span>API + JSON Schema</span>
+  </div>
+
+  <p>El caso: texto libre que hay que canonicalizar (nombres de universidad escritos de quince maneras) y campos que llegan con esquemas distintos según el formulario de origen —a veces la etiqueta literal, a veces un número de un desplegable.</p>
+
+  <h3>Diseño del esquema: tres piezas que aparecen solas</h3>
+  <ul>
+    <li><strong>Campo nullable.</strong> Si la pregunta no se muestra a parte de las personas, ese campo llega vacío. Con el campo obligatorio, el modelo se inventará un valor plausible. Con él nullable, devuelve <code>null</code> honestamente. Es la defensa estructural contra la fabricación.</li>
+    <li><strong>Enum con <code>unclear</code>.</strong> Para entradas genuinamente ambiguas, en vez de forzar una clasificación sin evidencia.</li>
+    <li><strong><code>other</code> + campo de detalle.</strong> Para lo que no encaje en tu lista cerrada, sin perder la información.</li>
+  </ul>
+
+  <pre>{
+  "properties": {
+    "universidad_canonica": { "type": ["string", "null"] },
+    "nivel_estudios": {
+      "type": "string",
+      "enum": ["Bachillerato", "FP Grado Medio", "FP Grado Superior",
+               "Grado", "Máster", "Doctorado", "unclear", "other"]
+    },
+    "detalle_other": { "type": ["string", "null"] }
+  },
+  "required": ["nivel_estudios"]
+}</pre>
+
+  <h3>Few-shot con razonamiento</h3>
+  <p>Los ejemplos los sacas de tus propios datos: <code>UPM</code>, <code>Politécnica de Madrid</code>, <code>U.P.M.</code>, <code>universidad politecnica</code>. Dos a cuatro, y cada uno con el <strong>razonamiento</strong> de cómo se localizó y por qué se resolvió así. Sin razonamiento el modelo aprende esos cuatro casos; con razonamiento aprende el principio y generaliza a los que no le enseñaste.</p>
+
+  <div class="box">
+    <span class="lbl">El bucle de validación</span>
+    <p>Aquí se toca la frontera que más pregunta el examen. Si el valor numérico llega fuera de rango, <strong>reintenta</strong> incluyendo el documento, la extracción fallida y el error específico. Si el campo directamente no viene en el formulario, <strong>no reintentes</strong>: ningún número de intentos crea información que no está. Eso se marca para revisión.</p>
+  </div>
+
+  <div class="check">
+    <span class="lbl">Señal de que lo has entendido</span>
+    <p>Cuando el JSON salga siempre bien formado pero encuentres un valor en el campo equivocado, no buscarás el fallo en el esquema. <code>tool_use</code> elimina los errores de sintaxis; los semánticos necesitan validación aparte.</p>
+  </div>
+</div></section>
+
+<!-- ============ 5 ============ -->
+<section id="p5"><div class="wrap">
+  <span class="tag">Proyecto 5</span>
+  <h2>Decidir si puedes fiarte de esa normalización</h2>
+  <div class="meta">
+    <span class="w">Domain 5 · 15% del examen</span>
+    <span>Task statements 5.3, 5.5</span>
+    <span>Encadena con el proyecto 4</span>
+  </div>
+
+  <p>Este es el que decide si lo del proyecto 4 puede ir a producción sin supervisión. Y es el que más se parece a una decisión de verdad.</p>
+
+  <h3>Precisión por segmento, no agregada</h3>
+  <p>Mide la precisión partiendo los datos: universidades españolas conocidas, siglas, universidades extranjeras, entradas con erratas. Casi con seguridad el agregado te va a salir estupendo porque las españolas grandes dominan el volumen, y las extranjeras van a estar muy por debajo.</p>
+  <table>
+    <tr><th>Segmento</th><th>Precisión</th></tr>
+    <tr><td>Universidades españolas conocidas</td><td>alta</td></tr>
+    <tr><td>Siglas</td><td>media</td></tr>
+    <tr><td>Universidades extranjeras</td><td><strong>baja</strong></td></tr>
+    <tr><td><strong>Agregado</strong></td><td><strong>engañosamente alto</strong></td></tr>
+  </table>
+  <p>Esa tabla es la trampa de las métricas agregadas del 5.5, con tus propios datos. Un 96% global puede convivir perfectamente con un 45% en el segmento que más te va a doler.</p>
+
+  <h3>Calibrar antes de enrutar</h3>
+  <p>Que el modelo emita confianza por campo, y <strong>calíbrala</strong> contra un conjunto que hayas etiquetado a mano. Un 0,90 no significa lo mismo en un campo que en otro: puede corresponder a un 94% de acierto real en uno y a un 82% en otro. Solo con la curva de calibración decides el umbral por encima del cual va directo y por debajo del cual entra en revisión manual.</p>
+
+  <div class="warnbox">
+    <span class="lbl">Muestrea también lo automatizado</span>
+    <p>Es lo contraintuitivo del 5.5. Las extracciones de baja confianza ya van a revisión humana. Las de alta confianza son las que se automatizan, y si el sistema desarrolla un patrón de error nuevo que las afecta, <strong>solo el muestreo estratificado lo va a detectar</strong>. Revisar solo lo dudoso te deja ciega justo donde no hay nadie mirando.</p>
+  </div>
+
+  <div class="box">
+    <span class="lbl">Propagación de errores en procesamiento por lotes</span>
+    <p>Si reprocesas registros en tanda y una parte falla por timeout, el resultado tiene que reflejarlo: cuántos se procesaron, cuáles fallaron, con qué error y qué resultados parciales hay. Un proceso que devuelva «éxito, 22 procesadas» cuando solo pasaron 10 deja datos incompletos en el CRM <em>sin que nadie lo sepa</em>. Eso es supresión silenciosa, y es el peor antipatrón del dominio precisamente porque es invisible: la salida parece correcta.</p>
+  </div>
+
+  <div class="check">
+    <span class="lbl">Señal de que lo has entendido</span>
+    <p>Que la respuesta a «¿podemos automatizar esto ya?» deje de ser un porcentaje global y pase a ser una tabla por segmento más un umbral calibrado.</p>
+  </div>
+</div></section>
+
+<!-- ============ ORDEN ============ -->
+<section id="orden"><div class="wrap">
+  <span class="tag">Cómo encadenarlos</span>
+  <h2>Orden recomendado</h2>
+
+  <div class="order">
+    <p class="chain">2 → 1 → 4 → 5 → 3</p>
+    <ul>
+      <li>El <strong>servidor MCP</strong> te da los cimientos: sin tools bien diseñadas no hay agente que funcione.</li>
+      <li>El <strong>agente</strong> te da dónde meter los gates y los hooks.</li>
+      <li>La <strong>extracción</strong> se apoya en las tools que ya tienes montadas.</li>
+      <li>La <strong>calibración</strong> necesita que la extracción exista para poder medirla.</li>
+      <li>La <strong>configuración de Claude Code</strong> es independiente del resto y la más rápida: se puede hacer en cualquier momento.</li>
+    </ul>
+  </div>
+
+  <h3>Si solo hay tiempo para dos</h3>
+  <p>El 1 y el 4. Son los dominios que más pesan (27% y 20% entre los dos, casi la mitad del examen) y los que tienen los conceptos que peor se aprenden leyendo: la diferencia entre una garantía determinista y una instrucción en un prompt no se interioriza hasta que ves fallar el prompt.</p>
+
+  <div class="warnbox">
+    <span class="lbl">Una advertencia honesta</span>
+    <p>El examen es de opción múltiple y evalúa criterio, no capacidad de construir. Estos proyectos no son requisito para aprobar. Pero los conceptos que se preguntan están diseñados alrededor de decisiones de arquitectura reales, y hay una diferencia notable entre reconocer la respuesta correcta y haber tomado esa decisión con datos de producción delante.</p>
+  </div>
+</div></section>
+
+<footer><div class="wrap">
+  <p>Proyectos de preparación para el <strong>Claude Certified Architect — Foundations</strong> (CCAR-F), mapeados contra las task statements del Exam Guide oficial v1.0 (julio 2026).</p>
+</div></footer>
+
+</body>
+</html>

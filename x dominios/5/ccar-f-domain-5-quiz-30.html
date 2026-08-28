@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz 30 · Domain 5 Context Management — CCAR-F</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#E7ECF1;--panel:#FAFBFC;--ink:#0F1A26;--ink-soft:#4A5A6B;--line:#C9D3DC;--det:#0C6D78;--anti:#A62347;--display:'Space Grotesk',system-ui,sans-serif;--body:'IBM Plex Sans',system-ui,-apple-system,sans-serif;--mono:'IBM Plex Mono',ui-monospace,Menlo,monospace}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16.5px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:760px;margin:0 auto;padding:0 22px}
+header{padding:48px 0 28px}
+.eyebrow{font-family:var(--mono);font-size:12.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--det)}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(1.9rem,5.5vw,2.6rem);line-height:1.08;letter-spacing:-.025em;margin:.3em 0 .35em}
+.lede{color:var(--ink-soft);margin:0 0 18px;max-width:60ch}
+.dist{display:flex;flex-wrap:wrap;gap:7px}
+.dist span{font-family:var(--mono);font-size:11.5px;border:1px solid var(--line);background:var(--panel);padding:4px 9px;border-radius:100px;color:var(--ink-soft)}
+.bar-wrap{position:sticky;top:0;z-index:10;background:rgba(231,236,241,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:11px 0}
+.bar-inner{display:flex;align-items:center;gap:14px}
+.track{flex:1;height:5px;background:#D3DCE4;border-radius:3px;overflow:hidden}
+.fill{height:100%;width:0;background:var(--det);transition:width .25s ease}
+.counter{font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);white-space:nowrap}
+.counter b{color:var(--ink)}
+main{padding:6px 0 20px}
+.sec{font-family:var(--display);font-weight:700;font-size:1.12rem;letter-spacing:-.01em;margin:32px 0 2px;padding-bottom:7px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.sec .cnt{font-family:var(--mono);font-size:11.5px;font-weight:400;color:var(--ink-soft)}
+.q{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:18px 20px 16px;margin:14px 0}
+.num{font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;color:var(--det)}
+.stem{font-weight:600;line-height:1.45;margin:5px 0 12px}
+.opt{display:block;width:100%;text-align:left;font:inherit;font-size:.95rem;line-height:1.45;background:#fff;border:1px solid var(--line);border-radius:5px;padding:10px 13px;margin-bottom:7px;cursor:pointer;transition:border-color .12s,background .12s}
+.opt:hover:not(:disabled){border-color:var(--ink-soft)}
+.opt:disabled{cursor:default}
+.opt .letter{font-family:var(--mono);font-size:12px;color:var(--ink-soft);margin-right:9px;font-weight:600}
+.opt.good{border-color:var(--det);background:#E6F1F2;box-shadow:inset 3px 0 0 var(--det)}
+.opt.good .letter{color:var(--det)}
+.opt.bad{border-color:var(--anti);background:#FBF0F3;box-shadow:inset 3px 0 0 var(--anti)}
+.opt.bad .letter{color:var(--anti)}
+.hintbtn{font-family:var(--mono);font-size:11.5px;color:var(--ink-soft);background:none;border:none;padding:3px 0;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.hintbtn:hover{color:var(--ink)}
+.hinttext{font-size:.9rem;color:var(--ink-soft);font-style:italic;margin:2px 0 10px;display:none}
+.hinttext.show{display:block}
+.why{font-size:.93rem;margin-top:10px;padding:12px 14px;border-radius:5px;background:#F0F3F6;border:1px solid var(--line);display:none}
+.why.show{display:block}
+.why b{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.08em}
+.why.ok b{color:var(--det)}
+.why.no b{color:var(--anti)}
+.result{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--det);border-radius:0 8px 8px 0;padding:24px;margin:30px 0 10px;display:none}
+.result.show{display:block}
+.result h2{font-family:var(--display);font-weight:700;font-size:1.35rem;margin:0 0 .35em}
+.big{font-family:var(--mono);font-size:2.2rem;font-weight:600;color:var(--det);line-height:1}
+.verdict{margin:.7em 0 1.2em;color:var(--ink-soft)}
+table{width:100%;border-collapse:collapse;font-size:.92rem;margin-top:6px}
+th,td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--line)}
+th{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);font-weight:600}
+td.sc{font-family:var(--mono);white-space:nowrap}
+td.sc.weak{color:var(--anti);font-weight:600}
+td.sc.strong{color:var(--det)}
+.reset{font-family:var(--mono);font-size:12.5px;background:var(--ink);color:var(--panel);border:none;border-radius:5px;padding:9px 16px;margin-top:18px;cursor:pointer}
+.reset:hover{background:var(--det)}
+footer{padding:26px 0 56px;font-size:.88rem;color:var(--ink-soft)}
+:focus-visible{outline:2px solid var(--det);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+@media (max-width:560px){body{font-size:16px}header{padding:34px 0 22px}}
+</style>
+</head>
+<body>
+
+<header><div class="wrap">
+  <span class="eyebrow">CCAR-F · Domain 5 · 15% del examen</span>
+  <h1>30 preguntas: gestión de contexto y fiabilidad</h1>
+  <p class="lede">Cinco por task statement. Es el dominio que menos pesa y el que más se cruza con los otros cuatro: varias respuestas ya las viste en el 1 y el 2, ahora desde el otro lado.</p>
+  <div class="dist"><span>5.1 · 5</span><span>5.2 · 5</span><span>5.3 · 5</span><span>5.4 · 5</span><span>5.5 · 5</span><span>5.6 · 5</span></div>
+</div></header>
+
+<div class="bar-wrap"><div class="wrap bar-inner">
+  <div class="track"><div class="fill" id="fill"></div></div>
+  <span class="counter" id="counter">Respondidas <b>0</b>/30 · Aciertos <b>0</b></span>
+</div></div>
+
+<main><div class="wrap" id="quiz"></div>
+<div class="wrap"><div class="result" id="result"></div></div></main>
+
+<footer><div class="wrap">Preguntas propias basadas en el temario del Domain 5 y en los objetivos del Exam Guide v1.0 (julio 2026). No reproducen las preguntas de muestra oficiales.</div></footer>
+
+<script>
+const SECTIONS=[
+ {ts:"5.1",title:"Gestión de la ventana de contexto",qs:[
+  {stem:"Tras varios turnos, el agente habla de «tu solicitud de reembolso reciente» en vez de los 247,83 € del pedido #8891. El historial se resume entre turnos. ¿Arreglo?",
+   hint:"¿Dónde tienen que vivir los datos que no pueden perderse?",
+   opts:["Instruir al modelo para que preserve todos los valores numéricos al resumir","Extraer los hechos transaccionales a un bloque persistente incluido en cada prompt, fuera del historial resumido","Guardar el historial en una base de datos externa y recuperar turnos bajo demanda","Ampliar la ventana para que quepa todo y no haga falta resumir"],
+   ok:1,why:"Instruir al resumidor sigue siendo probabilístico, y el resumen destruye números y fechas por defecto. El bloque de hechos vive fuera de lo resumible: es el patrón central del dominio."},
+  {stem:"Vas a pasar los resultados de tres subagentes a un agente de síntesis. ¿Cómo estructuras la entrada?",
+   opts:["En orden cronológico de llegada","Con un resumen de hallazgos clave al principio y los detalles después, con encabezados de sección explícitos","Con los detalles primero y el resumen al final","Todo junto, pidiendo en el prompt que preste atención a todo por igual"],
+   ok:1,why:"El efecto lost in the middle es posicional y su arreglo es estructural. Los recordatorios en el prompt no son fiables contra efectos de posición."},
+  {stem:"Tu tool de consulta de pedidos devuelve 40+ campos y solo necesitas 5. ¿Qué haces y dónde?",
+   opts:["Recortar a los campos relevantes en un PostToolUse o en la propia tool, antes de que entre en el historial","Dejarlos por si el modelo los necesita más adelante","Pedir en el prompt que ignore los campos irrelevantes","Recortarlos al resumir la conversación"],
+   ok:0,why:"Una vez que los datos verbosos están en contexto se quedan y gastan tokens en cada turno siguiente. El recorte va antes de la entrada, no después."},
+  {stem:"¿Por qué cada petición a la API debe llevar el historial completo?",
+   opts:["Por requisitos de auditoría","Porque la API es stateless: no hay estado de sesión en servidor, así que cada turno lleva todo lo que el modelo necesita para seguir la conversación","Porque el modelo cachea automáticamente lo repetido","Porque el orden de los mensajes determina la temperatura efectiva"],
+   ok:1,why:"De ahí la tensión del dominio: necesitas el historial completo para la coherencia pero crece cada turno. El bloque de hechos resuelve la tensión separando lo crítico de lo resumible."},
+  {stem:"Quieres aprovechar el prompt caching en un pipeline con instrucciones largas y un documento de referencia fijo. ¿Cómo ordenas el prompt?",
+   opts:["El mensaje del usuario primero, para que el modelo sepa qué busca antes de leer la referencia","Lo constante primero (instrucciones, tools, documento), el breakpoint cache_control al final de ese bloque, y lo volátil después","Da igual el orden mientras marques el breakpoint","Alternando bloques estáticos y dinámicos para maximizar coincidencias"],
+   ok:1,why:"La caché encaja desde el principio del prompt, prefijo a prefijo. Si lo dinámico va delante, el prefijo cambia en cada petición y pagas precio completo siempre."}
+ ]},
+
+ {ts:"5.2",title:"Escalado y ambigüedad",qs:[
+  {stem:"Un cliente escribe: «esto es indignante, llevo tres días esperando, quiero hablar con una persona». ¿Qué hace el agente?",
+   opts:["Reconocer la frustración y ofrecer resolver el envío, escalando solo si insiste","Escalar inmediatamente, sin investigar ni ofrecer ayuda primero","Analizar el sentimiento y escalar si supera el umbral","Consultar el estado del pedido y decidir según lo que encuentre"],
+   ok:1,why:"Ha pedido un humano explícitamente: regla absoluta. El matiz de la frustración aplica cuando el cliente está enfadado pero NO ha pedido un humano."},
+  {stem:"Un agente resuelve solo el 55% de los casos a la primera: escala reemplazos por daño con foto y en cambio intenta resolver excepciones de política. ¿Mejora más efectiva?",
+   opts:["Criterios de escalado explícitos en el system prompt con ejemplos few-shot de cuándo escalar y cuándo resolver","Un clasificador entrenado con tickets históricos que prediga qué necesita escalado","Análisis de sentimiento que escale automáticamente ante frustración","Que el agente autorreporte confianza de 1 a 10 y escale bajo umbral"],
+   ok:0,why:"La causa es una frontera de decisión poco clara, y la respuesta proporcionada es optimizar el prompt antes de montar infraestructura. La opción D es justo el modo de fallo descrito: la confianza mal calibrada produce exactamente ese patrón."},
+  {stem:"Un cliente pide igualar el precio de un competidor. La política solo cubre ajustes en la propia web. ¿Escalar?",
+   hint:"¿La política dice que no, o no dice nada?",
+   opts:["No: si la política no lo contempla, la respuesta es no","Sí: es un vacío de política, y el agente no puede inventar política sobre la marcha","No, salvo que el cliente insista","Depende del importe de la diferencia"],
+   ok:1,why:"Distinción clave: una violación tiene respuesta documentada («no») y no escala; un vacío significa que la política calla sobre esa situación, y eso requiere juicio humano."},
+  {stem:"Una búsqueda de cliente devuelve tres registros con el mismo nombre. ¿Qué hace el agente?",
+   opts:["Selecciona el más reciente","Selecciona el más activo","Pide identificadores adicionales: email, teléfono o número de pedido","Procesa contra los tres y compara"],
+   ok:2,why:"Cualquier heurística arriesga violación de privacidad o acción sobre la cuenta equivocada. La única respuesta segura es pedir aclaración."},
+  {stem:"¿Por qué el escalado basado en sentimiento es poco fiable?",
+   opts:["Porque los modelos detectan mal el sarcasmo","Porque la frustración no correlaciona con la complejidad del caso: un cliente furioso por una entrega tardía se resuelve fácil, y uno tranquilo con un vacío de política necesita humano","Porque añade latencia al análisis de cada mensaje","Porque depende del idioma del cliente"],
+   ok:1,why:"El sentimiento mide estado emocional, no dificultad del caso. Son dos ejes independientes, y el examen lo prueba directamente."}
+ ]},
+
+ {ts:"5.3",title:"Propagación de errores",qs:[
+  {stem:"Un subagente de búsqueda sufre timeout tras recuperar 3 de 5 fuentes. ¿Qué devuelve al coordinador?",
+   opts:["Un array vacío marcado como éxito, para no interrumpir el flujo","Contexto estructurado: tipo de fallo, query intentada, los 3 resultados parciales y enfoques alternativos","Un status genérico de «búsqueda no disponible» tras agotar reintentos","Una excepción que termine el workflow completo"],
+   ok:1,why:"Los cuatro elementos dan al coordinador con qué decidir. Vacío como éxito hace el hueco invisible; matar el workflow tira el trabajo de los otros subagentes."},
+  {stem:"¿Por qué la supresión silenciosa es el peor antipatrón de los dos?",
+   opts:["Porque consume más recursos que terminar el workflow","Porque el coordinador cree que la búsqueda corrió y no encontró nada: no reintenta, no prueba alternativas, y la salida parece completa aunque le falte un área entera","Porque genera logs incorrectos","Porque impide reintentar más de tres veces"],
+   ok:1,why:"El peligro es que es invisible: la salida se ve correcta y nadie detecta el hueco. En soporte sería decirle a un cliente que no tiene cuenta cuando el sistema estaba caído."},
+  {stem:"Una query se ejecuta correctamente y no encuentra coincidencias. ¿Cómo se reporta?",
+   opts:["Como error transitorio con isRetryable true","Como éxito con resultados vacíos y sin reintento: eso ES la respuesta","Como error de validación, porque la query no dio resultados","Como fallo parcial con resultados parciales vacíos"],
+   ok:1,why:"Fallo de acceso significa que la query no llegó a ejecutarse. Vacío válido significa que sí se ejecutó y no hay nada. Confundirlos hace que no reintentes cuando debes o que reintentes lo que siempre dará nada."},
+  {stem:"Un subagente sufre un fallo transitorio puntual. ¿Qué debe hacer antes de propagar?",
+   opts:["Propagar inmediatamente para que el coordinador decida","Intentar recuperación local (reintentos, fuentes alternativas) y propagar solo lo que no pueda resolver, con lo intentado y los resultados parciales","Terminar su tarea y devolver lo que tenga sin mencionar el fallo","Reiniciarse con un contexto limpio"],
+   ok:1,why:"Recuperación local con propagación selectiva reduce la complejidad del coordinador, que no tiene que gestionar los reintentos de cada posible fallo de cada subagente."},
+  {stem:"Una de las cinco áreas de una investigación quedó sin cubrir porque la fuente no estaba disponible. ¿Qué debe hacer la síntesis?",
+   opts:["Omitir el área en silencio para no ensuciar el informe","Incluir anotaciones de cobertura indicando qué está bien soportado y qué tiene huecos, con el motivo","Repetir la investigación completa hasta cubrirla","Rellenar el área con conocimiento general del modelo"],
+   ok:1,why:"Sin la anotación, un hueco parece que el tema no era relevante en vez de que la fuente no estaba disponible. La transparencia sobre las limitaciones es parte del entregable."}
+ ]},
+
+ {ts:"5.4",title:"Exploración de codebase",qs:[
+  {stem:"Un agente que explora un codebase empieza a hablar de «patrones repositorio típicos» en vez de las clases concretas que descubrió antes. ¿Mitigación?",
+   opts:["Ampliar la ventana de contexto","Ficheros scratchpad con los hallazgos clave, consultados en pasos posteriores","Reiniciar la sesión y pedirle que explore de forma más eficiente","Precargar toda la estructura del codebase en el contexto inicial"],
+   ok:1,why:"La degradación no es falta de espacio: es pérdida del rastro bajo salida más reciente. Una ventana mayor se llena igual de verbosidad."},
+  {stem:"¿Cuál es el beneficio principal de delegar exploración en subagentes, en este contexto?",
+   hint:"Lo obvio no es lo que pregunta el examen.",
+   opts:["La paralelización, que reduce el tiempo total","El aislamiento de contexto: el principal se mantiene limpio para coordinar mientras los subagentes absorben la verbosidad","Que cada subagente puede usar un modelo distinto","Que reduce el coste por token"],
+   ok:1,why:"La paralelización es la lectura obvia, pero el valor real en exploración de codebase es mantener limpio el contexto del agente principal."},
+  {stem:"Tu sesión de exploración se cae a mitad de la fase 2 y pierdes el progreso. ¿Qué implementas?",
+   opts:["Guardar la transcripción completa para reanudarla","Manifiestos de estado estructurados —rutas exploradas, hallazgos, fase y siguientes pasos— que el coordinador carga e inyecta al reanudar","Ejecutar todo con /compact activado","Dividir la exploración en sesiones más cortas"],
+   ok:1,why:"El manifiesto permite retomar sin repetir exploración. Guardar la transcripción entera reintroduce toda la verbosidad que causó el problema."},
+  {stem:"¿Cuándo se usa /compact en una sesión de exploración larga?",
+   opts:["Solo cuando llegas al límite de contexto","De forma proactiva durante la sesión, para proteger la calidad del contexto y no solo su cantidad","Nunca: destruye los hallazgos previos","Solo antes de cambiar de fase"],
+   ok:1,why:"Es una herramienta de calidad, no un extintor. Esperar al límite significa haber trabajado ya un rato con contexto degradado."},
+  {stem:"Vas a lanzar los subagentes de la fase 2 después de una fase 1 de arquitectura. ¿Qué les pasas?",
+   opts:["Nada: que exploren con la vista fresca","Un resumen inyectado de los hallazgos de la fase 1, para que no dupliquen exploración y sepan qué preguntas hacer","La transcripción completa de la fase 1","Solo la lista de ficheros ya explorados"],
+   ok:1,why:"Evita el arranque en frío. Sin el resumen, los agentes de la fase 2 redescubren la estructura del sistema en vez de investigar lo que les toca."}
+ ]},
+
+ {ts:"5.5",title:"Revisión humana y calibración",qs:[
+  {stem:"Un sistema reporta 97% de precisión global y proponen automatizar todo lo que supere 95% de confianza. ¿Riesgo crítico?",
+   opts:["El umbral de 95% es bajo y debería subirse a 99%","El agregado puede esconder mal rendimiento en tipos de documento o campos concretos, y los scores necesitan calibración contra sets etiquetados","Toda extracción automatizada debería llevar revisión humana igualmente","El modelo se volverá sobreconfiado con el tiempo"],
+   ok:1,why:"Un 97% ponderado por volumen puede convivir con un 45% en formatos internacionales. Son dos fallos apilados: métrica agregada y confianza sin calibrar."},
+  {stem:"Tu muestreo de calidad revisa solo las extracciones de baja confianza. ¿Qué problema tiene?",
+   opts:["Ninguno: son las que más fallan","Las de baja confianza ya van a revisión; si aparece un patrón de error nuevo en las de alta confianza, que están automatizadas, nada lo detectará","Consume demasiada capacidad de revisión","Debería revisarse solo lo de alta confianza"],
+   ok:1,why:"El muestreo estratificado mide precisión continua y detecta patrones nuevos. La segunda función solo existe si incluye lo automatizado."},
+  {stem:"¿Qué hace falta para que un score de confianza sirva para enrutar automáticamente?",
+   opts:["Que el modelo lo reporte con dos decimales","Calibrarlo contra un conjunto etiquetado, midiendo cómo la confianza reportada se corresponde con la precisión real por tipo de campo","Fijar un umbral conservador como 0,95","Promediar los scores de varias ejecuciones"],
+   ok:1,why:"0,90 puede significar 94% de acierto real en fechas y 82% en importes. El score es relativo, no absoluto, y usarlo sin calibrar para decisiones automáticas es un antipatrón."},
+  {stem:"Tienes capacidad para revisar el 10% de las extracciones. ¿Cómo la asignas?",
+   opts:["Uniformemente entre todos los tipos de documento","A los ítems de mayor incertidumbre primero, con una cola que se reordena dinámicamente según llegan extracciones nuevas","Por orden cronológico de llegada","A las extracciones de mayor importe económico"],
+   ok:1,why:"El reparto uniforme gasta revisores en lo que el modelo ya hace bien. Y la cola tiene que ser dinámica: el siguiente ítem es el más incierto pendiente, no el siguiente en el tiempo."},
+  {stem:"¿Cuál es el orden correcto antes de reducir la revisión humana?",
+   opts:["Reducir primero y medir el impacto después","Medir por tipo y campo, calibrar la confianza, fijar umbrales, implantar muestreo estratificado y solo entonces reducir","Calibrar la confianza y reducir directamente si supera el 95%","Reducir en los tipos de documento de mayor volumen"],
+   ok:1,why:"Cada paso de la secuencia existe para prevenir un modo de fallo concreto. Saltar al último basándose en el agregado es exactamente la trampa que el examen plantea."}
+ ]},
+
+ {ts:"5.6",title:"Trazabilidad y síntesis multifuente",qs:[
+  {stem:"Dos fuentes creíbles reportan 12% (datos de 2023) y 8% (datos de 2024). El agente de síntesis elige la más reciente. ¿Enfoque correcto?",
+   opts:["Marcar el conflicto y escalarlo a un humano antes de incluir cifra alguna","Promediar y reportar 10% con nota al pie","Usar siempre la más reciente","Anotar ambos valores con atribución y fechas, dejando interpretar a quien lo consume"],
+   ok:3,why:"Elegir destruye información y presenta certeza falsa. Y con las fechas delante puede que no haya conflicto sino tendencia."},
+  {stem:"Un informe de síntesis sale sin fuentes aunque los subagentes devolvieron URLs y referencias correctamente. ¿Qué falta?",
+   opts:["Instruir al agente de síntesis para que preserve y fusione los mapeos afirmación-fuente al combinar","Dar al agente de síntesis acceso a la tool de búsqueda","Aumentar su contexto","Pedir a los subagentes menos hallazgos"],
+   ok:0,why:"La atribución muere durante el resumen porque el agente comprime y parafrasea por naturaleza. La síntesis es el punto de fallo más común del pipeline."},
+  {stem:"¿Qué cinco campos lleva un mapeo afirmación-fuente completo?",
+   opts:["Claim, autor, editorial, ISBN y página","Claim, source URL, nombre de documento, extracto relevante y fecha de publicación","Claim, confianza, relevancia, categoría y fuente","Claim, resumen, conclusión, fuente y fecha de acceso"],
+   ok:1,why:"El extracto es lo que permite verificar la afirmación sin volver a la fuente, y la fecha es lo que permite interpretar correctamente números que difieren entre fuentes."},
+  {stem:"Un informe mezcla datos financieros, contexto de noticias y hallazgos técnicos. ¿Cómo lo renderizas?",
+   opts:["Todo en prosa, para lectura homogénea","Todo en listas, que es lo más escaneable","Financieros en tablas, noticias en prosa, técnicos en listas estructuradas","Todo en tablas, para facilitar la comparación"],
+   ok:2,why:"Forzar todo a un formato único degrada la legibilidad. La síntesis debe elegir el formato según el tipo de contenido."},
+  {stem:"Un subagente de análisis encuentra dos cifras de facturación contradictorias en el mismo documento. ¿Qué hace?",
+   opts:["Elige la de los estados auditados, más fiables","Completa el análisis incluyendo ambos valores anotados con su contexto y una posible explicación","Descarta el documento como no procesable","Promedia las dos cifras"],
+   ok:1,why:"Resolver el conflicto es decisión del coordinador o del consumidor. El trabajo del analista es completarlo con el conflicto intacto y contexto suficiente para que otro decida."}
+ ]}
+];
+
+const LETTERS=['A','B','C','D'];
+const root=document.getElementById('quiz');
+const fill=document.getElementById('fill');
+const counter=document.getElementById('counter');
+const result=document.getElementById('result');
+const TOTAL=SECTIONS.reduce((n,s)=>n+s.qs.length,0);
+const stats={};
+SECTIONS.forEach(s=>stats[s.ts]={right:0,total:s.qs.length,title:s.title});
+let answered=0,right=0,n=0;
+
+SECTIONS.forEach(sec=>{
+  const h=document.createElement('div'); h.className='sec';
+  h.innerHTML='<span>'+sec.ts+' · '+sec.title+'</span><span class="cnt">'+sec.qs.length+' preguntas</span>';
+  root.appendChild(h);
+  sec.qs.forEach(q=>{
+    n++; const idx=n;
+    const card=document.createElement('div'); card.className='q';
+    const num=document.createElement('span'); num.className='num'; num.textContent='PREGUNTA '+idx+' / '+TOTAL;
+    const stem=document.createElement('p'); stem.className='stem'; stem.textContent=q.stem;
+    card.append(num,stem);
+    if(q.hint){
+      const hb=document.createElement('button'); hb.className='hintbtn'; hb.type='button'; hb.textContent='Ver pista';
+      const ht=document.createElement('p'); ht.className='hinttext'; ht.textContent=q.hint;
+      hb.addEventListener('click',()=>{ht.classList.add('show');hb.remove();});
+      card.append(hb,ht);
+    }
+    const why=document.createElement('div'); why.className='why';
+    q.opts.forEach((o,j)=>{
+      const b=document.createElement('button'); b.className='opt'; b.type='button';
+      b.innerHTML='<span class="letter">'+LETTERS[j]+'</span>';
+      b.appendChild(document.createTextNode(o));
+      b.addEventListener('click',()=>{
+        card.querySelectorAll('.opt').forEach(x=>x.disabled=true);
+        card.querySelectorAll('.opt')[q.ok].classList.add('good');
+        const hit=j===q.ok;
+        if(!hit) b.classList.add('bad'); else {right++;stats[sec.ts].right++;}
+        why.className='why show '+(hit?'ok':'no');
+        why.innerHTML='<b>'+(hit?'Correcto.':'No es esa.')+'</b> '+q.why;
+        answered++; update();
+      });
+      card.appendChild(b);
+    });
+    card.appendChild(why); root.appendChild(card);
+  });
+});
+
+function update(){
+  fill.style.width=(answered/TOTAL*100)+'%';
+  counter.innerHTML='Respondidas <b>'+answered+'</b>/'+TOTAL+' · Aciertos <b>'+right+'</b>';
+  if(answered===TOTAL) finish();
+}
+function finish(){
+  const pct=Math.round(right/TOTAL*100);
+  let verdict;
+  if(pct>=90) verdict='Domain 5 controlado. Ya tienes los cinco dominios cubiertos: toca simulacro completo.';
+  else if(pct>=75) verdict='Buen nivel. Repasa las task statements flojas y repite dentro de unos días.';
+  else if(pct>=60) verdict='Justo. Merece otra vuelta a la guía antes del simulacro completo.';
+  else verdict='Toca releer la guía entera antes de repetir el test.';
+  let rows='';
+  Object.keys(stats).forEach(ts=>{
+    const s=stats[ts]; const p=Math.round(s.right/s.total*100);
+    const cls=p<75?'weak':(p===100?'strong':'');
+    rows+='<tr><td>'+ts+' · '+s.title+'</td><td class="sc '+cls+'">'+s.right+'/'+s.total+' · '+p+'%</td></tr>';
+  });
+  result.innerHTML='<h2>Resultado</h2><span class="big">'+right+'/'+TOTAL+' · '+pct+'%</span><p class="verdict">'+verdict+'</p><table><tr><th>Task statement</th><th>Aciertos</th></tr>'+rows+'</table><button class="reset" type="button" onclick="location.reload()">Volver a empezar</button>';
+  result.classList.add('show');
+  result.scrollIntoView({behavior:'smooth',block:'center'});
+}
+</script>
+</body>
+</html>

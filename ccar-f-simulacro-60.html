@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simulacro CCAR-F · 60 preguntas · 120 minutos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#E7ECF1;--panel:#FAFBFC;--ink:#0F1A26;--ink-soft:#4A5A6B;--line:#C9D3DC;--det:#0C6D78;--anti:#A62347;--warn:#9C6600;--display:'Space Grotesk',system-ui,sans-serif;--body:'IBM Plex Sans',system-ui,-apple-system,sans-serif;--mono:'IBM Plex Mono',ui-monospace,Menlo,monospace}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16.5px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:0 22px}
+
+/* intro */
+#intro{padding:56px 0 70px}
+.eyebrow{font-family:var(--mono);font-size:12.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--det)}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(2rem,5.5vw,2.9rem);line-height:1.07;letter-spacing:-.025em;margin:.3em 0 .4em}
+.lede{color:var(--ink-soft);max-width:60ch;margin:0 0 26px}
+.facts{width:100%;border-collapse:collapse;font-size:.94rem;background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-bottom:26px}
+.facts td{padding:10px 14px;border-bottom:1px solid var(--line)}
+.facts tr:last-child td{border-bottom:none}
+.facts td:first-child{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);width:42%;vertical-align:top}
+.note{border-left:3px solid var(--warn);background:#FBF6EC;padding:14px 16px;border-radius:0 6px 6px 0;font-size:.94rem;margin-bottom:26px}
+.note b{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--warn);display:block;margin-bottom:5px}
+.btn{font-family:var(--mono);font-size:13px;background:var(--ink);color:var(--panel);border:none;border-radius:6px;padding:13px 24px;cursor:pointer}
+.btn:hover{background:var(--det)}
+.btn.ghost{background:none;color:var(--ink-soft);border:1px solid var(--line)}
+.btn.ghost:hover{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+.btn:disabled{opacity:.4;cursor:default}
+
+/* exam bar */
+#bar{position:sticky;top:0;z-index:30;background:rgba(231,236,241,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:10px 0;display:none}
+.barin{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+#clock{font-family:var(--mono);font-size:15px;font-weight:600;padding:3px 10px;border:1px solid var(--line);border-radius:5px;background:#fff}
+#clock.low{color:var(--anti);border-color:var(--anti)}
+.progress{font-family:var(--mono);font-size:12.5px;color:var(--ink-soft)}
+.progress b{color:var(--ink)}
+.track{flex:1;min-width:80px;height:5px;background:#D3DCE4;border-radius:3px;overflow:hidden}
+.fill{height:100%;width:0;background:var(--det);transition:width .2s}
+
+/* exam */
+#exam{display:none;padding:24px 0 40px}
+.scn{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--det);border-radius:0 8px 8px 0;padding:16px 18px;margin-bottom:18px;font-size:.94rem}
+.scn h3{font-family:var(--display);font-weight:700;font-size:1.02rem;margin:0 0 .4em}
+.scn p{margin:0;color:var(--ink-soft)}
+.qhead{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+.qnum{font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;color:var(--det)}
+.dom{font-family:var(--mono);font-size:11px;color:var(--ink-soft);border:1px solid var(--line);border-radius:100px;padding:2px 9px}
+.stem{font-weight:600;line-height:1.45;margin:0 0 6px;font-size:1.02rem}
+.multi{font-family:var(--mono);font-size:11.5px;color:var(--anti);margin:0 0 12px;letter-spacing:.04em}
+.opt{display:block;width:100%;text-align:left;font:inherit;font-size:.96rem;line-height:1.45;background:#fff;border:1px solid var(--line);border-radius:5px;padding:11px 14px;margin-bottom:8px;cursor:pointer;transition:border-color .12s,background .12s}
+.opt:hover{border-color:var(--ink-soft)}
+.opt.sel{border-color:var(--det);background:#E6F1F2;box-shadow:inset 3px 0 0 var(--det)}
+.opt .letter{font-family:var(--mono);font-size:12px;color:var(--ink-soft);margin-right:10px;font-weight:600}
+.opt.sel .letter{color:var(--det)}
+.nav{display:flex;gap:10px;align-items:center;margin-top:22px;flex-wrap:wrap}
+.flagbtn{font-family:var(--mono);font-size:12px;background:none;border:1px solid var(--line);border-radius:5px;padding:8px 14px;cursor:pointer;color:var(--ink-soft)}
+.flagbtn.on{background:#FBF6EC;border-color:var(--warn);color:var(--warn)}
+.spacer{flex:1}
+
+/* grid */
+#grid{margin-top:30px;padding-top:20px;border-top:1px solid var(--line)}
+#grid h4{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-soft);margin:0 0 12px;font-weight:600}
+.cells{display:grid;grid-template-columns:repeat(auto-fill,minmax(38px,1fr));gap:6px}
+.cell{font-family:var(--mono);font-size:12px;aspect-ratio:1;border:1px solid var(--line);background:#fff;border-radius:4px;cursor:pointer;color:var(--ink-soft)}
+.cell.done{background:#E6F1F2;border-color:var(--det);color:var(--det);font-weight:600}
+.cell.flag{border-color:var(--warn);background:#FBF6EC;color:var(--warn)}
+.cell.cur{outline:2px solid var(--ink);outline-offset:1px}
+.legend{font-family:var(--mono);font-size:11px;color:var(--ink-soft);margin-top:12px}
+
+/* results */
+#res{display:none;padding:34px 0 60px}
+.scorebox{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:28px;margin-bottom:24px;text-align:center}
+.scaled{font-family:var(--mono);font-size:3.4rem;font-weight:600;line-height:1;margin:0}
+.verdict{font-family:var(--display);font-weight:700;font-size:1.5rem;margin:.35em 0 .2em}
+.pass{color:var(--det)}
+.fail{color:var(--anti)}
+.sub{color:var(--ink-soft);font-size:.94rem;margin:0}
+table.dom{width:100%;border-collapse:collapse;font-size:.93rem;background:var(--panel);border:1px solid var(--line);margin-bottom:26px}
+table.dom th,table.dom td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line)}
+table.dom th{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);font-weight:600}
+table.dom tr:last-child td{border-bottom:none}
+td.sc{font-family:var(--mono);white-space:nowrap;text-align:right}
+td.sc.weak{color:var(--anti);font-weight:600}
+td.sc.strong{color:var(--det)}
+.rev{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:18px 20px;margin:14px 0}
+.rev.ko{border-left:3px solid var(--anti)}
+.rev.ok{border-left:3px solid var(--det)}
+.rev .stem{font-size:.98rem}
+.ropt{font-size:.93rem;padding:8px 12px;border:1px solid var(--line);border-radius:5px;margin-bottom:6px;background:#fff}
+.ropt.good{border-color:var(--det);background:#E6F1F2}
+.ropt.bad{border-color:var(--anti);background:#FBF0F3}
+.ropt .letter{font-family:var(--mono);font-size:12px;color:var(--ink-soft);margin-right:9px;font-weight:600}
+.why{font-size:.93rem;margin-top:10px;padding:12px 14px;border-radius:5px;background:#F0F3F6;border:1px solid var(--line)}
+.why b{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--det)}
+.filters{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.filters button{font-family:var(--mono);font-size:12px;border:1px solid var(--line);background:#fff;border-radius:5px;padding:7px 13px;cursor:pointer;color:var(--ink-soft)}
+.filters button.on{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+h2.sec{font-family:var(--display);font-weight:700;font-size:1.4rem;margin:34px 0 14px}
+:focus-visible{outline:2px solid var(--det);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media (max-width:560px){body{font-size:16px}#intro{padding:36px 0 50px}.scaled{font-size:2.8rem}}
+</style>
+</head>
+<body>
+
+<div id="bar"><div class="wrap barin">
+  <span id="clock">120:00</span>
+  <div class="track"><div class="fill" id="fill"></div></div>
+  <span class="progress" id="prog">Respondidas <b>0</b>/60</span>
+  <button class="btn ghost" id="submitTop" type="button">Entregar</button>
+</div></div>
+
+<main>
+<section id="intro"><div class="wrap">
+  <span class="eyebrow">Claude Certified Architect — Foundations</span>
+  <h1>Simulacro completo</h1>
+  <p class="lede">Sesenta preguntas nuevas, ninguna repetida de las guías ni de los quizzes por dominio. Formato y reparto del examen real: escenarios de producción, distractores plausibles y sin feedback hasta que entregues.</p>
+
+  <table class="facts">
+    <tr><td>Preguntas</td><td>60</td></tr>
+    <tr><td>Tiempo</td><td>120 minutos (2 min por pregunta)</td></tr>
+    <tr><td>Formato</td><td>Opción múltiple y respuesta múltiple. Las de respuesta múltiple indican cuántas elegir.</td></tr>
+    <tr><td>Escenarios</td><td>6 (el examen real presenta 4 tomados de estos 6)</td></tr>
+    <tr><td>Reparto por dominio</td><td>D1 · 16 &nbsp; D2 · 11 &nbsp; D3 · 12 &nbsp; D4 · 12 &nbsp; D5 · 9</td></tr>
+    <tr><td>Aprobado</td><td>720 sobre una escala de 100–1000</td></tr>
+  </table>
+
+  <div class="note">
+    <b>Sobre la puntuación</b>
+    El examen real usa escalado psicométrico que no es una regla de tres. Aquí la escala es lineal (100 + aciertos/60 × 900), así que el 720 cae en 41 de 60 aciertos, un 68%. Úsalo como orientación, no como predicción exacta. Las preguntas de respuesta múltiple puntúan todo o nada, como en el examen.
+  </div>
+
+  <div class="note">
+    <b>Antes de empezar</b>
+    Reserva las dos horas de verdad. La mitad del valor de un simulacro está en aguantar la fatiga de las últimas quince preguntas, que es donde el examen real te pilla. Puedes marcar preguntas para revisar y volver a ellas antes de entregar.
+  </div>
+
+  <button class="btn" id="start" type="button">Empezar el simulacro</button>
+</div></section>
+
+<section id="exam"><div class="wrap">
+  <div id="scnBox"></div>
+  <div id="qBox"></div>
+  <div class="nav">
+    <button class="btn ghost" id="prev" type="button">← Anterior</button>
+    <button class="flagbtn" id="flag" type="button">Marcar para revisar</button>
+    <span class="spacer"></span>
+    <button class="btn" id="next" type="button">Siguiente →</button>
+  </div>
+  <div id="grid">
+    <h4>Navegación</h4>
+    <div class="cells" id="cells"></div>
+    <p class="legend">Verde: respondida · Ámbar: marcada · Contorno: actual</p>
+    <div style="margin-top:18px"><button class="btn" id="submitBottom" type="button">Entregar examen</button></div>
+  </div>
+</div></section>
+
+<section id="res"><div class="wrap"></div></section>
+</main>
+
+<script>
+const SCENARIOS={
+ s1:{t:"Escenario 1 · Agente de resolución de soporte",d:"Construyes un agente de soporte con el Claude Agent SDK. Atiende peticiones de alta ambigüedad —devoluciones, disputas de facturación, incidencias de cuenta— y accede a los sistemas internos mediante tools MCP: get_customer, lookup_order, process_refund y escalate_to_human. El objetivo es un 80% de resolución en primer contacto sabiendo cuándo escalar."},
+ s2:{t:"Escenario 2 · Generación de código con Claude Code",d:"Tu equipo usa Claude Code para generar código, refactorizar, depurar y documentar. Necesitas integrarlo en el flujo de desarrollo con comandos personalizados, configuración en CLAUDE.md, y criterio sobre cuándo usar plan mode frente a ejecución directa."},
+ s3:{t:"Escenario 3 · Sistema de investigación multiagente",d:"Construyes un sistema de investigación con el Agent SDK. Un coordinador delega en subagentes especializados: uno busca en la web, otro analiza documentos, otro sintetiza hallazgos y otro genera informes. El sistema investiga temas y produce informes completos y citados."},
+ s4:{t:"Escenario 4 · Herramientas de productividad para desarrollo",d:"Construyes herramientas de productividad con el Agent SDK. El agente ayuda a explorar codebases desconocidos, entender sistemas legacy, generar boilerplate y automatizar tareas repetitivas. Usa las tools integradas (Read, Write, Bash, Grep, Glob) e integra servidores MCP."},
+ s5:{t:"Escenario 5 · Claude Code en integración continua",d:"Integras Claude Code en tu pipeline de CI/CD. El sistema ejecuta revisiones de código automáticas, genera casos de prueba y da feedback sobre pull requests. Necesitas prompts que produzcan feedback accionable y minimicen los falsos positivos."},
+ s6:{t:"Escenario 6 · Extracción de datos estructurados",d:"Construyes un sistema de extracción sobre documentos no estructurados. Valida la salida con esquemas JSON y mantiene alta precisión. Debe manejar casos límite con elegancia e integrarse con sistemas aguas abajo."}
+};
+
+const Q=[
+// ============ ESCENARIO 1 · SOPORTE (13) ============
+{s:"s1",d:1,q:"Para ahorrar tokens, tu loop envía a la API solo los tres últimos mensajes en cada iteración. El agente empieza a repreguntar datos que el cliente ya dio y a repetir consultas de pedido que ya hizo. ¿Cuál es la causa?",
+ o:["El modelo necesita temperatura más baja para mantener coherencia","La API es stateless: cada petición debe llevar el historial completo, o el modelo pierde todo lo anterior a la ventana enviada","Los tool_result caducan pasados unos minutos","Falta un identificador de sesión en la cabecera de la petición"],
+ a:1,w:"No hay estado de sesión en servidor. Recortar el historial rompe la coherencia conversacional. Si el problema es el presupuesto de tokens, la solución es el bloque persistente de hechos del caso más recorte de resultados de tools, no truncar mensajes."},
+
+{s:"s1",d:1,q:"El cliente escribe: «quiero devolver el pedido #4410 y además cambiar la tarjeta asociada a mi cuenta». Tu agente resuelve la devolución y da por cerrada la conversación. ¿Qué patrón le falta?",
+ o:["Descomponer la petición en asuntos distintos, investigarlos en paralelo con contexto compartido y sintetizar una resolución unificada","Escalar a un humano porque las peticiones múltiples exceden su alcance","Tratar el segundo asunto en una sesión nueva para no mezclar contextos","Pedir al cliente que priorice cuál de los dos quiere resolver primero"],
+ a:0,w:"Es el patrón de peticiones multi-asunto del 1.4. Los datos de cuenta obtenidos sirven para ambos, así que investigar en paralelo con contexto compartido es más rápido y produce una única respuesta que cubre todo."},
+
+{s:"s1",d:1,q:"Cumplimiento exige que ninguna operación sobre pedidos se ejecute sin verificación previa de identidad. El equipo propone tres medidas. ¿Cuáles dos aportan garantía determinista? (Selecciona DOS)",
+ o:["Un prerequisite gate que bloquee lookup_order y process_refund hasta que get_customer devuelva un ID verificado","Un PreToolUse sobre esas tools que deniegue la llamada si no consta verificación en la sesión","Reforzar el system prompt indicando que la verificación es obligatoria","Añadir few-shot examples que muestren siempre la verificación primero"],
+ a:[0,1],m:true,w:"Gate y hook son las dos formas de enforcement programático: el modelo no puede saltárselos decidiendo saltárselos. Prompt y few-shot son probabilísticos: bajan la tasa de fallo pero nunca a cero, y aquí un fallo aislado es dinero mal reembolsado."},
+
+{s:"s1",d:1,q:"Quieres que las fechas que devuelven tus tools lleguen al modelo siempre en ISO 8601, sin importar el formato del sistema de origen. ¿Dónde lo implementas?",
+ o:["Un PreToolUse que reescriba los parámetros de la llamada","Un PostToolUse que transforme el resultado antes de que el modelo lo procese","Una instrucción en el system prompt que explique el formato de cada tool","Un SubagentStop que valide el formato de salida"],
+ a:1,w:"Normalizar es transformar el resultado ya obtenido, que es exactamente la ventana de PostToolUse: después de ejecutar, antes de que el modelo lea. PreToolUse actúa sobre la entrada, no sobre la respuesta."},
+
+{s:"s1",d:1,q:"El agente escala correctamente, pero los agentes humanos se quejan de que tienen que hacer repetir todo al cliente. Revisas el resumen de handoff: lleva ID de cliente, resumen de la conversación e importe del reembolso. ¿Qué le falta?",
+ o:["El histórico completo de pedidos del cliente","El análisis de causa raíz y la acción recomendada","La transcripción literal de la conversación","El score de confianza del agente sobre el caso"],
+ a:1,w:"Son cinco campos y faltan dos. El humano no tiene acceso a la transcripción, así que el resumen debe ser autocontenido: sin diagnóstico ni recomendación, el agente humano empieza la investigación desde cero."},
+
+{s:"s1",d:1,q:"Un arquitecto propone sustituir la selección de tools del agente por un árbol de decisión en código que mapee tipos de petición a secuencias fijas de tools. ¿Cuál es la objeción principal según el examen?",
+ o:["Los árboles de decisión son más lentos de ejecutar","Pierde la capacidad de adaptarse a casos que nadie mapeó y de encadenar tools en órdenes no previstos, que es la ventaja de la decisión dirigida por el modelo","Los árboles de decisión no pueden llamar a tools MCP","Requiere mantener el árbol sincronizado con el esquema de cada tool"],
+ a:1,w:"El examen prefiere la decisión dirigida por el modelo salvo cuando hace falta cumplimiento determinista. La excepción es concreta —dinero, seguridad, compliance— y se resuelve con gates puntuales, no sustituyendo todo el razonamiento."},
+
+{s:"s1",d:2,q:"process_refund falla porque el importe supera el límite de política. La tool devuelve isError true con errorCategory business e isRetryable false. El agente reintenta tres veces igualmente. ¿Qué falla?",
+ o:["La tool debería devolver isRetryable true para que el agente pueda reintentar tras escalar","El agente ignora los metadatos de error: los errores de negocio nunca se resuelven reintentando y exigen una ruta alternativa","El límite de reintentos del loop está mal configurado","La categoría debería ser permission en vez de business"],
+ a:1,w:"La tool está bien construida. El fallo está en la lógica del agente, que debe ramificar según errorCategory: reintentar los transitorios, corregir la entrada en los de validación, y escalar los de negocio y permisos."},
+
+{s:"s1",d:2,q:"get_customer devuelve un array vacío porque el email no corresponde a ninguna cuenta. ¿Cómo debe estructurarse esa respuesta?",
+ o:["isError true con errorCategory validation, porque el email no es válido","isError false con resultCount 0 y un mensaje indicando que la consulta se ejecutó correctamente sin coincidencias","isError true con isRetryable true, por si la cuenta se crea después","Un error genérico para no revelar si la cuenta existe"],
+ a:1,w:"La tool funcionó: consultó y no encontró nada. Eso es la respuesta, no un fallo. Si la respuesta se parece a la de un error de acceso, el agente reintentará y acabará escalando un caso que no lo necesitaba."},
+
+{s:"s1",d:2,q:"Tu agente tiene once tools tras añadir integraciones de logística, fidelización y facturación. La selección se ha vuelto poco fiable. Las once hacen trabajos claramente distintos. ¿Qué haces?",
+ o:["Reescribir las once descripciones con formatos, ejemplos y fronteras","Repartirlas entre dos servidores MCP para acortar cada lista","Dividir en agentes especializados con 4-5 tools cada uno según su rol","Consolidarlas en una tool genérica con un parámetro de operación"],
+ a:2,w:"Trabajos distintos se dividen por rol. Consolidar es para variaciones de un mismo trabajo con forma común. Y repartir entre servidores no cambia nada: el modelo recibe todas las tools de todos los servidores como una lista plana."},
+
+{s:"s1",d:2,q:"El agente confunde con frecuencia lookup_order y track_shipment. Solo tiene cinco tools y ambas aceptan números de pedido. ¿Primer paso?",
+ o:["Ampliar ambas descripciones con formatos de entrada, salidas, ejemplos y una frontera explícita frente a la otra","Fusionarlas en una sola tool order_info","Añadir un clasificador que preseleccione la tool por keywords","Añadir seis few-shot examples de enrutado correcto"],
+ a:0,w:"Con cinco tools el problema es de descripciones, no de sobrecarga, y las descripciones son el mecanismo primario de selección. Es el arreglo de menos esfuerzo y más palanca: la frontera explícita («NO la uses para X») es lo que desambigua."},
+
+{s:"s1",d:5,q:"Un cliente lleva ocho turnos y ha planteado tres incidencias distintas, cada una con su pedido e importe. El historial se resume para caber en contexto. ¿Cómo evitas que se mezclen los datos de las tres?",
+ o:["Instruir al resumidor para que mantenga las incidencias separadas","Extraer los datos de cada incidencia a entradas independientes dentro de una capa de contexto estructurada, fuera del historial resumido","Abrir una sesión por incidencia y coordinarlas desde fuera","Procesar las incidencias en orden estricto, cerrando cada una antes de la siguiente"],
+ a:1,w:"El bloque de hechos del caso admite varias entradas, una por asunto. Eso evita la contaminación cruzada durante el resumen, que es justo lo que ocurre cuando los tres importes conviven en prosa resumible."},
+
+{s:"s1",d:5,q:"Un cliente muy educado pregunta si podéis igualar el precio de un competidor. Vuestra política solo contempla ajustes sobre vuestra propia web. ¿Qué hace el agente?",
+ o:["Deniega la petición: si la política no lo contempla, la respuesta es no","Escala: es un vacío de política, y el agente no puede crear política sobre la marcha","Aplica el descuento, porque no está prohibido explícitamente","Consulta el histórico del cliente y decide según su valor como cliente"],
+ a:1,w:"Distinción de examen: una violación tiene respuesta documentada («no») y no escala. Un vacío significa que la política calla sobre esa situación concreta, y eso requiere juicio humano. El tono educado del cliente no cambia nada."},
+
+{s:"s1",d:5,q:"lookup_order devuelve 43 campos por consulta. Tras seis turnos, el agente empieza a perder precisión y el contexto está casi lleno. ¿Cuál es la intervención correcta?",
+ o:["Resumir el historial más agresivamente cada tres turnos","Recortar el resultado a los campos relevantes en un PostToolUse, antes de que entre en el historial","Pedir en el system prompt que ignore los campos irrelevantes","Aumentar la ventana de contexto del modelo"],
+ a:1,w:"Los resultados de tools se acumulan y gastan tokens en cada turno siguiente. Una vez dentro del contexto ya no salen, así que el recorte tiene que ocurrir antes de la entrada. Resumir más agresivamente además destruiría los datos transaccionales."},
+
+// ============ ESCENARIO 3 · INVESTIGACIÓN MULTIAGENTE (13) ============
+{s:"s3",d:1,q:"Configuras el coordinador con allowedTools: [\"Read\", \"Write\", \"review_output\"] y AgentDefinitions impecables para los cuatro subagentes. En ejecución no se lanza ninguno. ¿Qué revisas?",
+ o:["Que las descripciones de los subagentes sean más específicas","Que allowedTools del coordinador incluya \"Task\"","Que cada subagente tenga al menos una tool asignada","Que el system prompt del coordinador nombre a cada subagente"],
+ a:1,w:"Es una puerta binaria: sin Task (Agent en el Claude Code actual) en allowedTools, el coordinador no tiene mecanismo para lanzar subagentes por muy bien definidos que estén. Las descripciones afectan a cuál elige, no a si puede."},
+
+{s:"s3",d:1,q:"El coordinador lanza el subagente de búsqueda, espera, lanza el de análisis documental, espera, y luego sintetiza. Búsqueda y análisis trabajan sobre fuentes distintas y no dependen entre sí. ¿Qué cambias?",
+ o:["Emitir las dos llamadas a la Task tool en una sola respuesta del coordinador","Fusionar ambos subagentes en uno solo con más tools","Usar fork_session para crear dos ramas paralelas","Dejarlo así: el orden garantiza consistencia de resultados"],
+ a:0,w:"Tareas independientes van en paralelo, y el mecanismo es emitir varias Task calls en una única respuesta. La invocación secuencial añade latencia a cambio de nada. fork_session es para explorar alternativas divergentes, no para paralelizar."},
+
+{s:"s3",d:1,q:"El coordinador escribe al subagente de síntesis: «Paso 1: lee los hallazgos. Paso 2: agrupa por tema. Paso 3: escribe un párrafo por grupo. Paso 4: añade conclusión». Los informes salen rígidos y no se adaptan a temas con evidencia desigual. ¿Qué cambias?",
+ o:["Añadir más pasos que cubran los casos de evidencia desigual","Sustituir el procedimiento por objetivos y criterios de calidad, dejando que el subagente decida cómo lograrlos","Dividir el subagente de síntesis en cuatro, uno por paso","Aumentar el contexto del subagente de síntesis"],
+ a:1,w:"Tercera regla del paso de contexto: objetivos, no procedimientos. Las instrucciones paso a paso impiden que el subagente ajuste su enfoque cuando encuentra algo que nadie previó, como un tema con una sola fuente."},
+
+{s:"s3",d:1,q:"Sobre «impacto de la IA en la sanidad», el informe cubre diagnóstico por imagen y triaje en urgencias con gran profundidad, pero no menciona descubrimiento de fármacos, salud mental ni gestión hospitalaria. Cada subagente ejecutó bien su tarea. ¿Causa raíz?",
+ o:["El subagente de búsqueda usó consultas demasiado estrechas","El coordinador descompuso el tema en subtareas que no cubren todos los dominios relevantes","El subagente de síntesis filtró contenido de menor calidad","El subagente de análisis descartó fuentes fuera de su especialidad"],
+ a:1,w:"Fallo de amplitud, no de profundidad: faltan categorías enteras, y eso apunta siempre a la descomposición. Los subagentes solo investigan lo que se les asigna, y esos subtemas nunca se asignaron. Añadir más subagentes tampoco lo arreglaría."},
+
+{s:"s3",d:1,q:"El coordinador evalúa la síntesis y detecta que dos subtemas quedaron sin cubrir. ¿Qué hace un coordinador bien diseñado?",
+ o:["Entrega el informe anotando los huecos de cobertura","Re-delega a búsqueda y análisis con consultas dirigidas a esos subtemas y vuelve a invocar la síntesis","Amplía el system prompt del subagente de síntesis para futuras ejecuciones","Lanza más subagentes del mismo tipo para aumentar la cobertura general"],
+ a:1,w:"Refinamiento iterativo: evaluar, re-delegar con consultas dirigidas y volver a sintetizar hasta que la cobertura basta. Un coordinador que delega una sola vez es un despachador. Anotar los huecos es lo que se hace cuando la fuente no está disponible, no cuando puedes ir a buscarla."},
+
+{s:"s3",d:1,q:"Un ingeniero propone que el subagente de análisis pase sus hallazgos directamente al de síntesis, saltándose al coordinador, para ahorrar una vuelta. ¿Qué se pierde? (Selecciona DOS)",
+ o:["La observabilidad: deja de haber un punto único donde se registra todo el flujo","La gestión de errores consistente: cada subagente tendría que manejar los fallos del anterior","La capacidad de ejecutar subagentes en paralelo","El aislamiento de contexto entre subagentes"],
+ a:[0,1],m:true,w:"Son dos de las tres razones del hub-and-spoke; la tercera es el control del flujo de información. El paralelismo no se pierde (los subagentes seguirían pudiendo lanzarse a la vez) y el aislamiento de contexto tampoco: es propiedad de cada invocación."},
+
+{s:"s3",d:1,q:"Has terminado el análisis de un corpus documental y quieres comparar dos enfoques de síntesis —uno cronológico y otro temático— partiendo del mismo análisis, sin que se contaminen. ¿Qué usas?",
+ o:["--resume sobre la sesión de análisis, evaluando ambos enfoques en el mismo hilo","fork_session, para crear dos ramas independientes desde la línea base compartida","Dos sesiones nuevas con el análisis inyectado como resumen","Dos subagentes de síntesis en paralelo, coordinados desde la sesión actual"],
+ a:1,w:"Fork es exactamente esto: exploración divergente desde una base común, con ramas que no se ven entre sí. Resume mezclaría los dos enfoques en un mismo hilo, y las sesiones nuevas con resumen se reservan para cuando el contexto previo está obsoleto."},
+
+{s:"s3",d:2,q:"El subagente de síntesis tiene compile_report, format_citation, assess_coverage y verify_fact. Un ingeniero propone añadirle search_web y fetch_page «por si necesita ampliar algo». ¿Qué respondes?",
+ o:["Adelante: más autonomía reduce los round trips al coordinador","No: son tools fuera de su especialización y tenderá a usarlas mal, poniéndose a buscar en vez de usar los hallazgos que ya recibió","Solo si se documentan bien sus descripciones","Solo si se restringe su uso en el system prompt"],
+ a:1,w:"La relevancia pesa tanto como la cantidad. verify_fact ya cubre el caso frecuente como tool cross-rol acotada; darle búsqueda completa sobreaprovisiona, duplica trabajo y gasta contexto."},
+
+{s:"s3",d:2,q:"El servidor MCP de tu equipo expone catálogos de fuentes disponibles, y los subagentes gastan varias llamadas solo en descubrir qué hay antes de empezar a investigar. ¿Qué añades?",
+ o:["Una tool list_available_sources con buena descripción","Recursos MCP que expongan el catálogo de contenido, para que el agente tenga visibilidad sin llamadas exploratorias","Un resumen del catálogo en el system prompt de cada subagente","Un hook PostToolUse que cachee los resultados de descubrimiento"],
+ a:1,w:"Es la distinción del 2.4: los resources enseñan qué datos hay, las tools permiten actuar sobre ellos. Meterlo en el system prompt funcionaría pero lo carga en todas las sesiones aunque no se use."},
+
+{s:"s3",d:2,q:"El subagente de análisis documental necesita cargar PDF desde URLs. ¿Qué tool le das?",
+ o:["fetch_url, más flexible por si aparecen otros formatos","load_document, que valida que la URL apunte a un documento y rechaza el resto","fetch_url con una instrucción en el prompt limitando su uso","Ninguna: que el coordinador le pase el contenido ya descargado"],
+ a:1,w:"Mínimo privilegio aplicado al diseño de tools: la versión constreñida previene el mal uso, hace el propósito más claro y reduce efectos colaterales. La instrucción en el prompt vuelve a ser probabilística."},
+
+{s:"s3",d:5,q:"El subagente de búsqueda consulta cinco bases. Tres responden, dos dan timeout tras agotar sus reintentos locales. ¿Qué devuelve al coordinador?",
+ o:["Los resultados de las tres, marcados como éxito, para no bloquear el pipeline","Contexto de error estructurado: tipo de fallo, qué se intentó, los resultados parciales de las tres y enfoques alternativos","Un status de «búsqueda no disponible» tras los reintentos","Una excepción que detenga la investigación hasta que las bases respondan"],
+ a:1,w:"Los cuatro elementos dan al coordinador con qué decidir. Marcar como éxito es supresión silenciosa —el peor antipatrón, porque el hueco resulta invisible— y detener el pipeline tira el trabajo de los demás subagentes."},
+
+{s:"s3",d:5,q:"El informe final afirma «la adopción clínica creció con fuerza en el último bienio» sin cifra ni fuente. Los subagentes de búsqueda y análisis devolvieron URLs, títulos, extractos y fechas correctamente. ¿Dónde está el fallo?",
+ o:["El subagente de síntesis parafrasea sin preservar los mapeos afirmación-fuente al combinar hallazgos","El subagente de búsqueda no marcó las fuentes como citables","El coordinador debería generar las citas él mismo tras la síntesis","Falta un subagente dedicado a verificación de fuentes"],
+ a:0,w:"La atribución muere durante el resumen: el agente de síntesis comprime y parafrasea por naturaleza. Es el punto de fallo más común del pipeline y necesita instrucción explícita de preservar y fusionar los mapeos."},
+
+{s:"s3",d:5,q:"Dos fuentes creíbles dan cifras distintas de inversión: 4.200 M€ (informe publicado en 2023, datos de 2022) y 5.100 M€ (informe de 2024, datos de 2023). ¿Qué hace la síntesis?",
+ o:["Usa la más reciente por reflejar mejor la situación actual","Promedia ambas e indica la varianza en una nota","Presenta ambas con su atribución y sus fechas, señalando que los periodos difieren","Marca el conflicto y detiene el informe hasta que un humano lo resuelva"],
+ a:2,w:"Aquí ni siquiera hay conflicto: son periodos distintos y con las fechas delante cuentan una tendencia. Elegir o promediar destruiría esa información y presentaría una certeza falsa."},
+
+// ============ ESCENARIO 4 · PRODUCTIVIDAD DEV (6) ============
+{s:"s4",d:1,q:"Tu agente de exploración lleva veinte minutos analizando un monorepo. El código comprueba if len(response.content) == 1 para decidir si Claude ha terminado. Falla de forma intermitente. ¿Por qué?",
+ o:["Porque content siempre tiene al menos dos elementos","Porque el número de bloques de content no indica nada sobre la terminación: Claude puede devolver texto y bloques tool_use juntos, y stop_reason es la única señal fiable","Porque hay que comprobar la longitud después de filtrar los bloques vacíos","Porque en respuestas largas content se pagina"],
+ a:1,w:"Cualquier heurística sobre la forma de content es ambigua por construcción. stop_reason existe justamente para sacar esa decisión del contenido y meterla en un campo de protocolo con valores definidos."},
+
+{s:"s4",d:1,q:"Te piden añadir tests a un módulo de facturación legacy que nadie conoce. No sabes qué depende de qué ni dónde están los huecos. ¿Estrategia de descomposición?",
+ o:["Pipeline secuencial fijo: extraer funciones, generar tests, ejecutar, reportar","Descomposición dinámica: mapear estructura, identificar zonas de alto impacto y replanificar según aparezcan dependencias","Una sola pasada con todo el módulo en contexto","Un subagente por fichero, en paralelo, sin coordinación"],
+ a:1,w:"Alcance desconocido de partida: el plan tiene que evolucionar. Descubrir que un módulo depende de otro sin tests obliga a repriorizar, y un pipeline fijo no puede reaccionar a hallazgos intermedios."},
+
+{s:"s4",d:1,q:"Quieres validar que cada subagente de exploración devuelva su informe con el esquema acordado y, si no cumple, que lo rehaga en vez de terminar. ¿Qué hook?",
+ o:["SubagentStart, para inyectar el esquema al arrancar","SubagentStop, devolviendo decision \"block\" con el motivo","PostToolUse sobre la tool Agent, reescribiendo la salida","PreToolUse sobre la tool Agent, denegando la invocación"],
+ a:1,w:"SubagentStop es el único que puede frenar la finalización y mandar al subagente de vuelta a trabajar. Start solo observa. PostToolUse sí reescribiría la salida, pero eso es transformarla, no exigir que la rehaga."},
+
+{s:"s4",d:2,q:"Necesitas localizar todos los sitios donde se instancia la clase LegacyInvoiceBuilder y, además, los ficheros de configuración YAML del módulo. ¿Qué tools y en qué orden?",
+ o:["Glob para ambas cosas, filtrando por nombre","Grep para las instancias (contenido) y Glob para los YAML (rutas)","Grep para ambas cosas, buscando el nombre y la extensión","Read del directorio completo y búsqueda manual"],
+ a:1,w:"Grep busca dentro de los ficheros, Glob encuentra ficheros por su nombre. Instanciar una clase es contenido; localizar ficheros por extensión es ruta. Cada mitad de la pregunta lleva su tool."},
+
+{s:"s4",d:2,q:"Edit falla al modificar una función porque el texto que diste aparece en cuatro sitios del fichero. ¿Cuál es el siguiente paso documentado?",
+ o:["Read del fichero completo y Write con el contenido modificado","Ampliar old_string con contexto alrededor hasta que apunte a un solo sitio, o usar replace_all si quieres cambiar las cuatro","Dividir el fichero para que el texto sea único","Ejecutar sed mediante Bash"],
+ a:1,w:"El examen penaliza tanto usar Read + Write por defecto como saltar a él en cuanto Edit reporta coincidencia múltiple. Ampliar el ancla cuesta casi nada de contexto; Read + Write carga el fichero entero para lo que suele ser una línea."},
+
+{s:"s4",d:2,q:"Tu servidor MCP expone una tool de análisis de dependencias mucho más precisa que Grep, pero el agente sigue usando Grep. Su descripción actual dice «Analiza dependencias». ¿Qué haces?",
+ o:["Eliminar Grep de allowedTools para forzar el uso de la tool MCP","Ampliar la descripción explicando capacidades, salidas y cuándo usarla en lugar de Grep","Renombrar la tool a analyze_dependencies_better","Añadir few-shot examples de uso de la tool MCP"],
+ a:1,w:"El modelo prefiere las built-in porque sus descripciones son ricas y las entiende mejor. La comparación explícita frente a la alternativa built-in es lo que inclina la selección. Quitar Grep es desproporcionado y le deja sin la herramienta correcta para otros casos."},
+
+// ============ ESCENARIO 2 · CLAUDE CODE (9) ============
+{s:"s2",d:3,q:"Tu equipo tiene convenciones de commits, de nomenclatura y de manejo de errores que deben aplicarse siempre, y además un flujo de auditoría de dependencias que se lanza una vez al mes. ¿Dónde va cada cosa?",
+ o:["Todo en CLAUDE.md, con secciones separadas","Las convenciones en CLAUDE.md o .claude/rules/; la auditoría como skill en .claude/skills/","Todo como skills, para no cargar contexto innecesario","Las convenciones como skill con paths, la auditoría en CLAUDE.md"],
+ a:1,w:"La regla funciona en las dos direcciones: no metas procedimientos de tarea en CLAUDE.md, ni material siempre-activo en una skill. Lo que aplica a cada edición se carga solo; lo que se lanza una vez al mes se invoca."},
+
+{s:"s2",d:3,q:"Creas .claude/skills/audit/SKILL.md con context: fork. Un compañero pregunta qué gana con eso. ¿Qué le respondes?",
+ o:["Que la skill se ejecuta más rápido al no compartir contexto","Que se ejecuta en un subagente aislado, así que su salida verbosa no contamina la conversación principal, que solo recibe el resumen","Que la skill puede usar tools que el usuario no tiene aprobadas","Que la skill se comparte automáticamente con el equipo"],
+ a:1,w:"Sin fork, los listados de ficheros y extractos entran en la conversación principal, llenan la ventana y degradan las respuestas siguientes. Es la opción de frontmatter que el examen asocia a salida exploratoria ruidosa."},
+
+{s:"s2",d:3,q:"Trabajas en un monorepo. Las convenciones de accesibilidad deben aplicarse a todos los componentes .tsx, que están repartidos en once paquetes distintos. ¿Dónde las pones?",
+ o:["En el CLAUDE.md raíz","En un CLAUDE.md dentro de cada uno de los once paquetes","En .claude/rules/ con frontmatter paths apuntando a **/*.tsx","En una skill que los desarrolladores invoquen antes de tocar componentes"],
+ a:2,w:"Un tipo de fichero repartido por muchos directorios es exactamente el caso de las reglas por ruta. Once copias derivan con el tiempo, el raíz gastaría tokens editando backend, y la skill requiere invocación en vez de cargarse sola."},
+
+{s:"s2",d:3,q:"Te piden migrar el sistema de autenticación de sesiones a JWT. Afecta a 38 ficheros, hay tres formas razonables de gestionar la expiración y hay que decidir dónde vive la validación. ¿Cómo lo abordas?",
+ o:["Ejecución directa con instrucciones muy detalladas de entrada","Plan mode para explorar y diseñar la estrategia, y luego ejecución directa para aplicarla fichero a fichero","Ejecución directa, cambiando a plan mode si aparece complejidad","Plan mode durante toda la migración, incluida la implementación"],
+ a:1,w:"Es el híbrido plan-luego-ejecuta, el patrón que el examen busca en migraciones multi-fichero. La opción C es la trampa explícita: la complejidad ya está declarada en los requisitos, no va a emerger después."},
+
+{s:"s2",d:3,q:"Un compañero afirma que su CLAUDE.md de subdirectorio «gana» sobre el del proyecto cuando ambos dicen cosas contradictorias sobre el formato de logs. ¿Es correcto?",
+ o:["Sí: el alcance más específico tiene precedencia","Sí, pero solo si el de subdirectorio se carga después","No: los ficheros se concatenan sin precedencia garantizada, y ante una contradicción Claude puede elegir cualquiera; si la regla es obligatoria, va a settings.json o a un hook","No: el del proyecto gana siempre por estar versionado"],
+ a:2,w:"«Gana el más específico» es una paráfrasis que la documentación nunca hace. Precedencia estricta la tiene settings.json; CLAUDE.md se entrega como mensaje de usuario y sin garantía de cumplimiento estricto."},
+
+{s:"s2",d:3,q:"Describes en prosa cómo quieres convertir vuestros handlers al nuevo patrón de errores. Claude Code lo interpreta distinto en cada fichero. ¿Qué haces primero?",
+ o:["Reescribir la descripción con terminología más técnica y precisa","Dar 2-3 ejemplos concretos de entrada y salida esperada","Escribir tests que definan el patrón e iterar con los fallos","Usar el patrón entrevista para que pregunte antes de implementar"],
+ a:1,w:"Prosa más precisa sigue dependiendo de la interpretación; los ejemplos la eliminan. Los tests son la técnica para transformaciones complejas con muchos casos límite, y la entrevista es para dominios que no dominas."},
+
+{s:"s2",d:3,q:"Tienes tres problemas en el código generado: el formato de fecha, el nombre de una variable y la indentación. Son independientes entre sí. ¿Cómo das el feedback?",
+ o:["Los tres en un mensaje, para ahorrar iteraciones","Uno cada vez, secuencialmente","Los tres en un mensaje, numerados por prioridad","Como tests que fallen, sin describirlos"],
+ a:1,w:"Agrupar es correcto cuando los arreglos se afectan entre sí, porque el modelo necesita ver todas las restricciones a la vez. Con problemas independientes, agruparlos confunde sobre qué comentario aplica a qué parte del código."},
+
+{s:"s2",d:5,q:"Ayer analizaste un servicio con Claude Code y anoche cambiaste cuatro de sus treinta ficheros. Hoy reanudas y el agente recomienda cambios ya hechos y cita código que ya no existe. ¿Qué haces?",
+ o:["Reanudar y pedirle que relea los cuatro ficheros modificados","Usar fork_session para partir limpio desde la sesión anterior","Sesión nueva con un resumen inyectado de los hallazgos previos, nombrando los cuatro ficheros para reanálisis dirigido","Sesión nueva y reanálisis completo de los treinta ficheros"],
+ a:2,w:"Reanudar deja los tool_result obsoletos dentro del historial y el modelo puede seguir tirando de ellos en decisiones tangenciales. Forkear hereda esa misma basura. Y releer los treinta es tiempo tirado cuando solo cambiaron cuatro."},
+
+{s:"s2",d:5,q:"Durante una sesión larga de exploración, el agente pasa de citar clases y rutas concretas a hablar de «el patrón habitual en este tipo de servicios». ¿Qué haces?",
+ o:["Cambiar a un modelo con más ventana de contexto","Que mantenga un fichero scratchpad con los hallazgos clave y lo consulte en los pasos siguientes","Reiniciar la sesión pidiéndole que explore más rápido","Subir la temperatura para que sea más específico"],
+ a:1,w:"La degradación de contexto no es falta de espacio: es pérdida del rastro bajo salida más reciente y verbosa. Una ventana mayor se llena igual. El scratchpad persiste el conocimiento fuera del contexto conversacional."},
+
+// ============ ESCENARIO 5 · CI/CD (9) ============
+{s:"s5",d:3,q:"Tu workflow de GitHub Actions ejecuta claude con el prompt de revisión y el job se queda colgado hasta el timeout de 60 minutos. Los logs muestran a Claude Code esperando entrada. ¿Arreglo?",
+ o:["Exportar CLAUDE_HEADLESS=true antes del comando","Añadir la flag -p","Añadir la flag --batch","Redirigir stdin desde /dev/null"],
+ a:1,w:"-p (o --print) es el método documentado para modo no interactivo: procesa el prompt, escribe en stdout y sale. Las otras dos flags no existen, y redirigir stdin no aborda el modo interactivo de Claude Code."},
+
+{s:"s5",d:3,q:"Necesitas que la salida de la revisión se pueda publicar como comentarios inline en la PR, con fichero, línea, severidad y mensaje. ¿Qué combinación usas y de dónde extraes los datos?",
+ o:["--output-format json solo, leyendo el nivel superior del JSON","--output-format json con --json-schema, extrayendo el campo structured_output del sobre","--verbose y parseando la salida con expresiones regulares","--output-format text y un post-procesador propio"],
+ a:1,w:"--output-format json envuelve la ejecución en un sobre con resultado, session ID y metadatos de coste. Los datos validados contra el esquema viven dentro, en structured_output, no en el nivel superior."},
+
+{s:"s5",d:3,q:"Tu pipeline genera tests con Claude Code y salen genéricos: no usan vuestras factories ni vuestras fixtures. ¿Qué haces?",
+ o:["Documentar estándares de testing, fixtures disponibles y criterios en CLAUDE.md, que Claude Code lee también en CI","Pasar toda la suite de tests existente en el prompt de cada ejecución","Usar un modelo mayor para la generación de tests","Aumentar max_turns para que explore más antes de generar"],
+ a:0,w:"Claude Code lee los CLAUDE.md en CI igual que en interactivo, así que es la vía para dar contexto de proyecto a una ejecución automatizada. Sin él, la generación produce boilerplate de poco valor."},
+
+{s:"s5",d:3,q:"Quieres que Claude Code siga siendo un asistente de código en el pipeline pero cumpliendo además cuatro reglas internas de reporte. ¿Qué flag?",
+ o:["--system-prompt con el texto completo de las reglas","--append-system-prompt con las reglas","--bare para partir de mínimo y añadir solo lo tuyo","--permission-mode dontAsk"],
+ a:1,w:"Añadir conserva la guía de tools, las instrucciones de seguridad y las convenciones por defecto, y solo aporta lo que difiere. Sustituir es para cuando la identidad o el modelo de permisos son distintos de los de Claude Code."},
+
+{s:"s5",d:3,q:"El equipo se queja de que la revisión automática comenta las mismas cinco cosas en cada push, incluidas las que decidieron deliberadamente no cambiar. ¿Qué implementas?",
+ o:["Bajar el número máximo de hallazgos por ejecución","Incluir los hallazgos previos en el contexto e instruir a Claude para reportar solo lo nuevo o lo que sigue sin resolver","Ejecutar la revisión solo en el último push antes del merge","Subir el umbral de severidad"],
+ a:1,w:"Un re-escaneo sin contexto no distingue un problema nuevo de uno que el desarrollador vio y decidió no tocar. Las otras opciones reducen ruido a costa de señal, y los comentarios duplicados erosionan la confianza en todo el sistema."},
+
+{s:"s5",d:4,q:"Tu prompt de revisión dice «reporta los problemas importantes y sé conservador con el ruido». Los desarrolladores reciben una mezcla de bugs reales y nitpicks de estilo. ¿Qué reescribes?",
+ o:["Añadir «solo hallazgos de confianza alta» para que el modelo filtre","Definir criterios categóricos: qué reportar (bugs, seguridad) y qué saltar (estilo menor, patrones locales)","Pedir al modelo que puntúe cada hallazgo del 1 al 10","Bajar la temperatura para reducir la variabilidad"],
+ a:1,w:"«Importante» y «conservador» no son fronteras de decisión accionables. La confianza autorreportada además está mal calibrada, así que filtrar por ella es el distractor clásico del 4.1."},
+
+{s:"s5",d:4,q:"Tras definir criterios, la clasificación de severidad sigue variando entre ejecuciones: el mismo tipo de problema sale crítico unas veces y menor otras. ¿Siguiente paso?",
+ o:["Añadir ejemplos de código concretos para cada nivel de severidad","Reducir a dos niveles de severidad","Ejecutar tres veces y quedarte con la severidad mayoritaria","Describir cada nivel con más detalle en prosa"],
+ a:0,w:"Las descripciones en prosa obligan al modelo a interpretar qué significa cada nivel. Ver código real clasificado en cada uno elimina la ambigüedad y estabiliza la clasificación entre invocaciones."},
+
+{s:"s5",d:4,q:"La revisión de una PR de 18 ficheros produce profundidad desigual y marca un patrón en un fichero que aprueba en otro. Un compañero propone procesarlos en lotes de seis. ¿Qué le falta a la propuesta?",
+ o:["Nada: los lotes resuelven la dilución de atención","Una pasada de integración cross-fichero, porque los problemas que cruzan entre lotes siguen escapándose","Lotes más pequeños, de tres ficheros","Ejecutar cada lote con un modelo distinto"],
+ a:1,w:"El batching reduce la dilución dentro de cada lote pero no ve el flujo de datos entre módulos ni las inconsistencias de patrón entre lotes. Falta la segunda pasada."},
+
+{s:"s5",d:4,q:"Vuestros costes de API se disparan. Tenéis un check bloqueante pre-merge y una auditoría de seguridad que corre los sábados por la noche. ¿Qué mueves a la Batch API?",
+ o:["Los dos, con polling para comprobar finalización","Solo la auditoría de los sábados","Los dos, con fallback a síncrono si tardan demasiado","Ninguno: el batch no admite revisión de código"],
+ a:1,w:"Hasta 24 horas sin SLA de latencia: inservible para un flujo donde la gente espera para mergear, ideal para uno programado y tolerante. El fallback añade complejidad cuando basta con emparejar cada API con su caso."},
+
+// ============ ESCENARIO 6 · EXTRACCIÓN (10) ============
+{s:"s6",d:4,q:"Tu esquema marca supplier_tax_id como obligatorio. En los albaranes que no lo llevan, el modelo devuelve identificadores con formato válido pero inventados. ¿Arreglo?",
+ o:["Añadir al prompt que no debe inventar valores bajo ningún concepto","Hacer el campo nullable, para que pueda devolver null honestamente","Validar cada tax_id contra el registro mercantil tras la extracción","Cambiar a extracción por prompt en vez de tool_use"],
+ a:1,w:"Un campo obligatorio presiona al modelo a producir algo. Nullable es la defensa estructural contra la fabricación, y va antes que instrucciones o validación posterior."},
+
+{s:"s6",d:4,q:"Recibes facturas, albaranes y contratos sin saber de antemano cuál es cuál. Tienes un esquema de extracción por tipo. ¿Qué tool_choice?",
+ o:["\"auto\", para que el modelo decida si alguno encaja","\"any\": obliga a llamar a una tool y le deja elegir el esquema","Forzar el esquema de factura, que es el más frecuente","\"auto\" con instrucciones que prohíban responder en texto"],
+ a:1,w:"Con \"auto\" el modelo puede devolver texto conversacional describiendo el documento en vez de llamar a la tool. \"any\" garantiza estructura dejándole elegir el esquema, que es lo que necesitas con tipo desconocido."},
+
+{s:"s6",d:4,q:"Un documento indica «vencimiento: 30 días» en la cabecera y «condiciones: 60 días fin de mes» en el pie. ¿Cómo debe salir en la extracción?",
+ o:["El valor de la cabecera, que es más prominente","El valor más conservador para la empresa","Ambos valores, con un booleano conflict_detected activado","Null, porque el dato es ambiguo"],
+ a:2,w:"El agente de extracción no resuelve conflictos: los detecta y los anota. La decisión de cuál prevalece es del coordinador o de quien consume, que tiene contexto de negocio que el extractor no tiene."},
+
+{s:"s6",d:4,q:"Tu extracción devuelve JSON siempre bien formado gracias a tool_use, pero contabilidad detecta importes en el campo de fecha en documentos con maquetación inusual. ¿Por qué pasa y qué necesitas?",
+ o:["El esquema está mal definido; hay que separar los tipos","tool_use elimina errores de sintaxis pero no semánticos: colocación en campo equivocado necesita validación aparte","Falta bajar la temperatura","Hay que forzar la tool con tool_choice"],
+ a:1,w:"Ambos campos son strings, así que el esquema no puede detectar que el contenido está cruzado. Es el punto que el examen plantea con más malicia: el esquema garantiza la forma, no la corrección."},
+
+{s:"s6",d:4,q:"Documento A: las líneas suman 1.240 € y el total declarado es 1.340 €. Documento B: falta el número de contrato porque el documento remite a un anexo que no tienes. ¿Qué haces con cada uno?",
+ o:["Reintentar ambos con sus errores de validación","Reintentar A con el error específico; marcar B para revisión humana","Marcar ambos para revisión humana","Reintentar ambos sin cambios, porque la extracción no es determinista"],
+ a:1,w:"La frontera de efectividad: A es un error de captura y el dato está en el documento, así que el reintento con el error específico lo arregla. Ningún reintento crea información que solo existe en un anexo que no se aportó."},
+
+{s:"s6",d:4,q:"Tu extracción funciona en documentos con tabla de partidas y falla en los que describen los conceptos en párrafos corridos. Las instrucciones ya detallan los campos. ¿Qué haces?",
+ o:["Un preprocesado que convierta la narrativa en tablas","Ejemplos few-shot con extracción correcta desde ambas estructuras","Aumentar max_tokens para que procese más documento","Marcar los campos como nullable para que devuelva null"],
+ a:1,w:"Tercer disparador del few-shot: campos vacíos para información que sí existe pero en formato inesperado. Nullable sería correcto si la información no estuviera; aquí está, y marcarla nullable solo normalizaría el fallo."},
+
+{s:"s6",d:4,q:"Al construir los ejemplos few-shot para el punto anterior, ¿qué debe llevar cada uno además del par entrada-salida?",
+ o:["La confianza esperada para cada campo","El razonamiento de cómo se localizó el dato y por qué se extrajo así","El esquema JSON completo repetido","Un contraejemplo de extracción incorrecta"],
+ a:1,w:"Sin razonamiento el modelo aprende pattern-matching literal sobre los casos del ejemplo. Con él aprende el principio y generaliza a estructuras que no le enseñaste."},
+
+{s:"s6",d:4,q:"Vas a procesar 3.000 documentos por lotes esta noche. ¿Qué haces antes de enviar?",
+ o:["Enviarlos y gestionar los fallos por custom_id al día siguiente","Refinar los prompts contra una muestra de 5-10 documentos que cubra el rango de formatos y casos límite","Dividir en treinta lotes de 100 para acotar el impacto de los fallos","Subir max_tokens al máximo para evitar truncados"],
+ a:1,w:"Es la palanca de coste más grande del 4.5: un 90% de acierto a la primera son 300 reintentos, y un 60% son 1.200, cuatro veces el coste de reenvío más el procesamiento de esos reintentos."},
+
+{s:"s6",d:2,q:"Tu tool de extracción falla al procesar un documento que excede el límite de contexto. ¿Cómo debe reportarlo para que el pipeline decida bien?",
+ o:["errorCategory validation con isRetryable true y una descripción indicando que el documento debe trocearse","errorCategory transient con isRetryable true, por si en otro momento cabe","isError false con resultCount 0","Un mensaje genérico de fallo de extracción"],
+ a:0,w:"Es un problema de la entrada, no del servicio: la categoría es validation y el reintento solo funciona tras corregirla. La descripción accionable es lo que permite al pipeline trocear y reenviar en vez de reintentar igual."},
+
+{s:"s6",d:5,q:"Tu sistema reporta 96% de precisión global y proponen automatizar todo lo que supere 0,95 de confianza. ¿Qué respondes?",
+ o:["Que el umbral debería subirse a 0,99 antes de automatizar","Que el agregado puede esconder precisiones muy bajas en tipos de documento concretos, y que además la confianza necesita calibrarse contra un set etiquetado antes de enrutar","Que toda extracción debe llevar revisión humana","Que hay que reentrenar el modelo periódicamente"],
+ a:1,w:"Son dos fallos apilados. Un 96% ponderado por volumen puede convivir con un 45% en formatos internacionales, y un 0,95 crudo significa cosas distintas según el campo. Validar por tipo y campo, y calibrar, van antes de automatizar."}
+];
+
+const DOMS={1:"D1 · Arquitectura agéntica",2:"D2 · Tools y MCP",3:"D3 · Claude Code",4:"D4 · Prompt engineering",5:"D5 · Contexto y fiabilidad"};
+const LETTERS=['A','B','C','D'];
+const ans=new Array(Q.length).fill(null);
+const flags=new Array(Q.length).fill(false);
+let cur=0,remaining=120*60,timer=null,submitted=false;
+
+const el=id=>document.getElementById(id);
+
+el('start').addEventListener('click',()=>{
+  el('intro').style.display='none';
+  el('bar').style.display='block';
+  el('exam').style.display='block';
+  render(); buildCells();
+  timer=setInterval(tick,1000);
+  window.scrollTo(0,0);
+});
+
+function tick(){
+  remaining--;
+  const m=Math.floor(remaining/60),s=remaining%60;
+  el('clock').textContent=m+':'+String(s).padStart(2,'0');
+  if(remaining<=300) el('clock').classList.add('low');
+  if(remaining<=0){clearInterval(timer);finish();}
+}
+
+function render(){
+  const q=Q[cur];
+  const sc=SCENARIOS[q.s];
+  el('scnBox').innerHTML='<div class="scn"><h3>'+sc.t+'</h3><p>'+sc.d+'</p></div>';
+  let h='<div class="qhead"><span class="qnum">PREGUNTA '+(cur+1)+' / '+Q.length+'</span><span class="dom">'+DOMS[q.d]+'</span></div>';
+  h+='<p class="stem">'+q.q+'</p>';
+  if(q.m) h+='<p class="multi">Selecciona DOS respuestas.</p>';
+  q.o.forEach((o,i)=>{
+    let sel=false;
+    if(q.m) sel=Array.isArray(ans[cur])&&ans[cur].includes(i);
+    else sel=ans[cur]===i;
+    h+='<button class="opt'+(sel?' sel':'')+'" type="button" data-i="'+i+'"><span class="letter">'+LETTERS[i]+'</span>'+o+'</button>';
+  });
+  el('qBox').innerHTML=h;
+  el('qBox').querySelectorAll('.opt').forEach(b=>{
+    b.addEventListener('click',()=>{
+      const i=+b.dataset.i;
+      if(q.m){
+        let a=Array.isArray(ans[cur])?ans[cur].slice():[];
+        if(a.includes(i)) a=a.filter(x=>x!==i);
+        else { if(a.length>=2) a.shift(); a.push(i); }
+        ans[cur]=a.length?a:null;
+      } else ans[cur]=i;
+      render(); updateCells(); updateProg();
+    });
+  });
+  el('flag').className='flagbtn'+(flags[cur]?' on':'');
+  el('flag').textContent=flags[cur]?'Marcada':'Marcar para revisar';
+  el('prev').disabled=cur===0;
+  el('next').disabled=cur===Q.length-1;
+  updateCells();
+}
+
+function updateProg(){
+  const n=ans.filter(a=>a!==null).length;
+  el('prog').innerHTML='Respondidas <b>'+n+'</b>/'+Q.length;
+  el('fill').style.width=(n/Q.length*100)+'%';
+}
+
+function buildCells(){
+  let h='';
+  for(let i=0;i<Q.length;i++) h+='<button class="cell" type="button" data-i="'+i+'">'+(i+1)+'</button>';
+  el('cells').innerHTML=h;
+  el('cells').querySelectorAll('.cell').forEach(c=>{
+    c.addEventListener('click',()=>{cur=+c.dataset.i;render();window.scrollTo({top:0,behavior:'smooth'});});
+  });
+  updateCells(); updateProg();
+}
+function updateCells(){
+  el('cells').querySelectorAll('.cell').forEach((c,i)=>{
+    c.className='cell'+(ans[i]!==null?' done':'')+(flags[i]?' flag':'')+(i===cur?' cur':'');
+  });
+}
+
+el('prev').addEventListener('click',()=>{if(cur>0){cur--;render();window.scrollTo({top:0,behavior:'smooth'});}});
+el('next').addEventListener('click',()=>{if(cur<Q.length-1){cur++;render();window.scrollTo({top:0,behavior:'smooth'});}});
+el('flag').addEventListener('click',()=>{flags[cur]=!flags[cur];render();});
+el('submitTop').addEventListener('click',confirmSubmit);
+el('submitBottom').addEventListener('click',confirmSubmit);
+
+function confirmSubmit(){
+  const n=ans.filter(a=>a!==null).length;
+  const msg=n<Q.length?('Te quedan '+(Q.length-n)+' preguntas sin responder. ¿Entregar igualmente?'):'¿Entregar el examen?';
+  if(confirm(msg)) finish();
+}
+
+function correct(i){
+  const q=Q[i];
+  if(q.m){
+    const a=ans[i];
+    if(!Array.isArray(a)||a.length!==2) return false;
+    return q.a.slice().sort().join()===a.slice().sort().join();
+  }
+  return ans[i]===q.a;
+}
+
+function finish(){
+  if(submitted) return; submitted=true;
+  clearInterval(timer);
+  el('exam').style.display='none';
+  el('bar').style.display='none';
+  const res=el('res'); res.style.display='block';
+
+  let right=0; const byDom={1:[0,0],2:[0,0],3:[0,0],4:[0,0],5:[0,0]};
+  Q.forEach((q,i)=>{ byDom[q.d][1]++; if(correct(i)){right++;byDom[q.d][0]++;} });
+  const scaled=Math.round(100+(right/Q.length)*900);
+  const passed=scaled>=720;
+  const used=120*60-remaining;
+  const um=Math.floor(used/60), us=used%60;
+
+  let h='<div class="wrap">';
+  h+='<div class="scorebox"><p class="scaled '+(passed?'pass':'fail')+'">'+scaled+'</p>';
+  h+='<p class="verdict '+(passed?'pass':'fail')+'">'+(passed?'Aprobado':'No aprobado')+'</p>';
+  h+='<p class="sub">'+right+' de '+Q.length+' correctas · '+Math.round(right/Q.length*100)+'% · corte en 720 · tiempo empleado '+um+' min '+String(us).padStart(2,'0')+' s</p></div>';
+
+  h+='<table class="dom"><tr><th>Dominio</th><th style="text-align:right">Aciertos</th></tr>';
+  Object.keys(byDom).forEach(d=>{
+    const [r,t]=byDom[d]; const p=Math.round(r/t*100);
+    const cls=p<70?'weak':(p>=90?'strong':'');
+    h+='<tr><td>'+DOMS[d]+'</td><td class="sc '+cls+'">'+r+'/'+t+' · '+p+'%</td></tr>';
+  });
+  h+='</table>';
+
+  h+='<div class="filters"><button class="on" data-f="all" type="button">Todas</button><button data-f="ko" type="button">Solo falladas</button><button data-f="flag" type="button">Solo marcadas</button></div>';
+  h+='<h2 class="sec">Revisión</h2><div id="revlist"></div>';
+  h+='<div style="margin-top:26px"><button class="btn" type="button" onclick="location.reload()">Repetir el simulacro</button></div></div>';
+  res.innerHTML=h;
+
+  function drawRev(filter){
+    let out='';
+    Q.forEach((q,i)=>{
+      const ok=correct(i);
+      if(filter==='ko'&&ok) return;
+      if(filter==='flag'&&!flags[i]) return;
+      out+='<div class="rev '+(ok?'ok':'ko')+'">';
+      out+='<div class="qhead"><span class="qnum">PREGUNTA '+(i+1)+' · '+(ok?'CORRECTA':'FALLADA')+'</span><span class="dom">'+DOMS[q.d]+'</span></div>';
+      out+='<p class="stem">'+q.q+'</p>';
+      q.o.forEach((o,j)=>{
+        const isCorrect=q.m?q.a.includes(j):q.a===j;
+        const picked=q.m?(Array.isArray(ans[i])&&ans[i].includes(j)):(ans[i]===j);
+        let cls='ropt'+(isCorrect?' good':(picked?' bad':''));
+        let mark=isCorrect?' ✓':(picked?' ✗ (tu respuesta)':'');
+        out+='<div class="'+cls+'"><span class="letter">'+LETTERS[j]+'</span>'+o+'<b style="font-family:var(--mono);font-size:11px">'+mark+'</b></div>';
+      });
+      if(ans[i]===null) out+='<p style="font-family:var(--mono);font-size:11.5px;color:var(--anti);margin:8px 0 0">Sin responder</p>';
+      out+='<div class="why"><b>Por qué.</b> '+q.w+'</div></div>';
+    });
+    document.getElementById('revlist').innerHTML=out||'<p style="color:var(--ink-soft)">Nada que mostrar con este filtro.</p>';
+  }
+  drawRev('all');
+  res.querySelectorAll('.filters button').forEach(b=>{
+    b.addEventListener('click',()=>{
+      res.querySelectorAll('.filters button').forEach(x=>x.classList.remove('on'));
+      b.classList.add('on'); drawRev(b.dataset.f);
+    });
+  });
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>

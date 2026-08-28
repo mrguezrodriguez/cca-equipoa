@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Domain 5 · Context Management &amp; Reliability — CCAR-F</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#E7ECF1; --panel:#FAFBFC; --ink:#0F1A26; --ink-soft:#4A5A6B;
+  --line:#C9D3DC; --det:#0C6D78; --anti:#A62347; --now:#9C6600;
+  --display:'Space Grotesk',system-ui,sans-serif;
+  --body:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:70px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16.5px;line-height:1.62;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:0 22px}
+nav{position:sticky;top:0;z-index:20;background:rgba(231,236,241,.93);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;gap:2px;overflow-x:auto;padding-top:9px;padding-bottom:9px;scrollbar-width:none}
+nav .wrap::-webkit-scrollbar{display:none}
+nav a{font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);text-decoration:none;padding:4px 9px;border-radius:4px;white-space:nowrap}
+nav a:hover,nav a:focus-visible{background:var(--ink);color:var(--panel)}
+header{padding:56px 0 40px;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:var(--mono);font-size:12.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--det)}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(2.1rem,6vw,3.1rem);line-height:1.06;letter-spacing:-.025em;margin:.28em 0 .3em}
+.lede{font-size:1.09rem;color:var(--ink-soft);max-width:60ch;margin:0}
+.hero-meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.pill{font-family:var(--mono);font-size:12px;border:1px solid var(--line);background:var(--panel);padding:5px 10px;border-radius:100px}
+.pill b{color:var(--det);font-weight:600}
+figure{margin:34px 0 0;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:20px 18px 14px}
+figure svg{width:100%;height:auto;display:block}
+figcaption{font-family:var(--mono);font-size:12px;color:var(--ink-soft);margin-top:12px;text-align:center}
+section{padding:46px 0;border-bottom:1px solid var(--line)}
+.tag{font-family:var(--mono);font-size:12.5px;color:var(--det);letter-spacing:.06em}
+h2{font-family:var(--display);font-weight:700;font-size:1.62rem;letter-spacing:-.018em;margin:.18em 0 .55em;line-height:1.18}
+h3{font-family:var(--display);font-weight:500;font-size:1.06rem;margin:1.9em 0 .5em;letter-spacing:-.01em}
+p{margin:0 0 1em}
+ul,ol{margin:0 0 1em;padding-left:1.15em}
+li{margin-bottom:.42em}
+strong{font-weight:600}
+.k{font-family:var(--mono);font-size:.88em;background:#DCE7E9;color:#08525A;padding:1px 5px;border-radius:3px;font-weight:600;white-space:nowrap}
+.key{border-left:3px solid var(--det);background:var(--panel);padding:14px 16px;margin:20px 0;border-radius:0 6px 6px 0}
+.key .lbl{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--det);display:block;margin-bottom:5px}
+.key p:last-child{margin-bottom:0}
+.trap{border-left:3px solid var(--anti);background:#FBF3F5;padding:14px 16px;margin:20px 0;border-radius:0 6px 6px 0}
+.trap .lbl{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--anti);display:block;margin-bottom:5px}
+.trap ul{margin-bottom:0}
+.trap p:last-child{margin-bottom:0}
+.now{border-left:3px solid var(--now);background:#FBF6EC;padding:14px 16px;margin:20px 0;border-radius:0 6px 6px 0}
+.now .lbl{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--now);display:block;margin-bottom:5px}
+.now p:last-child{margin-bottom:0}
+.case{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:15px 17px;margin:20px 0}
+.case .lbl{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-soft);display:block;margin-bottom:6px}
+.case p:last-child,.case ul:last-child,.case ol:last-child{margin-bottom:0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:.93rem;background:var(--panel)}
+th,td{text-align:left;padding:9px 11px;border:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);font-weight:600;background:#F0F3F6}
+td code,li code,p code{font-family:var(--mono);font-size:.87em;background:#E3E9EE;padding:1px 4px;border-radius:3px}
+pre{background:#F0F3F6;border:1px solid var(--line);border-radius:6px;padding:13px 15px;overflow-x:auto;font-family:var(--mono);font-size:.83rem;line-height:1.5;margin:16px 0}
+.quiz{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:22px 20px;margin:26px 0}
+.q{padding:16px 0;border-top:1px solid var(--line)}
+.q:first-of-type{border-top:none;padding-top:6px}
+.q .num{font-family:var(--mono);font-size:11.5px;color:var(--det);letter-spacing:.08em}
+.q .stem{margin:5px 0 11px;font-weight:600;line-height:1.45}
+.opt{display:block;width:100%;text-align:left;font:inherit;font-size:.95rem;line-height:1.45;background:#fff;border:1px solid var(--line);border-radius:5px;padding:9px 12px;margin-bottom:7px;cursor:pointer;transition:border-color .12s,background .12s}
+.opt:hover:not(:disabled){border-color:var(--ink-soft)}
+.opt:disabled{cursor:default}
+.opt.good{border-color:var(--det);background:#E6F1F2;box-shadow:inset 3px 0 0 var(--det)}
+.opt.bad{border-color:var(--anti);background:#FBF0F3;box-shadow:inset 3px 0 0 var(--anti)}
+.why{font-size:.92rem;margin-top:9px;padding:11px 13px;border-radius:5px;background:#F0F3F6;border:1px solid var(--line);display:none}
+.why.show{display:block}
+.why b{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.08em}
+.why.ok b{color:var(--det)}
+.why.no b{color:var(--anti)}
+.score{font-family:var(--mono);font-size:13px;margin-top:18px;padding-top:14px;border-top:1px solid var(--line);color:var(--ink-soft)}
+.score b{color:var(--ink);font-size:15px}
+footer{padding:40px 0 60px;font-size:.9rem;color:var(--ink-soft)}
+footer a{color:var(--det)}
+:focus-visible{outline:2px solid var(--det);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+@media (max-width:560px){body{font-size:16px}header{padding:36px 0 30px}section{padding:36px 0}}
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <a href="#top">Domain 5</a>
+  <a href="#s51">5.1 Contexto</a>
+  <a href="#s52">5.2 Escalado</a>
+  <a href="#s53">5.3 Errores</a>
+  <a href="#check">Check</a>
+  <a href="#s54">5.4 Codebase</a>
+  <a href="#s55">5.5 Revisión</a>
+  <a href="#s56">5.6 Provenance</a>
+  <a href="#chuleta">Chuleta</a>
+  <a href="#final">Examen</a>
+</div></nav>
+
+<header id="top"><div class="wrap">
+  <span class="eyebrow">Claude Certified Architect · Foundations · CCAR-F</span>
+  <h1>Domain 5<br>Gestión de contexto y fiabilidad</h1>
+  <p class="lede">El dominio que menos pesa y el que más cosas rompe en producción. Su idea central: lo que importa no se deja en el historial de la conversación, se saca fuera y se protege.</p>
+  <div class="hero-meta">
+    <span class="pill"><b>15%</b> del examen</span>
+    <span class="pill">6 task statements</span>
+    <span class="pill">~9 de 60 preguntas</span>
+    <span class="pill">Escenarios 1, 3, 4 y 6</span>
+  </div>
+
+  <figure>
+    <svg viewBox="0 0 700 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="El historial se resume y pierde detalle, mientras el bloque de hechos del caso viaja intacto en cada prompt">
+      <g font-family="IBM Plex Mono, monospace" font-size="12">
+        <text x="20" y="26" fill="#4A5A6B" font-size="11">TURNO 3</text>
+        <text x="252" y="26" fill="#4A5A6B" font-size="11">RESUMEN</text>
+        <text x="490" y="26" fill="#4A5A6B" font-size="11">TURNO 8</text>
+
+        <rect x="18" y="38" width="200" height="64" rx="5" fill="#fff" stroke="#C9D3DC" stroke-width="1.4"/>
+        <text x="32" y="60" fill="#0F1A26" font-size="11">"reembolso de 247,83 €</text>
+        <text x="32" y="76" fill="#0F1A26" font-size="11">del pedido #8891 del</text>
+        <text x="32" y="92" fill="#0F1A26" font-size="11">3 de marzo"</text>
+
+        <path d="M224 70 H286" stroke="#A62347" stroke-width="1.4" fill="none"/>
+        <path d="M278 64 L286 70 L278 76" stroke="#A62347" stroke-width="1.4" fill="none"/>
+
+        <rect x="290" y="46" width="196" height="48" rx="5" fill="#FBF3F5" stroke="#A62347" stroke-width="1.4" stroke-dasharray="4 3"/>
+        <text x="388" y="68" text-anchor="middle" fill="#A62347" font-size="11">"el cliente quiere un</text>
+        <text x="388" y="84" text-anchor="middle" fill="#A62347" font-size="11">reembolso de un pedido"</text>
+
+        <path d="M492 70 H556" stroke="#A62347" stroke-width="1.4" fill="none"/>
+        <path d="M548 64 L556 70 L548 76" stroke="#A62347" stroke-width="1.4" fill="none"/>
+        <text x="600" y="66" text-anchor="middle" fill="#A62347" font-size="11">importe, pedido</text>
+        <text x="600" y="82" text-anchor="middle" fill="#A62347" font-size="11">y fecha: perdidos</text>
+
+        <rect x="18" y="140" width="664" height="72" rx="6" fill="#E6F1F2" stroke="#0C6D78" stroke-width="1.6"/>
+        <text x="34" y="164" fill="#08525A" font-size="12" font-weight="600">case facts block — va en CADA prompt, fuera del historial resumido</text>
+        <text x="34" y="186" fill="#08525A" font-size="11">orderId #8891 · orderDate 2024-03-03 · refundAmount 247,83 € · status pending_refund</text>
+        <text x="34" y="204" fill="#0C6D78" font-size="10.5">nunca se resume · sobrevive a cualquier compactación del historial</text>
+      </g>
+    </svg>
+    <figcaption>El patrón más importante del dominio: los hechos transaccionales viven fuera de lo resumible.</figcaption>
+  </figure>
+</div></header>
+
+<!-- ============ 5.1 ============ -->
+<section id="s51"><div class="wrap">
+  <span class="tag">Task Statement 5.1</span>
+  <h2>Gestión de la ventana de contexto</h2>
+
+  <h3>La trampa del resumen progresivo</h3>
+  <p>Cuando la conversación crece, la estrategia habitual es resumir turnos anteriores para liberar presupuesto de tokens. Es una trampa: el resumen destruye sistemáticamente lo más crítico en sistemas de cara al cliente y de procesamiento de datos —valores numéricos, fechas, porcentajes y expectativas declaradas por el cliente.</p>
+  <p>«Quiero un reembolso de 247,83 € del pedido #8891 del 3 de marzo» se convierte en «el cliente quiere un reembolso de un pedido reciente». El importe, el número de pedido y la fecha —los tres datos que el agente necesita para procesar el reembolso— han desaparecido. Y no es un caso raro: es lo que el resumen le hace a los datos transaccionales por defecto.</p>
+
+  <div class="key">
+    <span class="lbl">El patrón más importante del dominio</span>
+    <p>El <strong>bloque persistente de hechos del caso</strong>. Extrae los hechos transaccionales (importes, fechas, números de pedido, estados) a un bloque estructurado que se incluye en cada prompt, <strong>fuera del historial resumido</strong>. Ese bloque no se resume nunca y persiste en cada turno pase lo que pase con la conversación.</p>
+  </div>
+
+  <pre>{
+  "caseFactsBlock": {
+    "customerId": "C-4421",
+    "issues": [{
+      "orderId": "#8891",
+      "orderDate": "2024-03-03",
+      "refundAmount": "247,83 €",
+      "status": "pending_refund"
+    }]
+  }
+}</pre>
+  <p>Para sesiones con varios asuntos, extrae y persiste los datos de cada uno en una capa de contexto separada, con su propia entrada. Así evitas la contaminación cruzada entre asuntos durante el resumen.</p>
+
+  <h3>El efecto «perdido en el medio»</h3>
+  <p>Los modelos procesan de forma fiable la información al principio y al final de entradas largas. Lo que queda enterrado en el medio puede perderse o recibir menos peso.</p>
+  <div class="key">
+    <span class="lbl">El arreglo es estructural, no de prompt</span>
+    <p>Coloca los resúmenes de hallazgos clave <strong>al principio</strong> de las entradas agregadas y organiza los resultados detallados con encabezados de sección explícitos. Decirle al modelo «presta atención a todo» no funciona para efectos de posición.</p>
+  </div>
+  <pre>## Resumen de hallazgos clave
+- Fuente A: 12% de crecimiento del sector renovable (2023)
+- Fuente B: las solicitudes de patente subieron un 34% interanual
+- Fuente C: marco regulatorio retrasado hasta Q3 2025
+
+## Hallazgos detallados
+### Fuente A: informe de análisis de mercado
+[detalle...]</pre>
+
+  <h3>Recorte de resultados de tools</h3>
+  <p>Los resultados de tools son un asesino silencioso del presupuesto de contexto. Una consulta de pedido puede devolver 40+ campos: timestamps de auditoría interna, códigos de almacén, IDs de transportista, identificadores de centro logístico. Necesitas 5. Los otros 35 consumen tokens <strong>en cada turno siguiente</strong>, a medida que crece el historial.</p>
+  <p>Recorta a los campos relevantes <strong>antes</strong> de que el resultado entre en el historial: en un hook <code>PostToolUse</code> o en la propia implementación de la tool. Una vez que los datos verbosos están en contexto, se quedan ahí para siempre.</p>
+
+  <h3>La API es stateless</h3>
+  <p>Cada petición debe incluir el historial completo. No hay estado de sesión en el servidor, así que cada turno tiene que llevar todo lo que el modelo necesita para seguir la conversación. Esto crea la tensión del dominio: necesitas el historial completo para la coherencia, pero crece con cada turno. El bloque de hechos del caso resuelve la tensión separando los datos críticos de la narrativa resumible.</p>
+
+  <h3>Optimización de agentes upstream</h3>
+  <p>En sistemas multiagente, los agentes de arriba suelen devolver cadenas de razonamiento verbosas y contenido en bruto que los de abajo no necesitan. Modifícalos para que devuelvan <strong>datos estructurados</strong> —hechos clave, citas, scores de relevancia— en vez de contenido verboso. Los tokens no son la única ganancia: la salida estructurada permite al agente de abajo procesar hallazgos sin reparsear prosa.</p>
+
+  <div class="now">
+    <span class="lbl">Prompt caching: la otra mitad de la economía del contexto</span>
+    <p>En vez de recortar lo que el modelo ve, evitas pagar por reprocesar lo que no cambia. Marcas un prefijo estable con un breakpoint <code>cache_control</code> y la API guarda ese prefijo procesado para reutilizarlo.</p>
+    <p><strong>El orden lo decide todo:</strong> la caché encaja desde el principio del prompt, prefijo a prefijo. Pon primero lo constante (instrucciones de sistema, definiciones de tools, documentos de referencia largos), el breakpoint al final de ese bloque, y lo volátil después. Si el contenido dinámico va delante, el prefijo cambia en cada petición, no encaja nada y pagas precio completo siempre. Un breakpoint <code>ephemeral</code> dura unos cinco minutos desde el último uso: sirve para ráfagas de peticiones relacionadas, no para contenido reutilizado horas después.</p>
+  </div>
+</div></section>
+
+<!-- ============ 5.2 ============ -->
+<section id="s52"><div class="wrap">
+  <span class="tag">Task Statement 5.2</span>
+  <h2>Escalado y resolución de ambigüedad</h2>
+
+  <h3>Los tres disparadores válidos</h3>
+  <ol>
+    <li><strong>El cliente pide un humano explícitamente.</strong> «Quiero hablar con una persona.» Se honra <em>inmediatamente</em>. Sin investigar antes, sin «déjame ver si puedo ayudarte primero». Regla absoluta, sin excepciones.</li>
+    <li><strong>Excepciones o vacíos de política.</strong> La petición cae fuera de lo documentado. Por ejemplo, igualar el precio de un competidor cuando la política solo cubre ajustes en la propia web. El agente no puede inventar política sobre la marcha.</li>
+    <li><strong>Incapacidad de avanzar.</strong> Ha intentado resolver y no puede: las tools devuelven errores que el reintento local no arregla, hace falta acceso a sistemas que no tiene, o hay un bug técnico que requiere ingeniería. Es el cajón de sastre, pero <strong>solo después de un intento genuino</strong>.</li>
+  </ol>
+
+  <div class="key">
+    <span class="lbl">Vacío de política ≠ violación de política</span>
+    <p>Una <strong>violación</strong> (pedir un reembolso fuera del plazo de devolución) tiene respuesta documentada: «no». Un <strong>vacío</strong> significa que la política no dice nada sobre esa situación concreta. Los vacíos escalan; las violaciones no.</p>
+  </div>
+
+  <h3>Los dos disparadores no fiables</h3>
+  <div class="trap">
+    <span class="lbl">Antipatrones que el examen presenta como tentación</span>
+    <p><strong>Escalado por sentimiento.</strong> La frustración no correlaciona con la complejidad del caso. Un cliente furioso por una entrega tardía es fácil de resolver (disculpa, compensación, reenvío). Un cliente tranquilo y educado preguntando por igualar precios de la competencia requiere juicio humano sobre un vacío de política. El sentimiento mide el estado emocional, no la dificultad.</p>
+    <p><strong>Scores de confianza autorreportados.</strong> Mal calibrados por naturaleza: el modelo está incorrectamente seguro en los casos difíciles (no sabe lo que no sabe) e innecesariamente inseguro en los sencillos. Es exactamente el modo de fallo del escenario del examen: el agente escala casos simples e intenta los complejos.</p>
+  </div>
+
+  <h3>El matiz de la frustración</h3>
+  <table>
+    <tr><th>Situación</th><th>Respuesta</th></tr>
+    <tr><td>Cliente frustrado, problema resoluble</td><td>Reconoce la frustración y ofrece la resolución. «Entiendo que es frustrante. Puedo procesar tu reemplazo ahora mismo.» <strong>No escales.</strong></td></tr>
+    <tr><td>Cliente reitera que quiere un humano tras tu oferta</td><td>Ahora sí escala. Tuvo la oportunidad de aceptar y la declinó.</td></tr>
+    <tr><td>Cliente dice «quiero un humano» desde el principio</td><td>Escala inmediatamente. Cero investigación.</td></tr>
+  </table>
+
+  <h3>Coincidencias ambiguas de cliente</h3>
+  <p>Cuando una búsqueda devuelve varios clientes que encajan (tres «Juan García»), el agente <strong>pide identificadores adicionales</strong>: email, teléfono, número de pedido. Lo que no puede hacer es seleccionar el registro más reciente, el más activo, ni aplicar ninguna heurística. Elegir mal lleva a violaciones de privacidad (exponer datos de un cliente a otro) o a acciones incorrectas (reembolsar la cuenta equivocada). La única respuesta segura es pedir aclaración.</p>
+
+  <div class="key">
+    <span class="lbl">El arreglo proporcionado</span>
+    <p>Añadir criterios de escalado explícitos con ejemplos few-shot al system prompt. Va antes que montar infraestructura como clasificadores o análisis de sentimiento. La optimización de prompt siempre precede a los cambios arquitectónicos.</p>
+  </div>
+</div></section>
+
+<!-- ============ 5.3 ============ -->
+<section id="s53"><div class="wrap">
+  <span class="tag">Task Statement 5.3</span>
+  <h2>Propagación de errores en sistemas multiagente</h2>
+
+  <h3>Contexto de error estructurado: cuatro elementos</h3>
+  <ol>
+    <li><strong>Tipo de fallo.</strong> Transient, validation, business o permission.</li>
+    <li><strong>Qué se intentó.</strong> La query concreta, los parámetros y el sistema destino. «Busqué en la base académica "política de energía renovable" con rango 2022-2024» es accionable. «La búsqueda falló» no.</li>
+    <li><strong>Resultados parciales</strong> obtenidos antes del fallo. Si recuperó tres de cinco fuentes antes del timeout, esas tres valen. Descartarlas porque la operación falló es tirar trabajo.</li>
+    <li><strong>Enfoques alternativos.</strong> El subagente conoce su dominio: si la base académica está caída, puede sugerir otra base, ampliar los términos o mirar resultados cacheados.</li>
+  </ol>
+
+  <div class="trap">
+    <span class="lbl">Los dos antipatrones</span>
+    <p><strong>Supresión silenciosa: devolver vacío marcado como éxito.</strong> El peor de todos. El subagente sufre un timeout y devuelve <code>{ "results": [], "status": "success" }</code>. El coordinador cree que la búsqueda corrió y no encontró nada: no reintenta, no prueba alternativas y produce una síntesis que omite en silencio un área entera. <strong>La salida parece completa</strong>, y ahí está el peligro: nadie puede detectar el hueco. En soporte, sería reportar «no se encontraron pedidos» cuando el sistema estaba caído, y decirle al cliente que no tiene cuenta.</p>
+    <p><strong>Terminación del workflow: matar el pipeline entero por un fallo.</strong> Un subagente da timeout y se cae toda la investigación. Los otros cuatro habían terminado bien, y su trabajo se tira. Respuesta desproporcionada, sin ruta de recuperación.</p>
+  </div>
+
+  <h3>Fallo de acceso vs. resultado vacío válido</h3>
+  <p><strong>Fallo de acceso:</strong> la tool no pudo llegar a la fuente. Timeout, error de conexión, permiso denegado. La búsqueda no se ejecutó. Considera reintentar.<br>
+  <strong>Resultado vacío válido:</strong> la tool llegó y ejecutó la query. No hay coincidencias. <em>Eso es la respuesta.</em> No hay nada que reintentar.</p>
+  <p>Confundirlos da dos problemas espejo: tratar fallos de acceso como vacíos válidos significa no reintentar cuando deberías; tratar vacíos válidos como fallos significa gastar tiempo reintentando una query que siempre devolverá nada.</p>
+
+  <h3>Anotaciones de cobertura</h3>
+  <p>Cuando el agente de síntesis combina hallazgos, la salida debe indicar qué áreas están bien soportadas y cuáles tienen huecos: «la sección de geotermia es limitada por acceso no disponible a revistas durante la investigación». Sin esa anotación, un hueco en la síntesis parece que el tema no era relevante, en vez de que la fuente no estaba disponible.</p>
+
+  <h3>Recuperación local primero</h3>
+  <p>Los subagentes implementan recuperación local para fallos transitorios —reintentos, fuentes alternativas, respuestas degradadas— antes de propagar. Solo propagan lo que no pueden resolver, y siempre con qué se intentó y qué resultados parciales hay. Esto reduce la complejidad del coordinador, que no tiene que gestionar la lógica de reintentos de cada posible fallo de cada subagente.</p>
+</div></section>
+
+<!-- ============ CHECKPOINT ============ -->
+<section id="check"><div class="wrap">
+  <span class="tag">Punto de control</span>
+  <h2>Chequeo rápido: 5.1 – 5.3</h2>
+  <div class="quiz" id="quizA"></div>
+</div></section>
+
+<!-- ============ 5.4 ============ -->
+<section id="s54"><div class="wrap">
+  <span class="tag">Task Statement 5.4</span>
+  <h2>Exploración de codebase y degradación de contexto</h2>
+
+  <div class="key">
+    <span class="lbl">Qué es exactamente la degradación de contexto</span>
+    <p>El síntoma es observable y específico: el modelo empieza a hablar de «patrones típicos» en vez de las clases, métodos y cadenas de dependencia concretas que descubrió antes. Dice «esto sigue el patrón repositorio típico» en lugar de «la clase <code>OrderRepository</code> en <code>src/repos/order.ts</code> implementa <code>Repository&lt;T&gt;</code> con caché propia en <code>findById</code>».</p>
+    <p><strong>No es un problema de límite de tokens.</strong> Ampliar la ventana no lo arregla. El modelo no se queda sin espacio: pierde el rastro de detalles específicos según se van enterrando bajo salida más reciente y más verbosa.</p>
+  </div>
+
+  <p>El mecanismo, paso a paso: cada paso de exploración genera salida verbosa (contenidos de fichero, resultados de búsqueda, listados de directorio) → esa salida se acumula en el contexto → los descubrimientos precisos anteriores quedan empujados hacia atrás mientras domina lo reciente → la atención del modelo se desplaza y pierde las referencias concretas.</p>
+
+  <h3>Ficheros scratchpad</h3>
+  <p>Es la mitigación principal. El agente escribe los hallazgos clave a un fichero y lo consulta para preguntas posteriores. Eso persiste el conocimiento <strong>fuera</strong> del contexto conversacional, donde la degradación no lo alcanza.</p>
+  <pre># Scratchpad de exploración — Order Service
+
+## Clases clave
+- OrderRepository (src/repos/order.ts) — implementa Repository&lt;T&gt;,
+  caché propia en findById
+- RefundProcessor (src/services/refund.ts) — depende de
+  OrderService.getOrderWithItems()
+
+## Cadena de dependencias
+RefundProcessor → OrderService → OrderRepository → PostgreSQL
+
+## Hallazgos críticos
+- RefundProcessor no tiene lógica de reintento para fallos de Stripe
+- OrderRepository cachea por orderId pero falta invalidación al
+  cambiar de estado</pre>
+  <p>Trátalo como estrategia deliberada desde el principio de cualquier sesión larga, no como rescate cuando ya se ha degradado.</p>
+
+  <h3>Delegación en subagentes</h3>
+  <div class="trap">
+    <span class="lbl">La lectura equivocada</span>
+    <p>Lo obvio es pensar que la delegación va de paralelizar. El valor real aquí es el <strong>aislamiento de contexto</strong>: cada subagente explora verbosamente en su propio contexto y devuelve un resumen estructurado, mientras el contexto del agente principal se mantiene limpio para la coordinación de alto nivel.</p>
+  </div>
+
+  <h3>Inyección de resúmenes entre fases</h3>
+  <p>Cuando la exploración va por fases, resume los hallazgos de la fase 1 antes de lanzar los subagentes de la fase 2 e inyecta ese resumen en su contexto inicial. Evita el problema del arranque en frío, donde los agentes de la fase 2 duplican la exploración de la fase 1 porque nadie les contó lo que ya se sabía.</p>
+
+  <h3><code>/compact</code></h3>
+  <p>Reduce el uso de contexto durante sesiones largas resumiendo la conversación. <strong>Úsalo de forma proactiva</strong>, no solo cuando choques con el límite: está para proteger la calidad del contexto, no solo su cantidad.</p>
+
+  <h3>Recuperación ante caídas: manifiestos de estado</h3>
+  <p>Las sesiones largas pueden morir por crash, corte de red o agotamiento de contexto. Sin mecanismo de recuperación se pierde todo el progreso. Cada agente exporta su estado a un fichero conocido: qué se ha explorado, hallazgos clave, fase actual y siguientes pasos, y cuestiones pendientes.</p>
+  <pre>{
+  "sessionId": "explore-order-service-001",
+  "phase": 2,
+  "exploredPaths": ["src/repos/order.ts", "src/services/refund.ts"],
+  "keyFindings": {
+    "architecture": "Capas: Controllers → Services → Repositories → DB",
+    "criticalIssue": "RefundProcessor sin reintentos para Stripe"
+  },
+  "nextSteps": ["Investigar manejo de errores en PaymentGateway"]
+}</pre>
+  <p>Al reanudar, el coordinador carga el manifiesto y lo inyecta en los prompts. El agente retoma donde lo dejó sin repetir exploración.</p>
+</div></section>
+
+<!-- ============ 5.5 ============ -->
+<section id="s55"><div class="wrap">
+  <span class="tag">Task Statement 5.5</span>
+  <h2>Revisión humana y calibración de confianza</h2>
+
+  <h3>La trampa de las métricas agregadas</h3>
+  <p>Es la idea equivocada más peligrosa en sistemas de extracción en producción. El sistema reporta 97% de precisión global. El equipo lo celebra. Dirección aprueba automatizar todo lo de alta confianza.</p>
+
+  <table>
+    <tr><th>Tipo de documento</th><th>Precisión en fechas</th><th>En importes</th><th>En nombres</th></tr>
+    <tr><td>Facturas estándar</td><td>99,5%</td><td>98,2%</td><td>97,8%</td></tr>
+    <tr><td>Recibos manuscritos</td><td>60,1%</td><td>55,3%</td><td>71,2%</td></tr>
+    <tr><td>PDF escaneados</td><td>72,4%</td><td>69,8%</td><td>80,1%</td></tr>
+    <tr><td>Formatos internacionales</td><td>45,2%</td><td>52,1%</td><td>63,4%</td></tr>
+    <tr><td><strong>Agregado</strong></td><td><strong>97,0%</strong></td><td><strong>96,1%</strong></td><td><strong>95,8%</strong></td></tr>
+  </table>
+
+  <p>El agregado se ve excelente porque las facturas estándar dominan el volumen. Pero tres tipos de documento tienen precisión inaceptable, escondidos tras la media ponderada. Y suelen ser justo los segmentos donde el error tiene más impacto: recibos manuscritos de personal de campo, facturas internacionales de proveedores nuevos, documentos escaneados para auditorías de compliance.</p>
+
+  <div class="key">
+    <span class="lbl">La regla</span>
+    <p>Valida siempre la precisión <strong>por tipo de documento Y por segmento de campo</strong> antes de automatizar. Nunca tomes decisiones de automatización basándote solo en el agregado.</p>
+  </div>
+
+  <h3>Muestreo aleatorio estratificado</h3>
+  <p>Incluso tras validar por tipo y campo, necesitas verificación continua: seleccionas una muestra representativa de cada estrato (tipo de documento, banda de confianza, tipo de campo) y un humano la verifica.</p>
+  <div class="trap">
+    <span class="lbl">La parte contraintuitiva</span>
+    <p>Tienes que muestrear las extracciones de <strong>alta</strong> confianza, no solo las de baja. Las de baja ya van a revisión humana. Las de alta están automatizadas: si el modelo desarrolla un patrón de error nuevo que las afecta, <strong>solo el muestreo estratificado lo detectará</strong>. Sin él vuelas a ciegas sobre todo lo automatizado.</p>
+  </div>
+
+  <h3>Calibración de confianza por campo</h3>
+  <p>Los scores crudos del modelo no están calibrados. Un modelo que reporta 0,95 puede acertar el 88% de las veces en cierto tipo de campo y el 99% en otro. El score es relativo, no absoluto.</p>
+  <p><strong>Calibrar exige conjuntos de validación etiquetados.</strong> Coges documentos con extracciones correctas conocidas, pasas el modelo, comparas sus scores con la precisión real y construyes una curva de calibración: «cuando reporta 0,90 en campos de fecha, acierta el 94%; cuando reporta 0,90 en importes, acierta el 82%». Los umbrales calibrados son los que enrutan.</p>
+
+  <h3>Priorización de capacidad de revisión</h3>
+  <p>Los revisores humanos son caros y limitados. Enruta primero lo de mayor incertidumbre: campos de baja confianza, extracciones de documentos ambiguos o contradictorios, tipos de documento con mal historial de precisión.</p>
+  <p><strong>No repartas la capacidad de forma uniforme.</strong> Gastarías tiempo revisando cosas de alta confianza que el modelo maneja bien, dejando capacidad insuficiente para lo incierto. Y la priorización debe ser <strong>dinámica</strong>: cuando un revisor termina un ítem, el siguiente debe ser el de mayor incertidumbre pendiente, no el siguiente por orden cronológico.</p>
+
+  <div class="key">
+    <span class="lbl">La secuencia importa</span>
+    <p>1. Medir precisión por tipo y segmento (no agregada). 2. Calibrar la confianza con sets etiquetados. 3. Fijar umbrales calibrados. 4. Muestreo estratificado continuo. 5. <em>Solo entonces</em> reducir revisión humana en los segmentos validados. Saltar al paso 5 basándose en el agregado es la trampa.</p>
+  </div>
+</div></section>
+
+<!-- ============ 5.6 ============ -->
+<section id="s56"><div class="wrap">
+  <span class="tag">Task Statement 5.6</span>
+  <h2>Trazabilidad de la información y síntesis multifuente</h2>
+
+  <h3>Mapeos afirmación-fuente estructurados</h3>
+  <p>Cada hallazgo debe llevar su procedencia. No es metadato opcional: es la garantía estructural de que la salida final se puede trazar hasta fuentes concretas. Cinco campos:</p>
+  <ul>
+    <li><strong>Claim</strong> — la afirmación concreta.</li>
+    <li><strong>Source URL</strong> — dónde se encontró.</li>
+    <li><strong>Document name</strong> — título de la fuente.</li>
+    <li><strong>Relevant excerpt</strong> — el pasaje específico que la sostiene.</li>
+    <li><strong>Publication date</strong> — cuándo se publicó o se recogieron los datos.</li>
+  </ul>
+
+  <div class="trap">
+    <span class="lbl">La atribución muere durante el resumen</span>
+    <p>Cuando el agente de síntesis combina hallazgos, comprime y parafrasea por naturaleza. Sin instrucción explícita de preservar los mapeos, produce frases como «la inversión en renovables ha crecido significativamente»: sin cifra, sin fuente, sin fecha. El punto de fallo más común de todo el pipeline es el paso de síntesis.</p>
+  </div>
+
+  <h3>Conflictos entre fuentes</h3>
+  <p>Fuente A reporta 12% de crecimiento. Fuente B reporta 8%. Ambas creíbles.</p>
+  <p><strong>Mal:</strong> elegir la más reciente, promediar los valores, o quedarse con la del editor más autorizado.<br>
+  <strong>Bien:</strong> anotar ambos valores con atribución completa y dejar decidir a quien lo consume.</p>
+  <pre>Las estimaciones de crecimiento varían según la fuente:
+- 12% — IEA World Energy Report (junio 2024, datos año
+  natural 2023)
+- 8%  — Bloomberg NEF Annual Review (marzo 2024, datos
+  julio 2022–junio 2023)
+
+La diferencia puede reflejar periodos de reporte y
+metodologías distintas.</pre>
+  <p>Elegir arbitrariamente destruye información y presenta una certeza falsa.</p>
+
+  <div class="key">
+    <span class="lbl">Conciencia temporal</span>
+    <p>Fechas de publicación distintas explican números distintos. Eso no es una contradicción: es contexto temporal. Fuente A (2023) dice 8%, fuente B (2024) dice 12%. Sin fechas parecen contradecirse; con fechas cuentan una historia: el crecimiento se aceleró. El «conflicto» era una tendencia.</p>
+    <p>Sin contexto temporal, las tendencias válidas se leen como problemas de calidad de datos, y el agente de síntesis puede marcar o suprimir hallazgos que en realidad son consistentes.</p>
+  </div>
+
+  <h3>Renderizado según el tipo de contenido</h3>
+  <table>
+    <tr><th>Tipo de contenido</th><th>Formato</th><th>Por qué</th></tr>
+    <tr><td>Datos financieros</td><td>Tablas</td><td>Números, comparaciones y tendencias se leen mejor tabulados; en prosa cuesta comparar valores y ver patrones.</td></tr>
+    <tr><td>Noticias y actualidad</td><td>Prosa</td><td>Contexto narrativo, causa-efecto y cronología se leen naturalmente en párrafos.</td></tr>
+    <tr><td>Hallazgos técnicos</td><td>Listas estructuradas</td><td>Patrones de arquitectura, especificaciones de API y opciones de configuración son más claras jerarquizadas.</td></tr>
+  </table>
+  <p>Forzar todo a un único formato —todo tablas, o todo prosa— degrada la legibilidad. La síntesis debe elegir el formato según el contenido.</p>
+
+  <h3>Análisis con conflictos intactos</h3>
+  <p>Cuando el análisis documental encuentra valores contradictorios, debe completar su trabajo con los conflictos <strong>incluidos y anotados explícitamente</strong>. No debe resolverlos: esa decisión es del coordinador o del consumidor.</p>
+  <pre>{
+  "field": "annualRevenue",
+  "conflictDetected": true,
+  "values": [
+    { "value": "4,2 M€", "source": "Informe anual 2023",
+      "context": "Estados financieros auditados, ejercicio a diciembre 2023" },
+    { "value": "3,8 M€", "source": "SEC Filing Q4 2023",
+      "context": "Cifras preliminares no auditadas, año natural 2023" }
+  ],
+  "possibleExplanation": "Puede reflejar cifras auditadas vs
+    preliminares y ejercicio fiscal vs año natural"
+}</pre>
+
+  <p>Y en el informe final, separa explícitamente los hallazgos bien establecidos de los disputados. Una conclusión sostenida por tres fuentes independientes no es lo mismo que una basada en un solo informe, aunque el texto las presente con la misma seguridad.</p>
+</div></section>
+
+<!-- ============ CHULETA ============ -->
+<section id="chuleta"><div class="wrap">
+  <span class="tag">Repaso</span>
+  <h2>Chuleta de desambiguación</h2>
+
+  <table>
+    <tr><th>Si dudas entre…</th><th>Quédate con esto</th></tr>
+    <tr><td>Resumir mejor vs bloque de hechos</td><td>Instruir «preserva los números al resumir» sigue siendo probabilístico. Los hechos transaccionales viven <strong>fuera</strong> del historial resumido.</td></tr>
+    <tr><td>Lost in the middle</td><td>Arreglo estructural: resumen de hallazgos al principio y encabezados explícitos. Nunca «presta atención a todo».</td></tr>
+    <tr><td>Escalar por sentimiento o confianza</td><td>Ninguno de los dos. Sentimiento ≠ complejidad; confianza autorreportada mal calibrada. Criterios explícitos con few-shot.</td></tr>
+    <tr><td>Frustrado vs pide humano</td><td>Frustrado con problema resoluble → resuelve. Pide humano explícitamente → escala inmediatamente, sin investigar.</td></tr>
+    <tr><td>Vacío de política vs violación</td><td>Vacío (la política calla) escala. Violación (la política dice «no») no escala.</td></tr>
+    <tr><td>Degradación de contexto</td><td>No es límite de tokens. Scratchpad + delegación en subagentes, no una ventana más grande.</td></tr>
+    <tr><td>Delegación: paralelizar o aislar</td><td>En exploración de codebase, el valor es el <strong>aislamiento de contexto</strong>.</td></tr>
+    <tr><td>Métrica agregada vs por segmento</td><td>97% global puede esconder 45% en formatos internacionales. Siempre por tipo Y campo.</td></tr>
+    <tr><td>Muestrear baja o alta confianza</td><td>Alta también, y sobre todo: es lo automatizado y lo único donde un error nuevo pasa desapercibido.</td></tr>
+    <tr><td>Fuentes en conflicto</td><td>Anota ambas con atribución y fechas. Nunca elijas ni promedies.</td></tr>
+  </table>
+
+  <h3>Cinco frases que valen puntos</h3>
+  <ul>
+    <li>El bloque de hechos del caso <strong>no se resume nunca</strong>.</li>
+    <li>Un resultado vacío válido no se reintenta; un fallo de acceso sí se considera.</li>
+    <li>Devolver vacío como éxito es el peor antipatrón: el hueco es invisible.</li>
+    <li>La degradación de contexto no se arregla con más contexto.</li>
+    <li>Fechas distintas explican números distintos: es tendencia, no contradicción.</li>
+  </ul>
+</div></section>
+
+<!-- ============ FINAL ============ -->
+<section id="final"><div class="wrap">
+  <span class="tag">Simulacro</span>
+  <h2>Examen del Domain 5</h2>
+  <div class="quiz" id="quizB"></div>
+</div></section>
+
+<footer><div class="wrap">
+  <p>Guía de estudio del Domain 5 (15%) para el <strong>Claude Certified Architect — Foundations</strong> (CCAR-F), elaborada a partir del temario de <a href="https://claudecertificationguide.com/learn/5-context-management">claudecertificationguide.com</a> y del Exam Guide oficial v1.0 (julio 2026).</p>
+</div></footer>
+
+<script>
+const QUIZ_A=[
+ {stem:"Un agente de soporte, tras varios turnos, habla de «tu solicitud de reembolso reciente» en vez de los 247,83 € del pedido #8891. El historial se resume entre turnos. ¿Arreglo más efectivo?",
+  opts:["Instruir al modelo para que preserve todos los valores numéricos al resumir","Extraer los hechos transaccionales a un bloque persistente incluido en cada prompt, fuera del historial resumido","Guardar el historial completo en una base de datos externa y recuperar turnos bajo demanda","Ampliar la ventana de contexto para que el historial completo quepa y no haga falta resumir"],
+  ok:1,why:"Instruir al resumidor sigue siendo probabilístico y el resumen destruye números y fechas por defecto. El bloque de hechos vive fuera de lo resumible: es el patrón central del dominio."},
+ {stem:"Un cliente escribe: «esto es indignante, llevo tres días esperando el paquete, quiero hablar con una persona». ¿Qué hace el agente?",
+  opts:["Reconocer la frustración y ofrecer resolver el envío, escalando solo si insiste","Escalar inmediatamente, sin investigar ni ofrecer ayuda primero","Analizar el sentimiento y escalar si supera el umbral de negatividad","Consultar el estado del pedido y decidir según lo que encuentre"],
+  ok:1,why:"Ha pedido un humano explícitamente: regla absoluta, sin excepciones ni investigación previa. El matiz de la frustración aplica cuando el cliente está enfadado pero NO ha pedido un humano."},
+ {stem:"Un subagente de búsqueda web sufre un timeout tras recuperar 3 de 5 fuentes. ¿Qué devuelve al coordinador?",
+  opts:["Un array vacío marcado como éxito, para no interrumpir el flujo","Contexto de error estructurado: tipo de fallo, query intentada, los 3 resultados parciales y enfoques alternativos","Un status genérico de «búsqueda no disponible» tras agotar reintentos","Una excepción que termine el workflow de investigación completo"],
+  ok:1,why:"Los cuatro elementos dan al coordinador con qué decidir. Devolver vacío como éxito es el peor antipatrón porque el hueco resulta invisible; matar el workflow tira el trabajo de los otros subagentes."},
+ {stem:"Vas a pasar los resultados de tres subagentes a un agente de síntesis. ¿Cómo estructuras la entrada?",
+  opts:["En orden cronológico de llegada","Con un resumen de hallazgos clave al principio y los detalles después, con encabezados de sección explícitos","Con los detalles primero y el resumen al final, como conclusión","Todo junto, indicando en el prompt que preste atención a todo por igual"],
+  ok:1,why:"El efecto lost in the middle es posicional y el arreglo es estructural. Pedirle que preste atención a todo no funciona para efectos de posición."}
+];
+
+const QUIZ_B=[
+ {stem:"Un agente que explora un codebase desconocido empieza a hablar de «patrones repositorio típicos» en vez de las clases concretas que descubrió antes. ¿Mitigación?",
+  opts:["Ampliar la ventana de contexto para retener más salida de descubrimiento","Que el agente mantenga ficheros scratchpad con los hallazgos clave y los consulte en pasos posteriores","Reiniciar la sesión y pedirle que explore de forma más eficiente","Precargar toda la estructura del codebase en el contexto inicial"],
+  ok:1,why:"La degradación no es falta de espacio: es pérdida del rastro de detalles bajo salida más reciente. Una ventana mayor se llena igual de verbosidad. El scratchpad persiste fuera del contexto conversacional."},
+ {stem:"Un sistema de extracción reporta 97% de precisión global. El equipo propone automatizar todo lo que supere 95% de confianza. ¿Riesgo crítico?",
+  opts:["El umbral de 95% es bajo y debería subirse a 99%","El agregado puede esconder mal rendimiento en tipos de documento o campos concretos, y los scores de confianza necesitan calibración contra sets etiquetados","Toda extracción automatizada debería llevar revisión humana igualmente","El modelo se volverá sobreconfiado con el tiempo y necesitará reentrenamiento"],
+  ok:1,why:"Un 97% ponderado por volumen puede convivir con un 45% en formatos internacionales. Son dos fallos apilados: métrica agregada y confianza sin calibrar."},
+ {stem:"Dos fuentes creíbles reportan crecimientos distintos: 12% (datos de 2023) y 8% (datos de 2024). El agente de síntesis elige el más reciente. ¿Enfoque correcto?",
+  opts:["Marcar el conflicto y escalarlo a un investigador humano antes de incluir ninguna cifra","Promediar y reportar 10%, con nota al pie sobre la varianza","Usar siempre la fuente más reciente, por reflejar mejor la situación actual","Anotar ambos valores con atribución y fechas de publicación, dejando interpretar a quien lo consume"],
+  ok:3,why:"Elegir destruye información y presenta certeza falsa. Además, con las fechas delante puede que no haya conflicto sino tendencia."},
+ {stem:"Tu tool de consulta de pedidos devuelve 40+ campos y solo necesitas 5. ¿Qué haces y dónde?",
+  opts:["Recortar a los campos relevantes en un hook PostToolUse o en la propia tool, antes de que el resultado entre en el historial","Dejarlos por si el modelo los necesita más adelante","Pedir en el prompt que ignore los campos irrelevantes","Recortarlos al resumir la conversación"],
+  ok:0,why:"Una vez que los datos verbosos están en contexto se quedan ahí y gastan tokens en cada turno siguiente. El recorte tiene que ocurrir antes de la entrada, no después."},
+ {stem:"Una búsqueda de cliente devuelve tres registros con el mismo nombre. ¿Qué hace el agente?",
+  opts:["Selecciona el más reciente","Selecciona el más activo","Pide identificadores adicionales: email, teléfono o número de pedido","Procesa la petición contra los tres y compara resultados"],
+  ok:2,why:"Cualquier heurística arriesga violación de privacidad (exponer datos de un cliente a otro) o acción incorrecta (reembolsar la cuenta equivocada). La única respuesta segura es pedir aclaración."},
+ {stem:"Tu muestreo de control de calidad revisa solo las extracciones de baja confianza. ¿Qué problema tiene?",
+  opts:["Ninguno: las de baja confianza son las que más fallan","Las de baja confianza ya van a revisión humana; si aparece un patrón de error nuevo en las de alta confianza, que están automatizadas, nada lo detectará","Consume demasiada capacidad de revisión","Debería revisarse solo lo de alta confianza"],
+  ok:1,why:"El muestreo estratificado tiene dos funciones: medir precisión continua y detectar patrones de error nuevos. La segunda solo funciona si incluye lo automatizado."},
+ {stem:"Un agente de síntesis produce un informe sin fuentes, aunque los subagentes de búsqueda y análisis devolvieron URLs y referencias correctamente. ¿Qué falta?",
+  opts:["Instruir al agente de síntesis para que preserve y fusione los mapeos afirmación-fuente al combinar hallazgos","Dar al agente de síntesis acceso a la tool de búsqueda para que recupere las fuentes","Aumentar el contexto del agente de síntesis","Pedir a los subagentes que devuelvan menos hallazgos"],
+  ok:0,why:"La atribución muere durante el resumen: el agente comprime y parafrasea por naturaleza. El paso de síntesis es el punto de fallo más común del pipeline y necesita la instrucción explícita."},
+ {stem:"Tu sesión de exploración de codebase se cae a mitad de la fase 2 y pierdes todo el progreso. ¿Qué implementas?",
+  opts:["Guardar la transcripción completa de la sesión para reanudarla luego","Manifiestos de estado estructurados: rutas exploradas, hallazgos clave, fase actual y siguientes pasos, que el coordinador carga e inyecta al reanudar","Ejecutar todo con /compact activado para reducir el riesgo","Dividir la exploración en sesiones más cortas"],
+  ok:1,why:"El manifiesto permite retomar donde se dejó sin repetir exploración. Guardar la transcripción entera reintroduce toda la verbosidad que causó el problema."},
+ {stem:"Un informe de síntesis mezcla datos financieros, contexto de noticias y hallazgos técnicos. ¿Cómo lo renderizas?",
+  opts:["Todo en prosa, para que se lea de forma homogénea","Todo en listas, que es lo más escaneable","Datos financieros en tablas, noticias en prosa y hallazgos técnicos en listas estructuradas","Todo en tablas, para facilitar la comparación"],
+  ok:2,why:"Forzar todo a un único formato degrada la legibilidad. Cada tipo de contenido tiene un formato que lo hace comprensible, y la síntesis debe elegirlo según el contenido."},
+ {stem:"Un subagente de análisis documental encuentra dos cifras de facturación contradictorias en el mismo documento. ¿Qué hace?",
+  opts:["Elige la de los estados auditados, que son más fiables","Completa el análisis incluyendo ambos valores, anotados explícitamente con su contexto y una posible explicación","Descarta el documento y lo marca como no procesable","Promedia las dos cifras"],
+  ok:1,why:"Resolver el conflicto es decisión del coordinador o del consumidor, no del agente de análisis. Su trabajo es completar el análisis con el conflicto intacto y suficiente contexto para que otro decida."}
+];
+
+const LETTERS=['A','B','C','D'];
+function renderQuiz(id,data,label){
+  const root=document.getElementById(id); const st={a:0,r:0};
+  data.forEach((q,i)=>{
+    const d=document.createElement('div'); d.className='q';
+    const n=document.createElement('span'); n.className='num'; n.textContent=label+' '+(i+1)+' / '+data.length;
+    const s=document.createElement('p'); s.className='stem'; s.textContent=q.stem;
+    d.append(n,s);
+    const w=document.createElement('div'); w.className='why';
+    q.opts.forEach((o,j)=>{
+      const b=document.createElement('button'); b.className='opt'; b.type='button';
+      b.innerHTML='<span style="font-family:var(--mono);font-size:12px;color:var(--ink-soft);margin-right:9px;font-weight:600">'+LETTERS[j]+'</span>';
+      b.appendChild(document.createTextNode(o));
+      b.addEventListener('click',()=>{
+        const all=d.querySelectorAll('.opt'); all.forEach(x=>x.disabled=true);
+        all[q.ok].classList.add('good');
+        const hit=j===q.ok; if(!hit) b.classList.add('bad');
+        w.className='why show '+(hit?'ok':'no');
+        w.innerHTML='<b>'+(hit?'Correcto.':'No es esa.')+'</b> '+q.why;
+        st.a++; if(hit) st.r++;
+        sc.innerHTML='Respondidas <b>'+st.a+'/'+data.length+'</b> · Aciertos <b>'+st.r+'</b>';
+      });
+      d.appendChild(b);
+    });
+    d.appendChild(w); root.appendChild(d);
+  });
+  const sc=document.createElement('div'); sc.className='score';
+  sc.innerHTML='Respondidas <b>0/'+data.length+'</b> · Aciertos <b>0</b>';
+  root.appendChild(sc);
+}
+renderQuiz('quizA',QUIZ_A,'Check');
+renderQuiz('quizB',QUIZ_B,'Pregunta');
+</script>
+</body>
+</html>

@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz 30 · Domain 4 Prompt Engineering — CCAR-F</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#E7ECF1;--panel:#FAFBFC;--ink:#0F1A26;--ink-soft:#4A5A6B;--line:#C9D3DC;--det:#0C6D78;--anti:#A62347;--display:'Space Grotesk',system-ui,sans-serif;--body:'IBM Plex Sans',system-ui,-apple-system,sans-serif;--mono:'IBM Plex Mono',ui-monospace,Menlo,monospace}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16.5px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:760px;margin:0 auto;padding:0 22px}
+header{padding:48px 0 28px}
+.eyebrow{font-family:var(--mono);font-size:12.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--det)}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(1.9rem,5.5vw,2.6rem);line-height:1.08;letter-spacing:-.025em;margin:.3em 0 .35em}
+.lede{color:var(--ink-soft);margin:0 0 18px;max-width:60ch}
+.dist{display:flex;flex-wrap:wrap;gap:7px}
+.dist span{font-family:var(--mono);font-size:11.5px;border:1px solid var(--line);background:var(--panel);padding:4px 9px;border-radius:100px;color:var(--ink-soft)}
+.bar-wrap{position:sticky;top:0;z-index:10;background:rgba(231,236,241,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:11px 0}
+.bar-inner{display:flex;align-items:center;gap:14px}
+.track{flex:1;height:5px;background:#D3DCE4;border-radius:3px;overflow:hidden}
+.fill{height:100%;width:0;background:var(--det);transition:width .25s ease}
+.counter{font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);white-space:nowrap}
+.counter b{color:var(--ink)}
+main{padding:6px 0 20px}
+.sec{font-family:var(--display);font-weight:700;font-size:1.12rem;letter-spacing:-.01em;margin:32px 0 2px;padding-bottom:7px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.sec .cnt{font-family:var(--mono);font-size:11.5px;font-weight:400;color:var(--ink-soft)}
+.q{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:18px 20px 16px;margin:14px 0}
+.num{font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;color:var(--det)}
+.stem{font-weight:600;line-height:1.45;margin:5px 0 12px}
+.opt{display:block;width:100%;text-align:left;font:inherit;font-size:.95rem;line-height:1.45;background:#fff;border:1px solid var(--line);border-radius:5px;padding:10px 13px;margin-bottom:7px;cursor:pointer;transition:border-color .12s,background .12s}
+.opt:hover:not(:disabled){border-color:var(--ink-soft)}
+.opt:disabled{cursor:default}
+.opt .letter{font-family:var(--mono);font-size:12px;color:var(--ink-soft);margin-right:9px;font-weight:600}
+.opt.good{border-color:var(--det);background:#E6F1F2;box-shadow:inset 3px 0 0 var(--det)}
+.opt.good .letter{color:var(--det)}
+.opt.bad{border-color:var(--anti);background:#FBF0F3;box-shadow:inset 3px 0 0 var(--anti)}
+.opt.bad .letter{color:var(--anti)}
+.hintbtn{font-family:var(--mono);font-size:11.5px;color:var(--ink-soft);background:none;border:none;padding:3px 0;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.hintbtn:hover{color:var(--ink)}
+.hinttext{font-size:.9rem;color:var(--ink-soft);font-style:italic;margin:2px 0 10px;display:none}
+.hinttext.show{display:block}
+.why{font-size:.93rem;margin-top:10px;padding:12px 14px;border-radius:5px;background:#F0F3F6;border:1px solid var(--line);display:none}
+.why.show{display:block}
+.why b{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.08em}
+.why.ok b{color:var(--det)}
+.why.no b{color:var(--anti)}
+.result{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--det);border-radius:0 8px 8px 0;padding:24px;margin:30px 0 10px;display:none}
+.result.show{display:block}
+.result h2{font-family:var(--display);font-weight:700;font-size:1.35rem;margin:0 0 .35em}
+.big{font-family:var(--mono);font-size:2.2rem;font-weight:600;color:var(--det);line-height:1}
+.verdict{margin:.7em 0 1.2em;color:var(--ink-soft)}
+table{width:100%;border-collapse:collapse;font-size:.92rem;margin-top:6px}
+th,td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--line)}
+th{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);font-weight:600}
+td.sc{font-family:var(--mono);white-space:nowrap}
+td.sc.weak{color:var(--anti);font-weight:600}
+td.sc.strong{color:var(--det)}
+.reset{font-family:var(--mono);font-size:12.5px;background:var(--ink);color:var(--panel);border:none;border-radius:5px;padding:9px 16px;margin-top:18px;cursor:pointer}
+.reset:hover{background:var(--det)}
+footer{padding:26px 0 56px;font-size:.88rem;color:var(--ink-soft)}
+:focus-visible{outline:2px solid var(--det);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+@media (max-width:560px){body{font-size:16px}header{padding:34px 0 22px}}
+</style>
+</head>
+<body>
+
+<header><div class="wrap">
+  <span class="eyebrow">CCAR-F · Domain 4 · 20% del examen</span>
+  <h1>30 preguntas: prompt engineering y salida estructurada</h1>
+  <p class="lede">Cinco por task statement. La mitad se resuelven sabiendo en qué peldaño de la escalera estás: criterios, ejemplos, esquema o validación.</p>
+  <div class="dist"><span>4.1 · 5</span><span>4.2 · 5</span><span>4.3 · 5</span><span>4.4 · 5</span><span>4.5 · 5</span><span>4.6 · 5</span></div>
+</div></header>
+
+<div class="bar-wrap"><div class="wrap bar-inner">
+  <div class="track"><div class="fill" id="fill"></div></div>
+  <span class="counter" id="counter">Respondidas <b>0</b>/30 · Aciertos <b>0</b></span>
+</div></div>
+
+<main><div class="wrap" id="quiz"></div>
+<div class="wrap"><div class="result" id="result"></div></div></main>
+
+<footer><div class="wrap">Preguntas propias basadas en el temario del Domain 4 y en los objetivos del Exam Guide v1.0 (julio 2026). No reproducen las preguntas de muestra oficiales.</div></footer>
+
+<script>
+const SECTIONS=[
+ {ts:"4.1",title:"System prompts con criterios explícitos",qs:[
+  {stem:"Tu pipeline tiene un 40% de falsos positivos en «documentación desactualizada» y los desarrolladores ignoran ya todas las categorías, incluidas las de seguridad que aciertan. ¿Arreglo?",
+   hint:"¿La confianza es por categoría o del sistema entero?",
+   opts:["Desactivar temporalmente esa categoría mientras refinas su prompt con criterios explícitos y ejemplos de código","Añadir «reporta solo problemas de documentación de alta confianza»","Subir la temperatura y quedarte con lo que aparezca en varias pasadas","Añadir una segunda pasada que descarte lo que no pueda verificar"],
+   ok:0,why:"La confianza se contagia entre categorías. Recuperar la del sistema va por delante de la exhaustividad. Y «solo alta confianza» es el distractor clásico del dominio."},
+  {stem:"Defines severidades como «Crítico: problemas que podrían causar fallos del sistema». La clasificación sale inconsistente. ¿Qué haces?",
+   opts:["Precisar más la prosa, definiendo qué cuenta como fallo del sistema","Sustituir las descripciones en prosa por ejemplos de código concretos para cada nivel","Pedir al modelo que reporte su confianza junto a cada severidad","Reducir a dos niveles de severidad"],
+   ok:1,why:"La prosa obliga al modelo a interpretar. Un ejemplo con código real en cada nivel elimina la ambigüedad y da clasificación estable entre invocaciones."},
+  {stem:"¿Por qué falla «reporta solo hallazgos de alta confianza» como mejora de precisión?",
+   opts:["Porque reduce demasiado el número de hallazgos","Porque la confianza autorreportada de un LLM está mal calibrada: suele estar seguro de lo incorrecto y dudar de lo correcto","Porque consume tokens adicionales en cada respuesta","Porque los modelos no pueden autoevaluar confianza"],
+   ok:1,why:"Los scores de confianza sirven para enrutar tras calibrarlos, no para definir qué cuenta como hallazgo válido. Criterios explícitos primero, enrutado por confianza después."},
+  {stem:"¿Cuál de estos es un criterio explícito bien formulado?",
+   opts:["«Sé conservador al revisar»","«Marca comentarios solo cuando el comportamiento descrito contradiga el comportamiento real del código»","«Usa tu buen criterio para decidir qué es importante»","«Reporta lo que un revisor senior reportaría»"],
+   ok:1,why:"Da un disparador concreto y verificable. Las otras tres suenan razonables, y por eso el examen las usa como distractores: ninguna da una frontera de decisión accionable."},
+  {stem:"Estás definiendo qué debe reportar tu revisor automático. ¿Qué estructura sigue un prompt con criterios explícitos?",
+   opts:["Una lista de todo lo que podría ser un problema","Qué reportar (bugs, seguridad), qué saltar (estilo menor, patrones locales) y disparadores específicos por categoría","Una descripción del perfil de revisor que debe emular","Un umbral numérico de severidad mínima"],
+   ok:1,why:"Categorías concretas en las dos direcciones. Decir qué saltar es tan importante como decir qué marcar: es lo que recorta los falsos positivos."}
+ ]},
+
+ {ts:"4.2",title:"Few-shot prompting",qs:[
+  {stem:"Tu extracción funciona en tablas pero devuelve vacío cuando la información está en párrafos narrativos. Las instrucciones ya detallan campos y formatos. ¿Qué pruebas primero?",
+   opts:["Un preprocesado que convierta la narrativa en tablas","Ampliar la ventana de contexto","Ejemplos few-shot mostrando extracción correcta desde tablas y desde narrativa","Un reintento que reextraiga los campos vacíos"],
+   ok:2,why:"Tercer disparador del few-shot: campos vacíos para información que existe pero en formato inesperado. Las instrucciones ya están; más prosa no ayuda."},
+  {stem:"¿Cuántos ejemplos few-shot y con qué contenido?",
+   hint:"Hay un número y hay un ingrediente obligatorio.",
+   opts:["Cuantos más mejor, para cubrir todos los casos posibles","2-4 dirigidos, cada uno mostrando el razonamiento de por qué se eligió esa acción frente a alternativas plausibles","Uno por cada campo del esquema","5-8, alternando casos correctos e incorrectos"],
+   ok:1,why:"Menos de 2 no establece patrón; más de 4 gasta tokens sin beneficio proporcional. Y sin razonamiento el modelo solo aprende pattern-matching literal, no el principio que generaliza."},
+  {stem:"El modelo marca el shadowing de variables como «crítico» en un fichero y «menor» en otro. ¿Técnica?",
+   opts:["Un umbral de confianza que descarte las clasificaciones dudosas","Ejemplos few-shot que clasifiquen escenarios de shadowing con su razonamiento","Bajar la temperatura a 0","Eliminar la categoría de shadowing"],
+   ok:1,why:"Segundo disparador: juicios inconsistentes en casos ambiguos. Los umbrales de confianza no atacan la causa; los ejemplos con razonamiento enseñan el criterio directamente."},
+  {stem:"Tu salida es JSON pero a veces sale malformado, con comas colgando. ¿Few-shot?",
+   opts:["Sí: ejemplos de JSON bien formado enseñan el formato","No: para JSON malformado la respuesta es tool_use con JSON schema","Sí, combinado con temperatura 0","No: hay que reducir el tamaño del esquema"],
+   ok:1,why:"Cada problema tiene su técnica. Few-shot arregla consistencia y variedad estructural; el JSON malformado se elimina de raíz con tool_use, no con ejemplos."},
+  {stem:"¿Qué efecto colateral tienen los ejemplos few-shot en tareas de extracción?",
+   opts:["Aceleran la inferencia","Reducen la alucinación: al ver extracción correcta desde estructuras variadas, el modelo maneja la variedad sin inventarse datos","Reducen el coste por token","Permiten prescindir del esquema JSON"],
+   ok:1,why:"Importa sobre todo en documentos con formato inconsistente, donde el modelo clava la tabla y devuelve vacío o fabrica valores en la parte narrativa."}
+ ]},
+
+ {ts:"4.3",title:"Salida estructurada con tool use",qs:[
+  {stem:"Tu esquema tiene todos los campos obligatorios y el modelo se inventa fechas e importes plausibles cuando el documento no los tiene. ¿Mejor arreglo?",
+   opts:["Hacer opcionales o nullable los campos que la fuente puede no contener","Cambiar a extracción por prompt","Añadir una instrucción diciendo que no debe alucinar","Validación posterior que compare cada valor contra el documento"],
+   ok:0,why:"Un campo obligatorio presiona al modelo a producir algo. Nullable le permite devolver null honestamente. Es la defensa estructural, y va antes que instrucciones o validación."},
+  {stem:"Documentos de tipo desconocido, tres esquemas posibles. ¿Qué tool_choice garantiza salida estructurada?",
+   opts:["\"auto\"","\"any\": obliga a llamar a una tool y le deja elegir el esquema","Forzar el esquema de factura","\"auto\" con instrucciones que prohíban responder en texto"],
+   ok:1,why:"Con \"auto\" el modelo puede devolver texto conversacional. \"any\" garantiza la llamada dejándole elegir, que es lo que necesitas si no sabes el tipo de documento."},
+  {stem:"Usas tool_use con esquema estricto. ¿Qué tipo de error sigue siendo posible?",
+   opts:["JSON malformado con comas colgando","Claves sin comillas","Líneas que no suman el total declarado y valores en el campo equivocado","Campos obligatorios ausentes de la salida"],
+   ok:2,why:"El esquema elimina sintaxis y presencia de campos. Lo semántico —que los valores sean correctos y estén donde toca— queda fuera y necesita validación aparte."},
+  {stem:"Tu enum de categorías no cubre todos los documentos que llegan, y el modelo fuerza clasificaciones incorrectas. ¿Qué añades al esquema?",
+   opts:["Más valores al enum hasta cubrir todos los casos conocidos","Un valor «other» con un campo de detalle libre, y un valor «unclear» para lo genuinamente ambiguo","Un campo de confianza por clasificación","Quitar el enum y dejar el campo como string libre"],
+   ok:1,why:"Dos patrones distintos: «other» + detalle para categorización extensible, «unclear» para cuando la evidencia no basta. Ninguno de los dos obliga al modelo a forzar una respuesta."},
+  {stem:"Quieres que extract_metadata se ejecute obligatoriamente antes que las tools de enriquecimiento. ¿Cómo?",
+   opts:["tool_choice \"any\" en la primera llamada","tool_choice forzado a esa tool en la primera llamada, y \"auto\" en los turnos siguientes","Ponerla primera en el array de tools","Describirlo en el system prompt"],
+   ok:1,why:"La selección forzada es el mecanismo para imponer un primer paso: el modelo no puede saltárselo ni reordenarlo. \"any\" solo garantiza que llame a alguna tool."}
+ ]},
+
+ {ts:"4.4",title:"Validación, reintentos y feedback",qs:[
+  {stem:"Documento A: las líneas suman 450 € y el total declarado es 500 €. Documento B: el campo «departamento» no aparece en el texto. ¿Estrategia?",
+   hint:"¿El dato está en el documento o no está?",
+   opts:["Reintentar los dos con sus errores de validación","Mandar los dos a revisión humana","Reintentar A con el error de discrepancia; marcar B para revisión humana","Reintentar los dos con el mismo prompt, porque la extracción no es determinista"],
+   ok:2,why:"La frontera de efectividad. A es error de captura y el reintento con error específico lo arregla. Ningún reintento crea información ausente de la fuente."},
+  {stem:"¿Qué tres cosas incluye un reintento con feedback de error?",
+   opts:["El documento, el esquema y el número de intento","El documento original, la extracción fallida y el error de validación específico","El error, el esquema y un ejemplo correcto","La extracción fallida y una instrucción de reintentar con más cuidado"],
+   ok:1,why:"Sin el error específico, el modelo no tiene guía y suele reproducir el mismo fallo. Es lo que separa un reintento útil de uno ingenuo."},
+  {stem:"Quieres detectar automáticamente que una factura no cuadra, sin lógica de validación externa. ¿Qué diseñas?",
+   opts:["Un campo de confianza por línea","Extraer calculated_total (suma de líneas) y stated_total (total del documento) por separado, con un booleano de discrepancia","Un campo libre donde el modelo comente si algo le chirría","Marcar todos los campos numéricos como obligatorios"],
+   ok:1,why:"Autocorrección construida en el esquema: si los dos valores difieren tienes el flag automáticamente. En la misma línea van los booleanos conflict_detected para fuentes contradictorias."},
+  {stem:"Los desarrolladores descartan sistemáticamente ciertos hallazgos pero no sabes cuáles ni por qué. ¿Qué añades?",
+   opts:["Un campo detected_pattern que registre qué construcción de código disparó cada hallazgo","Un contador de descartes por desarrollador","Cinco niveles de severidad en vez de tres","Un enlace a la documentación de cada regla"],
+   ok:0,why:"Analizar los descartes por patrón te dice qué prompt refinar. Convierte los descartes en datos accionables en vez de en ruido."},
+  {stem:"Ya usas tool_use con JSON schema. ¿Para qué sigue haciendo falta Pydantic?",
+   opts:["Para nada: el esquema ya valida todo","Para las reglas que un JSON schema no puede expresar —aritmética entre campos, ordenación de fechas— y para producir los errores por campo que alimentan el reintento","Para convertir el JSON a objetos de Python, sin más","Para reducir el tamaño del esquema enviado a la API"],
+   ok:1,why:"Parseo y validadores hacen dos trabajos: estructura y semántica. Y el ValidationError da el error específico ya formateado para meterlo en el prompt de reintento."}
+ ]},
+
+ {ts:"4.5",title:"Procesamiento por lotes",qs:[
+  {stem:"Un manager propone pasar a Batch API el check pre-merge bloqueante y el informe nocturno de deuda técnica, por el 50% de ahorro. ¿Cómo lo evalúas?",
+   opts:["Batch solo para el informe nocturno; síncrono para el pre-merge","Batch para los dos, con polling","Síncrono para los dos, para evitar problemas de orden","Batch para los dos con fallback a síncrono si tardan"],
+   ok:0,why:"Hasta 24 horas sin SLA: inservible para un flujo donde la gente espera para mergear. El fallback añade complejidad cuando basta con emparejar cada API con su caso."},
+  {stem:"Un lote de 500 documentos falla en 80. ¿Cómo lo gestionas?",
+   opts:["Reenviar el lote completo por si fue transitorio","Identificar los fallidos por custom_id y reenviar solo esos con modificaciones dirigidas, como trocear los que excedieron el contexto","Procesar los 80 uno a uno con la API síncrona","Bajar max_tokens en todo el lote y reenviarlo"],
+   ok:1,why:"custom_id es el mecanismo de correlación exacto para esto. Reenviar el lote entero paga otra vez por los 420 que sí funcionaron."},
+  {stem:"Tu organización exige un SLA de 30 horas para un informe procesado por lotes. ¿Cada cuánto envías?",
+   opts:["Una vez al día, 30 horas antes del deadline","Cada 4-6 horas dentro de las 6 horas de margen que quedan tras restar las 24 de procesamiento máximo","Cada hora, para maximizar las probabilidades","Cuando se acumulen suficientes documentos"],
+   ok:1,why:"30 menos 24 deja 6 horas de margen para recoger peticiones, validar entradas o absorber retrasos. Enviar cada 4-6 horas mantiene siempre un lote en vuelo."},
+  {stem:"Tu flujo por lotes necesita que el modelo llame a tools externas a mitad del procesamiento y use sus resultados. ¿Qué haces?",
+   opts:["Usar la Batch API con las tools definidas en cada petición","Usar la API síncrona: el batch no soporta tool calling multi-turno dentro de una petición","Dividir el flujo en dos lotes consecutivos","Usar la Batch API con max_turns elevado"],
+   ok:1,why:"Limitación dura del batch, y punto de examen directo: no puedes ejecutar tools a mitad y continuar. Si el flujo lo necesita, va en síncrono."},
+  {stem:"Vas a procesar 1.000 documentos por lotes. ¿Qué haces antes de enviar?",
+   opts:["Enviar los 1.000 y ver qué falla","Refinar los prompts contra una muestra de 5-10 documentos representativos que cubra el rango de formatos y casos límite","Dividir en diez lotes de 100 y enviarlos escalonados","Subir max_tokens al máximo para evitar truncados"],
+   ok:1,why:"Un 90% de acierto a la primera son 100 reintentos; un 60% son 400, cuatro veces el coste de reenvío más el procesamiento. La muestra previa es la palanca de coste más grande."}
+ ]},
+
+ {ts:"4.6",title:"Revisión multi-instancia y multi-pasada",qs:[
+  {stem:"Tu pipeline genera código y le pide revisarlo en la misma sesión. Los humanos encuentran cosas que se le escaparon. ¿Qué cambias?",
+   opts:["Añadir «revisa con especial cuidado y cuestiona tus decisiones» al prompt","Usar una instancia independiente, sin el contexto de razonamiento de la generación","Activar extended thinking en la fase de revisión","Aumentar max_tokens para una revisión más exhaustiva"],
+   ok:1,why:"La misma sesión conserva el «elegí esto porque…» y tiende a confirmar. El examen descarta explícitamente tanto las instrucciones de revisar con cuidado como el extended thinking dentro de la sesión generadora."},
+  {stem:"Una PR de 14 ficheros recibe revisión inconsistente: detallada en unos, superficial en otros, y el mismo patrón marcado en uno y aprobado en otro. ¿Cómo la reestructuras?",
+   opts:["Modelo con ventana de contexto mucho mayor","Análisis local por fichero, más una pasada separada de integración cross-fichero","Tres pasadas independientes, marcando solo lo que coincida en dos","Exigir PR de 3-4 ficheros"],
+   ok:1,why:"Dilución de atención: problema de calidad de atención, no de capacidad. El consenso de tres pasadas suprimiría bugs reales que solo se detectan de forma intermitente."},
+  {stem:"¿Por qué un modelo con más ventana de contexto no arregla la dilución de atención?",
+   hint:"Distingue capacidad de reparto.",
+   opts:["Porque los modelos grandes son más lentos","Porque el problema no es el tamaño sino la calidad de la atención: más espacio no evita que se reparta de forma desigual entre ficheros","Porque el coste por token sube demasiado","Porque las ventanas grandes truncan por el medio"],
+   ok:1,why:"Es un distractor que el temario nombra explícitamente. Solo las pasadas enfocadas por fichero garantizan profundidad consistente."},
+  {stem:"¿Qué busca específicamente la pasada de integración cross-fichero?",
+   opts:["Los bugs que la pasada por fichero no tuvo tiempo de mirar","Flujo de datos entre módulos, uso consistente de API, conflictos de dependencias y contradicciones entre los hallazgos por fichero","Errores de estilo que cruzan el proyecto","Duplicación de código entre ficheros"],
+   ok:1,why:"Es lo que ninguna revisión de un solo fichero puede ver, incluida la coherencia entre los propios hallazgos de la pasada anterior."},
+  {stem:"Quieres usar los scores de confianza del modelo para enrutar hallazgos a revisión humana. ¿Qué haces antes?",
+   opts:["Fijar el umbral en 0.9, un valor conservador estándar","Calibrarlos contra un conjunto etiquetado, midiendo cómo la confianza reportada se corresponde con la precisión real","Pedir al modelo que sea más estricto al autoevaluarse","Nada: los scores son directamente interpretables"],
+   ok:1,why:"Los scores crudos no están calibrados: 0.90 puede significar 94% de acierto en un tipo de campo y 82% en otro. Usar confianza sin calibrar para decisiones automáticas es un antipatrón."}
+ ]}
+];
+
+const LETTERS=['A','B','C','D'];
+const root=document.getElementById('quiz');
+const fill=document.getElementById('fill');
+const counter=document.getElementById('counter');
+const result=document.getElementById('result');
+const TOTAL=SECTIONS.reduce((n,s)=>n+s.qs.length,0);
+const stats={};
+SECTIONS.forEach(s=>stats[s.ts]={right:0,total:s.qs.length,title:s.title});
+let answered=0,right=0,n=0;
+
+SECTIONS.forEach(sec=>{
+  const h=document.createElement('div'); h.className='sec';
+  h.innerHTML='<span>'+sec.ts+' · '+sec.title+'</span><span class="cnt">'+sec.qs.length+' preguntas</span>';
+  root.appendChild(h);
+  sec.qs.forEach(q=>{
+    n++; const idx=n;
+    const card=document.createElement('div'); card.className='q';
+    const num=document.createElement('span'); num.className='num'; num.textContent='PREGUNTA '+idx+' / '+TOTAL;
+    const stem=document.createElement('p'); stem.className='stem'; stem.textContent=q.stem;
+    card.append(num,stem);
+    if(q.hint){
+      const hb=document.createElement('button'); hb.className='hintbtn'; hb.type='button'; hb.textContent='Ver pista';
+      const ht=document.createElement('p'); ht.className='hinttext'; ht.textContent=q.hint;
+      hb.addEventListener('click',()=>{ht.classList.add('show');hb.remove();});
+      card.append(hb,ht);
+    }
+    const why=document.createElement('div'); why.className='why';
+    q.opts.forEach((o,j)=>{
+      const b=document.createElement('button'); b.className='opt'; b.type='button';
+      b.innerHTML='<span class="letter">'+LETTERS[j]+'</span>';
+      b.appendChild(document.createTextNode(o));
+      b.addEventListener('click',()=>{
+        card.querySelectorAll('.opt').forEach(x=>x.disabled=true);
+        card.querySelectorAll('.opt')[q.ok].classList.add('good');
+        const hit=j===q.ok;
+        if(!hit) b.classList.add('bad'); else {right++;stats[sec.ts].right++;}
+        why.className='why show '+(hit?'ok':'no');
+        why.innerHTML='<b>'+(hit?'Correcto.':'No es esa.')+'</b> '+q.why;
+        answered++; update();
+      });
+      card.appendChild(b);
+    });
+    card.appendChild(why); root.appendChild(card);
+  });
+});
+
+function update(){
+  fill.style.width=(answered/TOTAL*100)+'%';
+  counter.innerHTML='Respondidas <b>'+answered+'</b>/'+TOTAL+' · Aciertos <b>'+right+'</b>';
+  if(answered===TOTAL) finish();
+}
+function finish(){
+  const pct=Math.round(right/TOTAL*100);
+  let verdict;
+  if(pct>=90) verdict='Domain 4 controlado. Puedes pasar al siguiente.';
+  else if(pct>=75) verdict='Buen nivel. Repasa las task statements flojas y repite dentro de unos días.';
+  else if(pct>=60) verdict='Justo. Este dominio pesa un 20%: merece otra vuelta a la guía.';
+  else verdict='Toca releer la guía entera antes de repetir el test.';
+  let rows='';
+  Object.keys(stats).forEach(ts=>{
+    const s=stats[ts]; const p=Math.round(s.right/s.total*100);
+    const cls=p<75?'weak':(p===100?'strong':'');
+    rows+='<tr><td>'+ts+' · '+s.title+'</td><td class="sc '+cls+'">'+s.right+'/'+s.total+' · '+p+'%</td></tr>';
+  });
+  result.innerHTML='<h2>Resultado</h2><span class="big">'+right+'/'+TOTAL+' · '+pct+'%</span><p class="verdict">'+verdict+'</p><table><tr><th>Task statement</th><th>Aciertos</th></tr>'+rows+'</table><button class="reset" type="button" onclick="location.reload()">Volver a empezar</button>';
+  result.classList.add('show');
+  result.scrollIntoView({behavior:'smooth',block:'center'});
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Domain 4 · Prompt Engineering &amp; Structured Output — CCAR-F</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#E7ECF1; --panel:#FAFBFC; --ink:#0F1A26; --ink-soft:#4A5A6B;
+  --line:#C9D3DC; --det:#0C6D78; --anti:#A62347; --now:#9C6600;
+  --display:'Space Grotesk',system-ui,sans-serif;
+  --body:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:70px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16.5px;line-height:1.62;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:0 22px}
+nav{position:sticky;top:0;z-index:20;background:rgba(231,236,241,.93);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;gap:2px;overflow-x:auto;padding-top:9px;padding-bottom:9px;scrollbar-width:none}
+nav .wrap::-webkit-scrollbar{display:none}
+nav a{font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);text-decoration:none;padding:4px 9px;border-radius:4px;white-space:nowrap}
+nav a:hover,nav a:focus-visible{background:var(--ink);color:var(--panel)}
+header{padding:56px 0 40px;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:var(--mono);font-size:12.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--det)}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(2.1rem,6vw,3.1rem);line-height:1.06;letter-spacing:-.025em;margin:.28em 0 .3em}
+.lede{font-size:1.09rem;color:var(--ink-soft);max-width:60ch;margin:0}
+.hero-meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.pill{font-family:var(--mono);font-size:12px;border:1px solid var(--line);background:var(--panel);padding:5px 10px;border-radius:100px}
+.pill b{color:var(--det);font-weight:600}
+figure{margin:34px 0 0;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:20px 18px 14px}
+figure svg{width:100%;height:auto;display:block}
+figcaption{font-family:var(--mono);font-size:12px;color:var(--ink-soft);margin-top:12px;text-align:center}
+section{padding:46px 0;border-bottom:1px solid var(--line)}
+.tag{font-family:var(--mono);font-size:12.5px;color:var(--det);letter-spacing:.06em}
+h2{font-family:var(--display);font-weight:700;font-size:1.62rem;letter-spacing:-.018em;margin:.18em 0 .55em;line-height:1.18}
+h3{font-family:var(--display);font-weight:500;font-size:1.06rem;margin:1.9em 0 .5em;letter-spacing:-.01em}
+p{margin:0 0 1em}
+ul,ol{margin:0 0 1em;padding-left:1.15em}
+li{margin-bottom:.42em}
+strong{font-weight:600}
+.k{font-family:var(--mono);font-size:.88em;background:#DCE7E9;color:#08525A;padding:1px 5px;border-radius:3px;font-weight:600;white-space:nowrap}
+.key{border-left:3px solid var(--det);background:var(--panel);padding:14px 16px;margin:20px 0;border-radius:0 6px 6px 0}
+.key .lbl{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--det);display:block;margin-bottom:5px}
+.key p:last-child{margin-bottom:0}
+.trap{border-left:3px solid var(--anti);background:#FBF3F5;padding:14px 16px;margin:20px 0;border-radius:0 6px 6px 0}
+.trap .lbl{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--anti);display:block;margin-bottom:5px}
+.trap ul{margin-bottom:0}
+.trap p:last-child{margin-bottom:0}
+.now{border-left:3px solid var(--now);background:#FBF6EC;padding:14px 16px;margin:20px 0;border-radius:0 6px 6px 0}
+.now .lbl{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--now);display:block;margin-bottom:5px}
+.now p:last-child{margin-bottom:0}
+.case{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:15px 17px;margin:20px 0}
+.case .lbl{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-soft);display:block;margin-bottom:6px}
+.case p:last-child,.case ul:last-child,.case ol:last-child{margin-bottom:0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:.93rem;background:var(--panel)}
+th,td{text-align:left;padding:9px 11px;border:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);font-weight:600;background:#F0F3F6}
+td code,li code,p code{font-family:var(--mono);font-size:.87em;background:#E3E9EE;padding:1px 4px;border-radius:3px}
+pre{background:#F0F3F6;border:1px solid var(--line);border-radius:6px;padding:13px 15px;overflow-x:auto;font-family:var(--mono);font-size:.83rem;line-height:1.5;margin:16px 0}
+.quiz{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:22px 20px;margin:26px 0}
+.q{padding:16px 0;border-top:1px solid var(--line)}
+.q:first-of-type{border-top:none;padding-top:6px}
+.q .num{font-family:var(--mono);font-size:11.5px;color:var(--det);letter-spacing:.08em}
+.q .stem{margin:5px 0 11px;font-weight:600;line-height:1.45}
+.opt{display:block;width:100%;text-align:left;font:inherit;font-size:.95rem;line-height:1.45;background:#fff;border:1px solid var(--line);border-radius:5px;padding:9px 12px;margin-bottom:7px;cursor:pointer;transition:border-color .12s,background .12s}
+.opt:hover:not(:disabled){border-color:var(--ink-soft)}
+.opt:disabled{cursor:default}
+.opt.good{border-color:var(--det);background:#E6F1F2;box-shadow:inset 3px 0 0 var(--det)}
+.opt.bad{border-color:var(--anti);background:#FBF0F3;box-shadow:inset 3px 0 0 var(--anti)}
+.why{font-size:.92rem;margin-top:9px;padding:11px 13px;border-radius:5px;background:#F0F3F6;border:1px solid var(--line);display:none}
+.why.show{display:block}
+.why b{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.08em}
+.why.ok b{color:var(--det)}
+.why.no b{color:var(--anti)}
+.score{font-family:var(--mono);font-size:13px;margin-top:18px;padding-top:14px;border-top:1px solid var(--line);color:var(--ink-soft)}
+.score b{color:var(--ink);font-size:15px}
+footer{padding:40px 0 60px;font-size:.9rem;color:var(--ink-soft)}
+footer a{color:var(--det)}
+:focus-visible{outline:2px solid var(--det);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+@media (max-width:560px){body{font-size:16px}header{padding:36px 0 30px}section{padding:36px 0}}
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <a href="#top">Domain 4</a>
+  <a href="#s41">4.1 Criterios</a>
+  <a href="#s42">4.2 Few-shot</a>
+  <a href="#s43">4.3 Schemas</a>
+  <a href="#check">Check</a>
+  <a href="#s44">4.4 Validación</a>
+  <a href="#s45">4.5 Batch</a>
+  <a href="#s46">4.6 Multi-pasada</a>
+  <a href="#chuleta">Chuleta</a>
+  <a href="#final">Examen</a>
+</div></nav>
+
+<header id="top"><div class="wrap">
+  <span class="eyebrow">Claude Certified Architect · Foundations · CCAR-F</span>
+  <h1>Domain 4<br>Prompt engineering y salida estructurada</h1>
+  <p class="lede">Todo el dominio se ordena en una escalera: criterios explícitos, luego ejemplos, luego esquema, luego validación. Cada peldaño resuelve algo que el anterior no puede, y el examen te pregunta en cuál estás.</p>
+  <div class="hero-meta">
+    <span class="pill"><b>20%</b> del examen</span>
+    <span class="pill">6 task statements</span>
+    <span class="pill">~12 de 60 preguntas</span>
+    <span class="pill">Escenarios 5 y 6</span>
+  </div>
+
+  <figure>
+    <svg viewBox="0 0 700 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Escalera de técnicas: criterios explícitos, few-shot, tool_use con esquema, y validación semántica; cada peldaño resuelve un problema distinto">
+      <g font-family="IBM Plex Mono, monospace" font-size="12">
+        <rect x="18" y="176" width="150" height="52" rx="5" fill="#fff" stroke="#0C6D78" stroke-width="1.5"/>
+        <text x="93" y="198" text-anchor="middle" fill="#08525A" font-weight="600">criterios</text>
+        <text x="93" y="214" text-anchor="middle" fill="#08525A" font-weight="600">explícitos</text>
+        <text x="93" y="244" text-anchor="middle" fill="#4A5A6B" font-size="10.5">qué marcar y qué saltar</text>
+
+        <rect x="192" y="122" width="150" height="52" rx="5" fill="#fff" stroke="#0C6D78" stroke-width="1.5"/>
+        <text x="267" y="144" text-anchor="middle" fill="#08525A" font-weight="600">few-shot</text>
+        <text x="267" y="160" text-anchor="middle" fill="#08525A" font-weight="600">con razonamiento</text>
+        <text x="267" y="190" text-anchor="middle" fill="#4A5A6B" font-size="10.5">consistencia y casos ambiguos</text>
+
+        <rect x="366" y="68" width="150" height="52" rx="5" fill="#fff" stroke="#0C6D78" stroke-width="1.5"/>
+        <text x="441" y="90" text-anchor="middle" fill="#08525A" font-weight="600">tool_use</text>
+        <text x="441" y="106" text-anchor="middle" fill="#08525A" font-weight="600">+ JSON schema</text>
+        <text x="441" y="136" text-anchor="middle" fill="#4A5A6B" font-size="10.5">elimina errores de sintaxis</text>
+
+        <rect x="540" y="14" width="150" height="52" rx="5" fill="#fff" stroke="#A62347" stroke-width="1.5"/>
+        <text x="615" y="36" text-anchor="middle" fill="#A62347" font-weight="600">validación</text>
+        <text x="615" y="52" text-anchor="middle" fill="#A62347" font-weight="600">semántica</text>
+        <text x="615" y="82" text-anchor="middle" fill="#A62347" font-size="10.5">lo que el esquema NO ve</text>
+
+        <path d="M170 190 L190 168" stroke="#C9D3DC" stroke-width="2"/>
+        <path d="M344 136 L364 114" stroke="#C9D3DC" stroke-width="2"/>
+        <path d="M518 82 L538 60" stroke="#C9D3DC" stroke-width="2"/>
+      </g>
+    </svg>
+    <figcaption>El esquema garantiza la forma. No garantiza que los números cuadren.</figcaption>
+  </figure>
+</div></header>
+
+<!-- ============ 4.1 ============ -->
+<section id="s41"><div class="wrap">
+  <span class="tag">Task Statement 4.1</span>
+  <h2>System prompts con criterios explícitos</h2>
+
+  <p>El error más grande en prompt engineering de producción es apoyarse en instrucciones vagas. «Sé conservador.» «Reporta solo hallazgos de alta confianza.» «Usa tu buen criterio.» Ninguna le da al modelo una frontera de decisión accionable. Suenan razonables, y por eso el examen las usa como distractores.</p>
+
+  <pre>MAL
+Revisa este código. Sé conservador. Reporta solo hallazgos
+de alta confianza.
+
+BIEN
+Marca comentarios solo cuando el comportamiento que describen
+contradiga el comportamiento real del código.
+Reporta bugs y vulnerabilidades de seguridad.
+Salta preferencias de estilo menores y patrones locales.</pre>
+
+  <p>El primero no da criterios que aplicar: «conservador» significa cosas distintas en contextos distintos y «alta confianza» es un umbral subjetivo que el modelo no puede calibrar. El segundo da categorías concretas: qué reportar, qué saltar y un disparador específico para los comentarios.</p>
+
+  <h3>El problema de la confianza contagiada</h3>
+  <div class="case">
+    <span class="lbl">Caso de uso · el 40% que se lleva por delante al 98%</span>
+    <p>Tus hallazgos de «documentación desactualizada» son incorrectos el 40% de las veces. Consecuencia: los desarrolladores dejan de leer también tus hallazgos de «vulnerabilidad de seguridad», que aciertan el 98%. <strong>La confianza no es por categoría: se contagia a toda la salida.</strong></p>
+    <p><strong>El arreglo se siente al revés:</strong> desactiva temporalmente la categoría con muchos falsos positivos mientras reescribes su prompt. La confianza en las categorías que ya funcionan vuelve de inmediato. Luego iteras sobre la rota con ejemplos de código concretos y la vuelves a encender solo cuando mejora la precisión.</p>
+    <p>No estás abandonando la categoría. Estás poniendo la confianza en el sistema por delante de la exhaustividad.</p>
+  </div>
+
+  <h3>Calibrar severidad con ejemplos de código</h3>
+  <p>Definir niveles de severidad exige <strong>ejemplos de código concretos</strong>, no descripciones en prosa.</p>
+  <pre>PROSA (insuficiente)
+Crítico: problemas que podrían causar fallos del sistema
+         o pérdida de datos
+Menor:   problemas que afectan a la legibilidad
+
+EJEMPLOS (correcto)
+Crítico — input de usuario sin sanear en una query SQL:
+  query = f"SELECT * FROM users WHERE id = {user_input}"
+
+Menor — nomenclatura inconsistente:
+  userName vs user_name en el mismo módulo</pre>
+  <p>La prosa obliga al modelo a interpretar qué significa «podría causar fallos del sistema». El ejemplo de código elimina la ambigüedad del todo, y produce clasificación consistente entre invocaciones.</p>
+
+  <div class="key">
+    <span class="lbl">La jerarquía que hay que memorizar</span>
+    <p><strong>Criterios explícitos primero, enrutado por confianza después.</strong> Nunca te saltes el primer paso. Los scores de confianza sirven para enrutar (mandar lo incierto a revisión humana, como en el 4.6), pero no sustituyen a los criterios que definen qué cuenta como hallazgo válido.</p>
+  </div>
+
+  <div class="trap">
+    <span class="lbl">Por qué falla el filtrado por confianza</span>
+    <p>«Reporta solo hallazgos de alta confianza» suena a buena ingeniería: filtras por confianza y te quedas con la señal fuerte. Pero la confianza autorreportada de un LLM está mal calibrada: suele estar seguro de hallazgos incorrectos y dudar de los correctos. El examen presenta esta opción constantemente como tentación.</p>
+  </div>
+</div></section>
+
+<!-- ============ 4.2 ============ -->
+<section id="s42"><div class="wrap">
+  <span class="tag">Task Statement 4.2</span>
+  <h2>Few-shot prompting</h2>
+
+  <p>Los ejemplos few-shot son la técnica más efectiva para conseguir salida consistente y bien formateada. No más instrucciones. No umbrales de confianza. No ajustar temperatura. Cuando la salida es inconsistente, los ejemplos son la primera herramienta.</p>
+  <p>Es un principio directo del examen: te presentará escenarios donde instrucciones detalladas producen resultados inconsistentes y comprobará si eliges «añadir más instrucciones» o «añadir ejemplos». Casi siempre es lo segundo.</p>
+
+  <h3>Los tres disparadores</h3>
+  <ol>
+    <li><strong>Las instrucciones detalladas ya existen y el formato sigue siendo inconsistente.</strong> A veces lista, a veces tabla, a veces prosa. Más instrucciones no lo arreglan.</li>
+    <li><strong>El modelo juzga de forma inconsistente los casos ambiguos.</strong> Marca el shadowing de variables como «crítico» en un fichero y «menor» en otro.</li>
+    <li><strong>La extracción devuelve campos vacíos para información que sí está en el documento.</strong> Está presente pero en formato inesperado: dentro de un párrafo narrativo en vez de una tabla, o repartida en varios párrafos.</li>
+  </ol>
+
+  <div class="key">
+    <span class="lbl">Cómo se construyen — las reglas son estrictas</span>
+    <p><strong>2-4 ejemplos dirigidos.</strong> Menos de 2 no establece patrón; más de 4 gasta tokens sin beneficio proporcional. Apúntalos a los escenarios ambiguos concretos que te están dando problemas.</p>
+    <p><strong>Cada ejemplo debe mostrar el razonamiento.</strong> No solo pares entrada-salida: por qué se eligió una acción frente a alternativas plausibles. Eso es lo que enseña al modelo a generalizar a patrones nuevos, en vez de memorizar los casos del ejemplo.</p>
+  </div>
+
+  <pre>Ejemplo: selección de tool para "consulta mi pedido #12345"
+Input: "consulta mi pedido #12345"
+Tool elegida: lookup_order
+Razonamiento: el usuario aporta un número de pedido (#12345),
+lo que indica que quiere información específica de ese pedido.
+Aunque podría interpretarse como consulta general de cliente,
+el identificador concreto hace que lookup_order sea la elección
+correcta frente a get_customer.</pre>
+
+  <p>Sin el razonamiento, el modelo aprende solo «las consultas con número de pedido van a lookup_order». Con él, aprende el principio general: los identificadores específicos enrutan a búsquedas específicas.</p>
+
+  <h3>Efecto colateral: menos alucinación</h3>
+  <p>Cuando el modelo ve ejemplos de extracción correcta desde estructuras variadas —citas inline frente a bibliografías, descripciones narrativas frente a tablas—, aprende a manejar la variedad estructural sin inventarse datos. Un informe financiero puede listar gastos en una tabla en una página y enterrarlos en un párrafo en la siguiente: sin ejemplos, el modelo clava la tabla y devuelve vacío la parte narrativa, o peor, fabrica valores.</p>
+
+  <h3>Few-shot para reducir falsos positivos</h3>
+  <p>En revisión de código los ejemplos hacen doble trabajo: muestran qué marcar <em>y</em> qué ignorar. Un ejemplo que clasifica el shadowing dentro de una arrow function como «menor», con el razonamiento de que el ámbito es limitado y no causa bug, enseña al modelo a distinguir bugs reales de patrones benignos sin perder la capacidad de generalizar a casos de shadowing que sí son problemáticos.</p>
+
+  <h3>Cuándo NO son la respuesta</h3>
+  <table>
+    <tr><th>Problema</th><th>Técnica correcta</th></tr>
+    <tr><td>Formato de salida inconsistente</td><td>Few-shot</td></tr>
+    <tr><td>JSON malformado</td><td><code>tool_use</code> con JSON schema</td></tr>
+    <tr><td>Valores fabricados para campos que faltan</td><td>Campos opcionales/nullable en el esquema</td></tr>
+    <tr><td>Selección incorrecta de tool</td><td>Mejores descripciones primero (2.1), luego few-shot</td></tr>
+    <tr><td>Se pierde información en texto narrativo</td><td>Few-shot con extracción desde narrativa</td></tr>
+    <tr><td>La suma de la extracción no cuadra con el total</td><td>Bucle de validación y reintento</td></tr>
+  </table>
+</div></section>
+
+<!-- ============ 4.3 ============ -->
+<section id="s43"><div class="wrap">
+  <span class="tag">Task Statement 4.3</span>
+  <h2>Salida estructurada con tool use</h2>
+
+  <div class="key">
+    <span class="lbl">La jerarquía de fiabilidad</span>
+    <p>1. <span class="k">tool_use</span> con JSON schema — elimina los errores de sintaxis JSON por completo.<br>
+    2. JSON pedido por prompt — el modelo puede producir JSON malformado.</p>
+    <p>El esquema de la tool restringe la forma de lo que Claude devuelve: se acabaron los corchetes que faltan, las comas colgando y las claves sin comillas. El parámetro <code>tool_choice</code>, que es aparte, es lo que fuerza que llame a la tool.</p>
+  </div>
+
+  <h3>Los tres modos de tool_choice</h3>
+  <table>
+    <tr><th>Modo</th><th>Qué obliga</th><th>Cuándo</th></tr>
+    <tr><td><span class="k">"auto"</span></td><td>El modelo decide si llama a una tool o responde en texto.</td><td>Cuando responder conversacionalmente es una opción legítima.</td></tr>
+    <tr><td><span class="k">"any"</span></td><td>DEBE llamar a una tool, pero elige cuál.</td><td>Varios esquemas de extracción y tipo de documento desconocido.</td></tr>
+    <tr><td><span class="k">{"type":"tool","name":"..."}</span></td><td>DEBE llamar a esa tool concreta.</td><td>Imponer un primer paso obligatorio antes del enriquecimiento.</td></tr>
+  </table>
+
+  <div class="trap">
+    <span class="lbl">Lo que tool_use NO previene</span>
+    <p>Aquí es donde el examen se pone astuto. El esquema elimina errores de <strong>sintaxis</strong>, no de <strong>semántica</strong>:</p>
+    <ul>
+      <li><strong>Discrepancias de suma:</strong> las líneas no suman el total declarado.</li>
+      <li><strong>Campos cruzados:</strong> una fecha en el campo de importe cuando ambos son strings.</li>
+      <li><strong>Fabricación:</strong> el modelo inventa valores para campos obligatorios cuando el documento no los tiene.</li>
+    </ul>
+    <p>El esquema garantiza la estructura. No garantiza la corrección.</p>
+  </div>
+
+  <h3>Diseño de esquema que previene errores</h3>
+  <p><strong>Campos opcionales/nullable.</strong> Es la defensa principal contra la fabricación. Si un campo es obligatorio, el modelo siente la presión de producir un valor aunque la fuente no lo tenga. Si es nullable, puede devolver <code>null</code> honestamente.</p>
+  <pre>{
+  "properties": {
+    "invoice_number": { "type": "string" },
+    "vendor_name":    { "type": "string" },
+    "payment_terms":  { "type": ["string", "null"] },
+    "purchase_order": { "type": ["string", "null"] }
+  },
+  "required": ["invoice_number", "vendor_name"]
+}</pre>
+
+  <p><strong>Valor de enum «unclear».</strong> Para casos donde la fuente es genuinamente ambigua, evita que el modelo fuerce una clasificación sin evidencia.</p>
+  <p><strong>«other» + string de detalle.</strong> Para categorización extensible: un valor <code>other</code> emparejado con un campo libre que captura lo que tus categorías predefinidas no cubren.</p>
+  <p><strong>Reglas de normalización en el prompt.</strong> El esquema impone la estructura; el prompt impone la consistencia de formato («todas las fechas en ISO 8601», «importes como decimales sin símbolo de moneda»).</p>
+</div></section>
+
+<!-- ============ CHECKPOINT ============ -->
+<section id="check"><div class="wrap">
+  <span class="tag">Punto de control</span>
+  <h2>Chequeo rápido: 4.1 – 4.3</h2>
+  <div class="quiz" id="quizA"></div>
+</div></section>
+
+<!-- ============ 4.4 ============ -->
+<section id="s44"><div class="wrap">
+  <span class="tag">Task Statement 4.4</span>
+  <h2>Validación, reintentos y bucles de feedback</h2>
+
+  <h3>Reintento con feedback de error</h3>
+  <p>El patrón correcto manda tres cosas de vuelta al modelo:</p>
+  <ol>
+    <li><strong>El documento original</strong> — para que pueda reexaminar la fuente.</li>
+    <li><strong>La extracción fallida</strong> — para que vea qué produjo.</li>
+    <li><strong>El error de validación específico</strong> — para que sepa exactamente qué falló.</li>
+  </ol>
+  <pre>Documento original:
+{documento}
+
+Tu extracción:
+{json_fallido}
+
+Error de validación: las líneas suman 450 € pero stated_total
+es 500 €. Reextrae asegurándote de capturar todas las líneas.</pre>
+  <p>Esto le da mil vueltas a un reintento ingenuo. Sin el error específico, el modelo no tiene guía y suele reproducir el mismo fallo.</p>
+
+  <div class="key">
+    <span class="lbl">La frontera de efectividad — lo más preguntado del 4.4</span>
+    <p><strong>Los reintentos SÍ funcionan para:</strong> desajustes de formato, errores estructurales de salida, valores en el campo equivocado, errores matemáticos (se saltó una línea).</p>
+    <p><strong>Los reintentos NO funcionan para:</strong> información genuinamente ausente de la fuente, datos que solo existen en un documento externo que no se aportó, campos que requieren conocimiento que el modelo no tiene.</p>
+    <p>Si un documento no contiene el nombre del departamento, ningún reintento lo va a producir. Marca para revisión humana, o devuelve <code>null</code> si el esquema lo permite.</p>
+  </div>
+
+  <h3>Autocorrección desde el propio esquema</h3>
+  <p><strong><code>calculated_total</code> vs <code>stated_total</code>:</strong> extrae tanto la suma que el modelo calcula de las líneas como el total declarado en el documento. Cuando difieren tienes un flag de discrepancia automático, sin lógica externa.</p>
+  <p><strong>Booleanos <code>conflict_detected</code>:</strong> si el documento dice «pago a 30 días» en una sección y «net 60» en otra, el modelo extrae ambos y marca el conflicto en vez de elegir uno en silencio.</p>
+
+  <h3>Campos <code>detected_pattern</code></h3>
+  <p>En pipelines de revisión, añade a cada hallazgo un campo que registre qué construcción concreta lo disparó («concatenación de strings en query SQL»). Cuando los desarrolladores descartan hallazgos, puedes analizar los descartes por patrón: si siempre descartan los de «shadowing en ámbito anidado», ese patrón necesita afinar el prompt. Extraer, validar, recoger descartes, refinar, repetir.</p>
+
+  <h3>Pydantic como capa de validación</h3>
+  <p>Un modelo Pydantic hace dos trabajos a la vez. El <strong>parseo</strong> impone estructura (tipos, obligatorios, enums). Los <strong>validadores</strong> imponen semántica: las reglas que un JSON schema no puede expresar, como aritmética entre campos u ordenación de fechas. Ambos fallos salen por un mismo <code>ValidationError</code>, con errores legibles por máquina que nombran el campo y la regla rota.</p>
+  <pre>@model_validator(mode="after")
+def totals_must_match(self):
+    calculated = round(sum(i.amount for i in self.line_items), 2)
+    if abs(calculated - self.stated_total) &gt; 0.01:
+        raise ValueError(
+            f"las líneas suman {calculated} pero stated_total "
+            f"es {self.stated_total}"
+        )
+    return self</pre>
+  <p>La rama <code>except</code> es el patrón de reintento con feedback: Pydantic simplemente aporta el tercer ingrediente (el error específico) en un formato que puedes meter directamente en el prompt. Y la frontera de efectividad sigue igual: un validador que falla porque la información no está en la fuente sigue significando revisión humana, no reintento.</p>
+
+  <div class="now">
+    <span class="lbl">Matiz: parseo a nivel de SDK y strict tool use</span>
+    <p>Desde julio de 2026, el SDK de Python tiene <code>client.messages.parse(..., output_format=Invoice)</code>, que devuelve instancias Pydantic validadas en <code>parsed_output</code>, y <code>strict: true</code> en la definición de una tool garantiza inputs conformes al esquema en servidor. Ninguna de las dos elimina la capa semántica: la plataforma impone el esquema, tus validadores imponen las reglas de negocio, y el bucle de reintento consume la que falle.</p>
+  </div>
+</div></section>
+
+<!-- ============ 4.5 ============ -->
+<section id="s45"><div class="wrap">
+  <span class="tag">Task Statement 4.5</span>
+  <h2>Estrategias de procesamiento por lotes</h2>
+
+  <h3>Los hechos de la Message Batches API</h3>
+  <ul>
+    <li><strong>50% de ahorro</strong> frente a llamadas síncronas.</li>
+    <li><strong>Hasta 24 horas</strong> de ventana de procesamiento.</li>
+    <li><strong>Sin SLA de latencia garantizado.</strong></li>
+    <li><strong>Sin tool calling multi-turno</strong> dentro de una petición del lote.</li>
+    <li><strong><code>custom_id</code></strong> para correlacionar cada petición con su respuesta.</li>
+  </ul>
+
+  <div class="key">
+    <span class="lbl">La regla de emparejamiento</span>
+    <p><strong>API síncrona:</strong> flujos bloqueantes donde alguien o algo está esperando el resultado. Checks pre-merge, feedback de revisión en tiempo real.<br>
+    <strong>Batch API:</strong> flujos tolerantes a latencia cuyo resultado se consume más tarde. Informes nocturnos de deuda técnica, auditorías semanales, generación de tests de madrugada.</p>
+  </div>
+
+  <div class="trap">
+    <span class="lbl">La tentación</span>
+    <p>El examen plantea un escenario donde un manager propone pasarlo todo a batch por el ahorro. La respuesta correcta mantiene los flujos bloqueantes en síncrono y mueve solo los tolerantes. Y ojo con el razonamiento de «pero normalmente tarda poco»: no hay SLA, así que diseñas contra el máximo de 24 horas, no contra el mejor caso.</p>
+  </div>
+
+  <h3>Cálculo de SLA</h3>
+  <p>Si tu organización exige un SLA de 30 horas para un informe: el batch garantiza resultados en 24 horas, así que el último lote debe enviarse como muy tarde 24 horas antes del deadline. 30 menos 24 deja <strong>6 horas de margen</strong> para recoger peticiones, validar entradas o absorber retrasos operativos. Envía lotes cada 4-6 horas dentro de esa ventana para que siempre haya uno en vuelo.</p>
+
+  <h3>Manejo de fallos</h3>
+  <ol>
+    <li><strong>Identifica los fallos por <code>custom_id</code>.</strong></li>
+    <li><strong>Reenvía solo los fallidos, con modificaciones.</strong> Nunca el lote entero. Modificaciones típicas: trocear documentos que excedieron el contexto, simplificar prompts para estructuras inusuales, añadir ejemplos few-shot específicos del formato que falló.</li>
+    <li><strong>Refina los prompts en una muestra ANTES de procesar el lote.</strong></li>
+  </ol>
+
+  <div class="case">
+    <span class="lbl">Caso de uso · por qué la muestra previa sale rentable</span>
+    <p>Coge 5-10 documentos representativos que cubran el rango de formatos y casos límite. Itera sobre ellos hasta que la precisión sea alta. Luego lanza el lote completo.</p>
+    <p>Con 1.000 documentos, un 90% de acierto a la primera son 100 reintentos. Un 60% son 400: cuatro veces el coste de reenvío, más el coste de procesar esos reintentos.</p>
+  </div>
+
+  <div class="trap">
+    <span class="lbl">Limitación de tool calling</span>
+    <p>El batch no soporta tool calling multi-turno dentro de una misma petición: no puedes definir tools y que el modelo las llame a mitad, ni procesar resultados y continuar la conversación dentro del mismo elemento del lote, ni correr loops agénticos. Si un escenario describe un flujo por lotes que necesita llamar a tools externas durante el procesamiento, la respuesta es API síncrona.</p>
+  </div>
+</div></section>
+
+<!-- ============ 4.6 ============ -->
+<section id="s46"><div class="wrap">
+  <span class="tag">Task Statement 4.6</span>
+  <h2>Revisión multi-instancia y multi-pasada</h2>
+
+  <h3>La limitación de la autorrevisión</h3>
+  <p>Un modelo que revisa su propia salida en la misma sesión conserva su cadena de razonamiento original. Ya «sabe» por qué eligió cada enfoque, por qué clasificó cada hallazgo en esa severidad. Cuando le pides revisar, tiende a confirmar en vez de cuestionar.</p>
+  <p>Una <strong>instancia independiente</strong> —una invocación separada, sin el contexto de razonamiento previo— llega en frío. Juzga el código, los hallazgos o la extracción por lo que ve, sin el sesgo del «elegí esto porque…». Por eso caza problemas sutiles mucho mejor.</p>
+
+  <div class="key">
+    <span class="lbl">Lo que el examen espera</span>
+    <p>Ante opciones para mejorar la calidad de revisión, la correcta implica una <strong>instancia separada</strong>, no añadir «por favor revisa con cuidado» a la misma sesión ni recurrir a extended thinking dentro de la sesión que generó.</p>
+  </div>
+
+  <h3>Arquitectura multi-pasada</h3>
+  <p>Las revisiones grandes sufren <strong>dilución de atención</strong> en una sola pasada, con síntomas específicos: feedback detallado en unos ficheros y superficial en otros, bugs obvios que se escapan en el medio, y hallazgos contradictorios (el mismo patrón marcado como problemático en un fichero y aprobado en otro).</p>
+  <ul>
+    <li><strong>Pasada 1 — análisis local por fichero.</strong> Cada invocación examina un solo fichero, así que le da toda su atención. Esto garantiza profundidad consistente.</li>
+    <li><strong>Pasada 2 — integración cross-fichero.</strong> Recibe todos los hallazgos por fichero y busca flujo de datos entre módulos, uso consistente de API, conflictos de dependencias y contradicciones entre los propios hallazgos.</li>
+  </ul>
+
+  <div class="trap">
+    <span class="lbl">Por qué una ventana de contexto mayor no lo arregla</span>
+    <p>El examen incluye este distractor concreto: «pásate a un modelo de gama superior con más contexto». Suena razonable —si no puede con 14 ficheros, dale más capacidad— pero el problema no es el tamaño del contexto, es la <strong>calidad de la atención</strong>. Una ventana más grande no evita que el modelo reparta su atención de forma desigual.</p>
+  </div>
+
+  <h3>Enrutado por confianza</h3>
+  <p>El modelo puede autorreportar confianza junto a cada hallazgo, lo que habilita una estrategia de enrutado: alta confianza directo al desarrollador, baja confianza a revisión humana. Pero el score no es precisión autorreportada: es la lectura que el modelo hace de su propia certeza.</p>
+  <p><strong>Calíbralo</strong> pasando ejemplos etiquetados (donde ya conoces la respuesta) por el sistema y midiendo cómo la confianza reportada sigue a la precisión real. Luego ajusta los umbrales con esos datos. El examen distingue entre scores crudos (sin calibrar, poco fiables para decisiones automáticas) y umbrales calibrados contra conjuntos etiquetados (aptos para enrutar). Usar confianza sin calibrar para decisiones automáticas es un antipatrón.</p>
+</div></section>
+
+<!-- ============ CHULETA ============ -->
+<section id="chuleta"><div class="wrap">
+  <span class="tag">Repaso</span>
+  <h2>Chuleta de desambiguación</h2>
+
+  <table>
+    <tr><th>Si dudas entre…</th><th>Quédate con esto</th></tr>
+    <tr><td>Más instrucciones vs few-shot</td><td>Si las instrucciones detalladas ya existen y sigue inconsistente, más prosa no arregla nada. Ejemplos.</td></tr>
+    <tr><td>Few-shot vs esquema nullable</td><td>Formato inconsistente o narrativa no extraída → few-shot. Valores <em>fabricados</em> → campos nullable.</td></tr>
+    <tr><td>Error de sintaxis vs semántico</td><td><code>tool_use</code> mata la sintaxis. Sumas que no cuadran y campos cruzados necesitan validación aparte.</td></tr>
+    <tr><td>Reintentar vs revisión humana</td><td>¿La información está en el documento? Reintenta con el error específico. ¿No está? Humano.</td></tr>
+    <tr><td><code>"any"</code> vs forzar tool</td><td><code>"any"</code>: obligada a llamar, elige cuál. Forzada: obligada a llamar a <em>esa</em>.</td></tr>
+    <tr><td>Batch vs síncrono</td><td>¿Alguien está esperando para poder avanzar? Síncrono. Sin excepción por ahorro.</td></tr>
+    <tr><td>Autorrevisión vs instancia independiente</td><td>La misma sesión confirma sus decisiones. Siempre instancia nueva para revisar.</td></tr>
+    <tr><td>Confianza cruda vs calibrada</td><td>Cruda no vale para decisiones automáticas. Calíbrala contra un set etiquetado antes de enrutar.</td></tr>
+  </table>
+
+  <h3>Cinco frases que valen puntos</h3>
+  <ul>
+    <li>«Sé conservador» y «solo alta confianza» nunca son la respuesta correcta.</li>
+    <li>Un 40% de falsos positivos en una categoría destruye la confianza en <strong>todas</strong>.</li>
+    <li>Los few-shot llevan <strong>razonamiento</strong>, no solo pares entrada-salida.</li>
+    <li>Campos obligatorios presionan al modelo a fabricar. Nullable permite decir <code>null</code>.</li>
+    <li>Más ventana de contexto no arregla la dilución de atención.</li>
+  </ul>
+</div></section>
+
+<!-- ============ FINAL ============ -->
+<section id="final"><div class="wrap">
+  <span class="tag">Simulacro</span>
+  <h2>Examen del Domain 4</h2>
+  <div class="quiz" id="quizB"></div>
+</div></section>
+
+<footer><div class="wrap">
+  <p>Guía de estudio del Domain 4 (20%) para el <strong>Claude Certified Architect — Foundations</strong> (CCAR-F), elaborada a partir del temario de <a href="https://claudecertificationguide.com/learn/4-prompt-engineering">claudecertificationguide.com</a> y del Exam Guide oficial v1.0 (julio 2026).</p>
+</div></footer>
+
+<script>
+const QUIZ_A=[
+ {stem:"Tu pipeline de revisión tiene un 40% de falsos positivos en «documentación desactualizada», y los desarrolladores ignoran ya todas las categorías, incluidas las de seguridad que aciertan. ¿Arreglo más efectivo?",
+  opts:["Desactivar temporalmente la categoría de documentación mientras refinas su prompt con criterios explícitos y ejemplos de código","Añadir «reporta solo problemas de documentación de alta confianza» al system prompt","Subir la temperatura para generar varias pasadas y quedarte con lo que aparezca repetido","Añadir una segunda pasada del modelo que reexamine cada hallazgo de documentación y descarte lo que no pueda verificar"],
+  ok:0,why:"La confianza se contagia entre categorías: recuperar la del sistema es prioritario sobre la exhaustividad. Y «solo alta confianza» es el distractor clásico: la confianza autorreportada de un LLM está mal calibrada."},
+ {stem:"Tu extracción identifica bien los datos en tablas pero devuelve campos vacíos cuando la misma información aparece en párrafos narrativos. Las instrucciones ya detallan todos los campos y formatos. ¿Qué pruebas primero?",
+  opts:["Un preprocesado que convierta la narrativa en tablas antes de extraer","Ampliar la ventana de contexto para procesar más documento","Ejemplos few-shot mostrando extracción correcta desde tablas y desde párrafos narrativos","Un reintento posterior que reextraiga los campos que salgan vacíos"],
+  ok:2,why:"Es el tercer disparador del few-shot: campos vacíos para información que sí existe pero en formato inesperado. Las instrucciones ya están; más prosa no ayuda."},
+ {stem:"Tu extracción usa tool_use con un esquema estricto donde todos los campos son obligatorios, y el modelo se inventa fechas e importes plausibles cuando el documento no los tiene. ¿Mejor arreglo?",
+  opts:["Hacer opcionales o nullable los campos que la fuente puede no contener","Cambiar a extracción por prompt, que da más flexibilidad","Añadir una instrucción diciendo que no debe alucinar ningún valor","Añadir validación posterior que compare cada valor contra el documento"],
+  ok:0,why:"Un campo obligatorio presiona al modelo a producir algo. Nullable le permite devolver null honestamente. Es la defensa estructural contra la fabricación, y va antes que cualquier instrucción o validación."},
+ {stem:"Necesitas extraer datos de documentos de tipo desconocido, con tres esquemas posibles. ¿Qué tool_choice garantiza salida estructurada?",
+  opts:["\"auto\", para que el modelo decida si algún esquema encaja","\"any\": obliga a llamar a una tool y le deja elegir el esquema","Forzar el esquema de factura y descartar los otros","\"auto\" con instrucciones que prohíban responder en texto"],
+  ok:1,why:"Con \"auto\" el modelo puede devolver texto conversacional en vez de llamar a la tool. \"any\" garantiza la llamada dejándole elegir, que es lo que necesitas si no sabes el tipo de documento."}
+];
+
+const QUIZ_B=[
+ {stem:"Documento A: las líneas suman 450 € pero el total declarado es 500 €. Documento B: el campo «departamento» no aparece en el texto fuente. ¿Estrategia de reintento correcta?",
+  opts:["Reintentar los dos con sus errores de validación","Saltarse los reintentos y mandar ambos a revisión humana","Reintentar A con el error de discrepancia; marcar B para revisión humana porque la información no está en la fuente","Reintentar los dos con el mismo prompt, porque la extracción no es determinista"],
+  ok:2,why:"Es la frontera de efectividad. A es un error matemático o de captura: el dato está y el reintento con error específico lo arregla. B no se puede reintentar: ningún número de intentos crea información ausente."},
+ {stem:"Un manager propone pasar a la Batch API tanto el check pre-merge bloqueante como el informe nocturno de deuda técnica, por el 50% de ahorro. ¿Cómo lo evalúas?",
+  opts:["Batch solo para el informe nocturno; síncrono para el check pre-merge","Batch para los dos, con polling para comprobar finalización","Síncrono para los dos, para evitar problemas de orden","Batch para los dos con fallback a síncrono si tardan demasiado"],
+  ok:0,why:"Hasta 24 horas sin SLA de latencia: inservible para un flujo donde la gente espera para mergear, ideal para uno nocturno. El fallback añade complejidad cuando la solución simple es emparejar cada API con su caso."},
+ {stem:"Una PR de 14 ficheros recibe revisión inconsistente: detallada en unos, superficial en otros, bugs obvios que se escapan y el mismo patrón marcado en un fichero y aprobado en otro. ¿Cómo la reestructuras?",
+  opts:["Pasar a un modelo con ventana de contexto mucho mayor para que los 14 quepan con atención suficiente","Análisis local por fichero para profundidad consistente, más una pasada separada de integración cross-fichero","Tres pasadas independientes sobre la PR completa, marcando solo lo que coincida en dos","Exigir que los desarrolladores partan las PR en envíos de 3-4 ficheros"],
+  ok:1,why:"Dilución de atención: es un problema de calidad de atención, no de capacidad. Más contexto no evita el reparto desigual. El consenso de tres pasadas suprimiría bugs reales que solo se detectan de forma intermitente."},
+ {stem:"Tu system prompt define severidades como «Crítico: problemas que podrían causar fallos del sistema». La clasificación sale inconsistente entre ejecuciones. ¿Qué haces?",
+  opts:["Precisar más la prosa, definiendo qué cuenta como fallo del sistema","Sustituir las descripciones en prosa por ejemplos de código concretos para cada nivel de severidad","Pedir al modelo que reporte su confianza junto a cada severidad","Reducir a dos niveles de severidad para simplificar la decisión"],
+  ok:1,why:"La prosa obliga al modelo a interpretar. Un ejemplo con código real clasificado en cada nivel elimina la ambigüedad y produce clasificación estable entre invocaciones."},
+ {stem:"Un lote de 500 documentos falla en 80. ¿Cómo lo gestionas?",
+  opts:["Reenviar el lote completo, por si el fallo fue transitorio","Identificar los fallidos por custom_id y reenviar solo esos con modificaciones dirigidas, como trocear los que excedieron el contexto","Procesar los 80 fallidos uno a uno con la API síncrona","Bajar el max_tokens de todo el lote y reenviarlo"],
+  ok:1,why:"custom_id es exactamente el mecanismo de correlación para esto. Reenviar el lote entero paga otra vez por los 420 que ya funcionaron."},
+ {stem:"Tu pipeline genera código y le pide revisarlo en la misma sesión. Los revisores humanos encuentran cosas que se le escaparon. ¿Qué cambias?",
+  opts:["Añadir «revisa con especial cuidado y cuestiona tus decisiones» al prompt de revisión","Usar una instancia independiente, sin el contexto de razonamiento de la generación","Activar extended thinking en la fase de revisión","Aumentar max_tokens para que la revisión sea más exhaustiva"],
+  ok:1,why:"La misma sesión conserva el «elegí esto porque…» y tiende a confirmar en vez de cuestionar. El examen descarta explícitamente tanto las instrucciones de revisar con cuidado como el extended thinking dentro de la sesión generadora."},
+ {stem:"Quieres detectar automáticamente cuando la extracción de una factura no cuadra, sin escribir lógica de validación externa. ¿Qué diseñas en el esquema?",
+  opts:["Un campo de confianza por cada línea","Extraer calculated_total (suma de líneas) y stated_total (total del documento) por separado, con un booleano de discrepancia","Un campo de texto libre donde el modelo comente si algo le chirría","Marcar todos los campos numéricos como obligatorios"],
+  ok:1,why:"Autocorrección construida en el propio esquema: cuando los dos valores difieren tienes el flag automáticamente. En la misma línea van los booleanos conflict_detected para fuentes contradictorias."},
+ {stem:"Los desarrolladores descartan sistemáticamente ciertos hallazgos de tu revisor automático, pero no sabes cuáles ni por qué. ¿Qué añades?",
+  opts:["Un campo detected_pattern en cada hallazgo, que registre qué construcción de código lo disparó","Un contador de descartes por desarrollador","Un campo de severidad más granular, con cinco niveles","Un enlace a la documentación de cada regla"],
+  ok:0,why:"Registrar el patrón que disparó cada hallazgo te permite analizar los descartes por patrón y priorizar qué prompt refinar. Convierte los descartes en datos accionables."},
+ {stem:"Tu extracción usa tool_use con esquema estricto. ¿Qué tipo de error sigue siendo posible?",
+  opts:["JSON malformado con comas colgando","Claves sin comillas","Líneas que no suman el total declarado y valores colocados en el campo equivocado","Campos obligatorios que faltan en la salida"],
+  ok:2,why:"El esquema elimina la sintaxis y la presencia de campos. Lo semántico —que los valores sean correctos y estén donde toca— queda fuera y necesita validación aparte."},
+ {stem:"Quieres usar los scores de confianza del modelo para enrutar hallazgos a revisión humana. ¿Qué haces antes?",
+  opts:["Fijar el umbral en 0.9, que es un valor conservador estándar","Calibrarlos contra un conjunto etiquetado, midiendo cómo la confianza reportada se corresponde con la precisión real por tipo de campo","Pedir al modelo que sea más estricto al autoevaluarse","Nada: los scores de confianza son directamente interpretables"],
+  ok:1,why:"Los scores crudos no están calibrados: 0.90 en fechas puede significar 94% de acierto real y 0.90 en importes solo un 82%. Usar confianza sin calibrar para decisiones automáticas es un antipatrón explícito."}
+];
+
+const LETTERS=['A','B','C','D'];
+function renderQuiz(id,data,label){
+  const root=document.getElementById(id); const st={a:0,r:0};
+  data.forEach((q,i)=>{
+    const d=document.createElement('div'); d.className='q';
+    const n=document.createElement('span'); n.className='num'; n.textContent=label+' '+(i+1)+' / '+data.length;
+    const s=document.createElement('p'); s.className='stem'; s.textContent=q.stem;
+    d.append(n,s);
+    const w=document.createElement('div'); w.className='why';
+    q.opts.forEach((o,j)=>{
+      const b=document.createElement('button'); b.className='opt'; b.type='button';
+      b.innerHTML='<span style="font-family:var(--mono);font-size:12px;color:var(--ink-soft);margin-right:9px;font-weight:600">'+LETTERS[j]+'</span>';
+      b.appendChild(document.createTextNode(o));
+      b.addEventListener('click',()=>{
+        const all=d.querySelectorAll('.opt'); all.forEach(x=>x.disabled=true);
+        all[q.ok].classList.add('good');
+        const hit=j===q.ok; if(!hit) b.classList.add('bad');
+        w.className='why show '+(hit?'ok':'no');
+        w.innerHTML='<b>'+(hit?'Correcto.':'No es esa.')+'</b> '+q.why;
+        st.a++; if(hit) st.r++;
+        sc.innerHTML='Respondidas <b>'+st.a+'/'+data.length+'</b> · Aciertos <b>'+st.r+'</b>';
+      });
+      d.appendChild(b);
+    });
+    d.appendChild(w); root.appendChild(d);
+  });
+  const sc=document.createElement('div'); sc.className='score';
+  sc.innerHTML='Respondidas <b>0/'+data.length+'</b> · Aciertos <b>0</b>';
+  root.appendChild(sc);
+}
+renderQuiz('quizA',QUIZ_A,'Check');
+renderQuiz('quizB',QUIZ_B,'Pregunta');
+</script>
+</body>
+</html>
