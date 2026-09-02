@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CCAR-F — Question Bank</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#EDF0F3; --card:#FBFCFD; --ink:#16222D; --ink-soft:#4A5C6B;
+  --rule:#C2CCD4; --caution:#C07617; --caution-tint:#FBF2E4;
+  --stop:#A03227; --stop-tint:#FAECE9; --clear:#2C6650; --clear-tint:#E8F1EC;
+  --sans:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:900px;margin:0 auto;padding:0 24px 96px}
+
+.masthead{border-bottom:3px solid var(--ink);padding:56px 0 22px;margin-bottom:26px}
+.masthead h1{font-size:clamp(28px,5vw,46px);line-height:1.05;font-weight:700;letter-spacing:-0.025em;margin:0 0 14px;max-width:17ch}
+.masthead p{margin:0 0 8px;max-width:66ch;color:var(--ink-soft);font-size:16.5px}
+
+/* controls */
+.controls{position:sticky;top:0;z-index:20;background:var(--paper);padding:12px 0;border-bottom:1px solid var(--rule);margin-bottom:34px}
+.filters{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px}
+button.f{
+  font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;
+  background:var(--card);border:1px solid var(--rule);color:var(--ink-soft);
+  padding:5px 11px;
+}
+button.f:hover{border-color:var(--ink-soft)}
+button.f[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+button.f:focus-visible{outline:2px solid var(--caution);outline-offset:2px}
+.tally{display:flex;gap:22px;align-items:baseline;flex-wrap:wrap;font-size:13.5px;color:var(--ink-soft)}
+.tally b{font-family:var(--mono);font-size:17px;font-weight:600;color:var(--ink)}
+.tally .ok b{color:var(--clear)} .tally .no b{color:var(--stop)}
+button.reset{background:none;border:none;color:var(--ink-soft);font-size:13px;cursor:pointer;text-decoration:underline;font-family:var(--sans);padding:0}
+
+/* questions */
+.q{background:var(--card);border:1px solid var(--rule);border-left:6px solid var(--rule);margin-bottom:18px;padding:20px 24px 22px}
+.q.done-ok{border-left-color:var(--clear)}
+.q.done-no{border-left-color:var(--stop)}
+.qmeta{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:9px}
+.qmeta span{font-family:var(--mono);font-size:11.5px;color:var(--ink-soft)}
+.qtext{font-size:16px;margin:0 0 15px;max-width:76ch}
+.opts{list-style:none;margin:0;padding:0}
+.opts li{margin-bottom:7px}
+.opt{
+  display:flex;gap:11px;width:100%;text-align:left;cursor:pointer;
+  font-family:var(--sans);font-size:15px;line-height:1.5;color:var(--ink);
+  background:#F2F5F7;border:1px solid var(--rule);padding:10px 13px;
+}
+.opt:hover:not(:disabled){border-color:var(--ink-soft);background:#EAEFF2}
+.opt:disabled{cursor:default}
+.opt:focus-visible{outline:2px solid var(--caution);outline-offset:1px}
+.opt .k{font-family:var(--mono);font-size:13px;color:var(--ink-soft);flex:0 0 auto;padding-top:1px}
+.opt.right{background:var(--clear-tint);border-color:#B6D0C1}
+.opt.right .k{color:var(--clear);font-weight:600}
+.opt.wrong{background:var(--stop-tint);border-color:#E0BFB9}
+.opt.wrong .k{color:var(--stop);font-weight:600}
+.why{margin-top:14px;padding:13px 16px;background:var(--caution-tint);border:1px solid #EEDCBE;font-size:14.5px;max-width:80ch}
+.why b{display:block;font-size:12.5px;color:var(--caution);margin-bottom:4px}
+.why[hidden]{display:none}
+code{font-family:var(--mono);font-size:0.88em;background:#E4E9ED;padding:1px 5px;border-radius:2px}
+.opt code{background:#E0E6EA}
+.why code{background:#F4E6CD}
+
+/* consolidation */
+section h2{font-size:26px;font-weight:700;letter-spacing:-0.02em;margin:0 0 6px}
+.lede{color:var(--ink-soft);max-width:70ch;margin:0 0 26px;font-size:15.5px}
+.hold{border-top:1px solid var(--rule);margin-bottom:40px}
+.hold div{display:grid;grid-template-columns:1fr;gap:2px;padding:14px 0;border-bottom:1px solid var(--rule)}
+.hold b{font-weight:600;font-size:15.5px}
+.hold p{margin:0;font-size:15px;color:var(--ink-soft);max-width:78ch}
+.note{background:var(--card);border:1px solid var(--rule);border-left:6px solid var(--caution);padding:18px 22px;margin:0 0 40px;font-size:15px;max-width:80ch}
+.note b{display:block;margin-bottom:5px}
+#empty{color:var(--ink-soft);font-size:15px;padding:20px 0}
+#empty[hidden]{display:none}
+footer{border-top:3px solid var(--ink);padding-top:20px;color:var(--ink-soft);font-size:14px;max-width:70ch;margin-top:50px}
+@media (max-width:620px){.q{padding:16px 16px 18px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="masthead">
+  <h1>Question bank and holding pattern</h1>
+  <p>Fifty-two scenario questions in the exam's own shape: every option is something a competent architect might do, one is correct. Answering reveals why the tempting option fails, which is the part that transfers.</p>
+  <p>The last third covers the objectives you already scored 100% on. Those are marks you are currently banking — the questions are there so they stay banked.</p>
+</header>
+
+<div class="controls">
+  <div class="filters" id="filters"></div>
+  <div class="tally">
+    <span>Answered <b id="t-done">0</b>/<b id="t-total">0</b></span>
+    <span class="ok">Right <b id="t-ok">0</b></span>
+    <span class="no">Wrong <b id="t-no">0</b></span>
+    <button class="reset" id="reset" type="button">Clear answers</button>
+  </div>
+</div>
+
+<div id="bank"></div>
+<p id="empty" hidden>No questions in this filter.</p>
+
+<section>
+  <h2>What you already hold</h2>
+  <p class="lede">Fifteen objectives came back at 100%. Here is the single rule behind each one, so you can revise them without working through questions. If you can restate the rule in your own words, that objective is fine and you should spend the time elsewhere.</p>
+
+  <div class="note">
+    <b>One diagnostic worth noticing</b>
+    <p>Two of your zeros sit next to a hundred. You scored 100% on "configure <code>tool_choice</code> to guarantee tool invocation" and 0% on "configure <code>tool_choice</code> … and sequence multi-tool workflows" — so the parameter is not your problem, the <em>sequencing half</em> is. Same story with MCP: 100% on choosing the scope, 25% on the integration bundle, which means auth expansion and tool discovery are where the marks went. Aim at those halves specifically.</p>
+  </div>
+
+  <div class="hold">
+    <div><b>Session termination safeguards</b><p>Every session ends in one of exactly two states: a completed resolution, or a handoff to a human. A loop that ends any other way — token limit, iteration cap, unhandled error — routes to escalation rather than falling silent.</p></div>
+    <div><b>Structured handoff packages</b><p>Carry accumulated context, findings, and authorization state. The receiver should never need to redo work or re-derive what the agent was permitted to do.</p></div>
+    <div><b>Dynamic subtask decomposition</b><p>Subtasks are generated as findings arrive, not fixed up front. A plan that executes the same sequence regardless of what step two discovered is the anti-pattern.</p></div>
+    <div><b>PreToolUse hooks</b><p>Run before the call and can block it. This is where business rules and policy constraints live when they must not be left to model discretion.</p></div>
+    <div><b>PostToolUse hooks</b><p>Run after the call completes. Cannot prevent the edit, but enforce what comes next — formatting, linting, tests — on every edit, independent of instruction-following.</p></div>
+    <div><b>Permissions vs. <code>CLAUDE.md</code></b><p>Anything that must hold regardless of the model's judgment is a settings permission or a hook. <code>CLAUDE.md</code> is guidance the model weighs, which is the right home for conventions and the wrong home for boundaries.</p></div>
+    <div><b>Choosing the configuration mechanism</b><p><code>CLAUDE.md</code> for always-on project context. <code>.claude/rules/</code> with globs for guidance scoped to matching files. Skills for procedures loaded on demand. Hooks and permissions for anything deterministic.</p></div>
+    <div><b>Custom slash commands</b><p>Markdown files whose filename becomes the command. <code>.claude/commands/</code> in the repo for team-shared commands; <code>~/.claude/commands/</code> for personal ones across all your projects. Frontmatter carries the description, argument hint and allowed tools.</p></div>
+    <div><b>MCP server scope</b><p>Project scope for shared team tooling, user scope for personal or experimental servers.</p></div>
+    <div><b>Providing project context</b><p><code>@</code> references for a specific file needed right now. <code>CLAUDE.md</code> for context that is reusable across sessions. Inline description for a one-off detail that will not recur.</p></div>
+    <div><b>Sync vs. batch processing</b><p>Messages API when something is blocked waiting on the result. Message Batches API for large asynchronous volumes: half the token cost, a processing window of up to 24 hours, and no streaming.</p></div>
+    <div><b>Structured output method</b><p>Strictest compliance comes from tool use with a JSON schema. Prefilled responses shape the start of a format. Prompt-based formatting is the loosest and the wrong answer when a parser depends on it.</p></div>
+    <div><b>Extraction schema design</b><p>Optional fields, nullable values and enums exist so the model can represent missing or ambiguous information instead of inventing it.</p></div>
+    <div><b>Tool use to enforce structured output</b><p>Define the schema, and force invocation with <code>tool_choice</code> when a conversational reply would break something downstream.</p></div>
+    <div><b>Feedback loops</b><p>Capture structured metadata about model errors — what field, what document type, what the correction was — and feed the pattern back into prompts, schemas and few-shot examples.</p></div>
+  </div>
+</section>
+
+<footer>
+  <p>Questions are written against your score report for CCAR-F. They are practice items, not retired exam content, so treat the rationales as the thing to learn rather than the wording. Check anything version-specific against the current Claude Code and Claude API documentation before you sit the retake.</p>
+</footer>
+
+</div>
+
+<script>
+const Q = [
+/* ---------- exploration ---------- */
+{a:"explore",t:"Codebase exploration · 0%",q:"An agent must find where retry logic for the payment gateway is implemented in an unfamiliar 600-file service. What is the first action?",
+o:["Read every file under <code>src/payments/</code> to build a complete picture before deciding anything.",
+"Use <code>Glob</code> to find candidate paths, then <code>Grep</code> for the retry-related symbols within those matches, then <code>Read</code> only the regions that matched.",
+"Read the repository README and infer the location from the architecture section.",
+"Ask the user which file contains the retry logic."],c:1,
+w:"Narrow before you read. Option A is the exhaustive-first distractor and is wrong even though it would eventually work — it spends the context window on files that were never relevant. The README rarely names implementation details, and asking wastes a turn when the tools answer it directly."},
+
+{a:"explore",t:"Codebase exploration · 0%",q:"A <code>Grep</code> for <code>validateUser</code> returns 240 matches. What next?",
+o:["Read the first ten matches and generalise from them.",
+"Read every matching file to be thorough.",
+"Tighten the pattern or restrict the path, then read the handful of matches that remain.",
+"Abandon Grep and walk the directory tree instead."],c:2,
+w:"240 matches means the query was too broad, not that reading is now required. Each step should shrink the candidate set; sampling ten of them is guessing, and reading all of them is the exhaustive trap in a different coat."},
+
+{a:"explore",t:"Codebase exploration · 0%",q:"Which description of the three tools is correct?",
+o:["<code>Glob</code> searches file contents; <code>Grep</code> searches file names.",
+"<code>Grep</code> matches contents by regular expression; <code>Glob</code> matches paths by pattern; <code>Read</code> opens one file, optionally a line range.",
+"<code>Read</code> should come first because it gives the most reliable information.",
+"<code>Glob</code> and <code>Grep</code> are interchangeable for locating a function definition."],c:1,
+w:"Recall item, and the one that makes the scenario questions answerable. Reversing Grep and Glob is the commonest way to lose a whole cluster of marks."},
+
+{a:"explore",t:"Codebase exploration · 0%",q:"The agent is roughly 60% through its context window and still needs to trace three more call paths. Best move?",
+o:["Raise <code>max_tokens</code> so there is room for the rest.",
+"Keep reading and let compaction handle it when it triggers.",
+"Write the findings so far to a scratchpad file, then delegate the remaining traces to a subagent that returns summaries.",
+"Start a fresh session and re-explore from the beginning."],c:2,
+w:"<code>max_tokens</code> governs the response length, not the window — a perennial distractor. Compaction is lossy and is the thing you are trying not to need. Restarting throws away work that a scratchpad would have preserved."},
+
+/* ---------- escalation ---------- */
+{a:"escalate",t:"Escalation criteria · 0%",q:"A support agent has a working refund tool and clear authority to refund under €50. The customer writes: “this is ridiculous, I want to talk to a real person.” The refund would be €22.",
+o:["Issue the refund, then mention that a human is available if they still want one.",
+"Ask whether they would prefer the refund now rather than waiting for a person.",
+"Escalate to a human immediately, with the context package.",
+"Issue the refund and close the conversation as resolved."],c:2,
+w:"Capability is real and irrelevant. An explicit request for a person is the resolution the customer chose, and resolving-then-offering overrides a stated preference. Option B is the same override wearing a question mark."},
+
+{a:"escalate",t:"Escalation criteria · 0%",q:"A tool call returns a 503 on the first attempt. Should the agent escalate?",
+o:["Yes — any tool failure means the agent can no longer guarantee resolution.",
+"No — retry with backoff; a transient error is inside the agent's remit.",
+"Yes — report the failure to the user and end the session.",
+"No — switch to a different tool immediately without retrying."],c:1,
+w:"The mirror-image failure of over-escalation. Retries belong <em>before</em> escalation; what must not happen is retrying <em>after</em> a human has been requested."},
+
+{a:"escalate",t:"Escalation criteria · 0%",q:"An agent was authorised to “clean up stale test data”. Completing the task as it now understands it would require dropping a production table. Its permissions technically allow the drop and nobody has asked for a human.",
+o:["Execute the drop, since the permissions allow it.",
+"Escalate: the action is irreversible and falls outside the authorised scope, whatever the permissions permit.",
+"Execute the drop and log it for human review afterwards.",
+"Refuse the task and close it as impossible."],c:1,
+w:"Permission is not authorisation. The scope granted was test data; an irreversible production action outside that scope escalates before it happens, not after. Logging afterwards is auditing an unauthorised action, not preventing one."},
+
+{a:"escalate",t:"Escalation criteria · 0%",q:"A customer is polite and has not asked for anyone. What they want is fully within the agent's tooling but requires a policy exception the agent does not hold.",
+o:["Grant it — the tool allows it, so the system considers it permitted.",
+"Escalate: granting an exception is an authorisation the agent does not have.",
+"Refuse and close the conversation.",
+"Grant it and flag it for review in the next audit cycle."],c:1,
+w:"The escalation trigger here is missing authorisation, not a request and not an error. Note that “refuse and close” is also wrong — it ends the session in neither resolution nor handoff, which breaks the termination safeguard."},
+
+/* ---------- tool_choice ---------- */
+{a:"toolchoice",t:"tool_choice and sequencing · 0%",q:"A workflow needs <code>get_customer</code> and then <code>create_ticket(customer_id)</code>. Both are defined. The model calls them in parallel and <code>create_ticket</code> receives an invented id. Best fix?",
+o:["Set <code>tool_choice</code> to <code>{\"type\":\"any\"}</code>.",
+"Add “call the tools in the correct order” to the system prompt.",
+"Sequence it in the orchestration: return <code>get_customer</code>'s result, then make the next request — and state the dependency in <code>create_ticket</code>'s description.",
+"Merge both into a single tool that does the lookup internally."],c:2,
+w:"This is the half of the objective you lost. <code>tool_choice</code> controls <em>whether</em> a tool is called, never the order. A prompt instruction is guidance, not a guarantee. Merging is defensible engineering but does not answer a question about sequencing dependent tools."},
+
+{a:"toolchoice",t:"tool_choice and sequencing · 0%",q:"What does <code>{\"type\":\"any\"}</code> guarantee?",
+o:["That the named tool is called.",
+"That some tool is called, with the model choosing which.",
+"That at most one tool is called per turn.",
+"That tools are available but not required."],c:1,
+w:"<code>any</code> forces <em>a</em> tool, not <em>the</em> tool. Confusing it with <code>{\"type\":\"tool\",\"name\":…}</code> is the standard trap when only one schema is acceptable. Option D describes <code>auto</code>."},
+
+{a:"toolchoice",t:"tool_choice and sequencing · 0%",q:"A classifier must return exactly one of five labels through a <code>classify</code> tool schema, and downstream code parses the tool input. Which setting?",
+o:["<code>{\"type\":\"auto\"}</code>", "<code>{\"type\":\"any\"}</code>", "<code>{\"type\":\"tool\",\"name\":\"classify\"}</code>", "<code>{\"type\":\"none\"}</code>"],c:2,
+w:"One schema must be filled, so name it. <code>auto</code> permits a prose answer that kills the parser; <code>any</code> only guarantees that something is called, which is indistinguishable from <code>tool</code> here only if <code>classify</code> is the sole tool defined — and the exam will not promise you that."},
+
+{a:"toolchoice",t:"tool_choice and sequencing · 0%",q:"You need a guaranteed structured extraction and then a natural-language summary of what was extracted. How do you structure it?",
+o:["One request with <code>tool_choice</code> set to the extraction tool, asking for prose alongside the tool call.",
+"Two requests: the first forces the extraction tool, the second continues with <code>{\"type\":\"none\"}</code> for the summary.",
+"One request with <code>{\"type\":\"any\"}</code> so the model can do both.",
+"Prefill the assistant response with the summary heading."],c:1,
+w:"Forcing a tool means that turn is a tool call, not a prose answer. Splitting into two turns is the shape the exam wants, and <code>none</code> on the second turn is what stops the model reaching for a tool again."},
+
+/* ---------- refinement ---------- */
+{a:"refine",t:"Iterative refinement · 25%",q:"Nine of forty generated summaries come out in the wrong tone. What is the next iteration?",
+o:["Add “use a more professional tone” to the prompt and re-run.",
+"Fix the first failing summary, re-run, then fix the next, and continue.",
+"Describe all nine failures concretely as a batch with produced and expected output, revise once, then re-run all forty.",
+"Regenerate the whole prompt from scratch with tone as the priority."],c:2,
+w:"The objective names batching explicitly. One-at-a-time correction regresses earlier fixes and hides which change worked; a generic instruction produces a generic change; a full rewrite destroys your ability to attribute the improvement."},
+
+{a:"refine",t:"Iterative refinement · 25%",q:"An extractor handles four invoice layouts well and misses the delivery date on the fifth. Best next step?",
+o:["Add a sentence to the prompt saying delivery dates matter.",
+"Add a few-shot example showing that layout with its delivery date extracted correctly.",
+"Increase the model's temperature to make it look harder.",
+"Mark the field required so it cannot be skipped."],c:1,
+w:"A specific failure gets a specific example, not another general rule. Marking it required is actively harmful — it invites fabrication on the documents that genuinely lack the field."},
+
+{a:"refine",t:"Iterative refinement · 25%",q:"You changed six things in a prompt between runs and accuracy improved by nine points. What is the problem?",
+o:["Nothing — the metric improved, which is what matters.",
+"You cannot attribute the gain, so you cannot keep the part that worked or drop the part that did not.",
+"Six changes is too few to move a metric reliably.",
+"The evaluation set should have been changed at the same time."],c:1,
+w:"Refinement is an experiment, and experiments isolate variables. Option D is a trap in the opposite direction: changing the evaluation set between runs destroys comparability entirely."},
+
+/* ---------- MCP ---------- */
+{a:"mcp",t:"MCP integration · 25%",q:"A shared internal MCP server needs an API token. Three developers and CI must all reach it. Where does the config live and how does the token get in?",
+o:["User scope, with the token written into the config so it works immediately.",
+"Project scope in a committed <code>.mcp.json</code>, with the token referenced as <code>${INTERNAL_API_TOKEN}</code> and set locally by each developer.",
+"Project scope in a committed <code>.mcp.json</code> with the token inline, and the repository made private.",
+"Local scope on each machine, configured by hand."],c:1,
+w:"Two rules at once: shared audience means project scope, and committed files reference secrets rather than containing them. A private repository is not a secret store — option C is the plausible-sounding one that fails review."},
+
+{a:"mcp",t:"MCP integration · 25%",q:"You add an MCP server, the session starts cleanly, but <code>/mcp</code> shows the server with no tools. Most likely cause?",
+o:["The server is broken and needs reinstalling.",
+"Tools must be activated individually before they appear.",
+"A required environment variable, typically an API key, has not been provided.",
+"The scope is wrong, so tools are registered to a different project."],c:2,
+w:"An empty tool list on a server that started is the signature of a missing environment variable. There is no activation step — every configured, reachable server exposes its tools at connection time, which is itself a favourite exam point."},
+
+{a:"mcp",t:"MCP integration · 25%",q:"You are trialling a note-taking MCP server for your own use and want it available in every repository you work in, without affecting teammates.",
+o:["Project scope in each repository.","User scope.","Local scope in each repository.","Project scope in one repository and let the others inherit it."],c:1,
+w:"User scope is the personal-across-projects answer. Local is per-project and would need repeating; project scope would push a personal tool onto the team. Scopes do not inherit across repositories."},
+
+/* ---------- routing ---------- */
+{a:"routing",t:"Human review routing · 33%",q:"An OCR pipeline produces 3,000 extractions a day. The team wants human review to catch errors without reviewing everything. Design the routing.",
+o:["Review a random 10% sample each day.",
+"Route on per-field confidence, field-level ambiguity, document characteristics and downstream impact, to the reviewer matching the characteristic.",
+"Route every document whose overall confidence falls below a fixed threshold.",
+"Route the first 300 documents each morning, when reviewers are freshest."],c:1,
+w:"Random sampling measures quality; it does not catch the systematically hard cases. A document-level threshold sends whole documents when a single field was the problem, and misses confident-but-wrong extractions in known-difficult formats."},
+
+{a:"routing",t:"Human review routing · 33%",q:"A contract extraction returns high confidence on every field except the IBAN, which is ambiguous between two candidates. What gets routed?",
+o:["The whole document, since one field is uncertain.",
+"Only the IBAN field, with both candidates and their context.",
+"Nothing — one uncertain field out of twenty is within tolerance.",
+"The whole document, plus every other document from the same supplier."],c:1,
+w:"Field-level ambiguity gets field-level routing. Sending the whole document wastes reviewer time on nineteen fields that were fine; the impact of a wrong bank account is exactly why the field itself must be seen."},
+
+{a:"routing",t:"Human review routing · 33%",q:"The review pool includes one reviewer fluent in German medical forms and three generalists. A batch of German medical forms arrives with mid-range confidence. What does good routing do?",
+o:["Distribute them evenly so no reviewer is overloaded.",
+"Send them to the specialist, because document characteristics drive reviewer assignment.",
+"Send them to the generalists and have the specialist audit afterwards.",
+"Hold them until confidence improves in a later model version."],c:1,
+w:"The objective says routing is based on document characteristics, not load balancing. An after-the-fact audit is a second pass, not routing — and it costs two reviews where one would have done."},
+
+/* ---------- loop ---------- */
+{a:"loop",t:"Agentic loop · 50%",q:"A response comes back with <code>stop_reason: \"pause_turn\"</code>. How do you continue?",
+o:["Send the tool results for the pending calls.",
+"Send the assistant content back as-is to let the model finish.",
+"Retry the original request with a higher <code>max_tokens</code>.",
+"Treat it as an error and fall back to another model."],c:1,
+w:"<code>pause_turn</code> and <code>tool_use</code> have opposite continuations and that is precisely what gets tested. <code>pause_turn</code> means a server-tool loop hit its iteration limit; you send the response back. <code>tool_use</code> means you owe results."},
+
+{a:"loop",t:"Agentic loop · 50%",q:"A response has <code>stop_reason: \"max_tokens\"</code> and its final content block is an incomplete <code>tool_use</code>. What now?",
+o:["Execute the partial tool call with the arguments that arrived.",
+"Retry the request with a higher <code>max_tokens</code> to get the complete tool call.",
+"Send an empty <code>tool_result</code> so the loop can continue.",
+"Treat it as <code>end_turn</code> and return what you have."],c:1,
+w:"A truncated tool call has no valid arguments to execute, and inventing a <code>tool_result</code> for a call that was never complete corrupts the history. Raise the limit and ask again."},
+
+{a:"loop",t:"Agentic loop · 50%",q:"A response contains two <code>tool_use</code> blocks. You run both tools. What does the follow-up user message contain?",
+o:["A <code>tool_result</code> for each, plus a short text block explaining what you ran.",
+"A <code>tool_result</code> for the more important one, with the other summarised in text.",
+"Exactly two <code>tool_result</code> blocks, one per <code>tool_use</code> id, and nothing else.",
+"A single combined <code>tool_result</code> containing both outputs."],c:2,
+w:"Every <code>tool_use</code> id needs its own matching <code>tool_result</code>, immediately, with nothing after them. Adding a text block after the results ends the assistant turn — it is a documented cause of empty <code>end_turn</code> responses and, with server tools, of a 400."},
+
+/* ---------- context ---------- */
+{a:"context",t:"Context management · 50%",q:"A subagent is dispatched to survey the test suite and returns its full raw exploration transcript to the parent. What went wrong?",
+o:["Nothing — the parent needs the detail to reason well.",
+"The isolation was defeated; the subagent should return a summary, which is the point of delegating.",
+"The subagent should have written to <code>CLAUDE.md</code> instead.",
+"The parent should compact immediately to recover."],c:1,
+w:"Subagent isolation exists so the noisy middle never enters the main window. Returning the transcript spends the context you delegated in order to save."},
+
+{a:"context",t:"Context management · 50%",q:"An investigation will span several sessions and its findings must survive both compaction and a handoff to a colleague. Where do they go?",
+o:["Kept in the conversation and re-summarised as needed.",
+"Written to a scratchpad file on disk.",
+"Stored by increasing the context window setting.",
+"Appended to the system prompt each turn."],c:1,
+w:"Anything that must outlive the session goes to disk. Conversation content dies with the session and degrades through compaction long before that."},
+
+{a:"context",t:"Context management · 50%",q:"You need the value of one constant defined somewhere in a 4,000-line configuration file. Best approach?",
+o:["Read the whole file so nothing related is missed.",
+"Grep for the constant, then read the small range around the match.",
+"Ask a subagent to read the file and report back.",
+"Read the first 500 lines, where constants usually live."],c:1,
+w:"Targeted reading is the answer when the target is specific. A subagent is the right tool for a broad noisy sweep, not for one grep-able constant — using it here is over-engineering the same trap."},
+
+/* ---------- stateless ---------- */
+{a:"stateless",t:"Statelessness · 50%",q:"Which statement about multi-turn state in the Messages API is correct?",
+o:["A conversation id maintains state between requests.",
+"The system prompt persists once set and need not be resent.",
+"Every request must carry the full conversation, including prior <code>tool_use</code> and <code>tool_result</code> blocks.",
+"Prompt caching stores conversation history server-side for reuse."],c:2,
+w:"There is no server-side conversation. Caching lowers the cost of resending identical prefixes; it does not remember anything on your behalf, and that distinction is a favourite item."},
+
+{a:"stateless",t:"Statelessness · 50%",q:"A long-running agent is approaching the context limit and history must be trimmed. What is safe?",
+o:["Drop the oldest <code>tool_use</code>/<code>tool_result</code> pairs, since their content is stale.",
+"Summarise older turns into a single earlier message, keeping recent tool exchanges intact.",
+"Drop the system prompt, which is the largest single block.",
+"Keep only the most recent user message and rely on the model's memory of the session."],c:1,
+w:"Breaking a tool exchange breaks the pairing the API requires. Summarising older turns preserves validity, and the system prompt is what defines behaviour — dropping it changes the agent, not the token count."},
+
+/* ---------- extraction ---------- */
+{a:"extract",t:"Extraction accuracy · 50%",q:"An invoice extractor is inventing supplier VAT numbers on documents that do not carry one. Which fix?",
+o:["Add “do not fabricate values” to the system prompt.",
+"Make the field optional and nullable, and add a few-shot example where it is absent.",
+"Lower the temperature.",
+"Post-process to strip VAT numbers that fail a checksum."],c:1,
+w:"If the schema marks a field required, you have told the model a value must exist and no instruction outranks that. Checksum filtering catches some fabrications and silently keeps the well-formed ones."},
+
+{a:"extract",t:"Extraction accuracy · 50%",q:"Country of origin comes back as “Deutschland”, “DE”, “Germany” and “germany” across documents. Best schema change?",
+o:["A free-text string with a prompt instruction to normalise.",
+"An enum of permitted values, with the expected format stated in the field description.",
+"A required string field so the model always commits to one form.",
+"Post-process with a lookup table."],c:1,
+w:"Closed sets belong in enums — that is what stops the drift at source. A lookup table is a reasonable belt-and-braces addition but it is repair work, and the question asks about the schema."},
+
+/* ---------- tool descriptions ---------- */
+{a:"tooldesc",t:"Tool selection · 50%",q:"An agent keeps calling <code>search_documents</code> when it should call <code>search_contracts</code>. Where does the fix belong?",
+o:["In the system prompt, as a rule about when to prefer each.",
+"In both tool descriptions, as an explicit contrast with input formats and use cases.",
+"In the tool names, renamed to be more distinct.",
+"In the orchestration, by removing one tool when the other is more likely."],c:1,
+w:"The description is what the model reads at selection time, so that is where the boundary goes. Renaming does not encode the distinction, and removing a tool conditionally replaces a selection problem with an availability problem."},
+
+{a:"tooldesc",t:"Tool selection · 50%",q:"Which of these belongs in a tool description aimed at reliable selection?",
+o:["The implementation language and the service that hosts it.",
+"Use-case examples, the exact input format with a sample value, and what to use instead for the neighbouring case.",
+"The average latency and error rate.",
+"A warning that the tool is expensive to call."],c:1,
+w:"The description exists to help the model choose correctly and call correctly. Operational metadata does not inform either decision, however useful it is to your team."},
+
+/* ---------- plan mode ---------- */
+{a:"plan",t:"Plan mode · 67%",q:"A single-line change to the payment reconciliation job. Tests exist but do not cover this path. Plan mode or direct execution?",
+o:["Direct — a one-line change does not justify the overhead.",
+"Plan mode — reversibility and blast radius are the criteria, not size.",
+"Direct, then a code review afterwards.",
+"Plan mode only if a stakeholder has asked to be involved."],c:1,
+w:"Size is the criterion the exam wants you to reject. An uncovered payment path is where the approach gets reviewed before code exists; option D narrows the trigger to one of four criteria."},
+
+{a:"plan",t:"Plan mode · 67%",q:"A mechanical rename of one exported symbol across forty files. Full test coverage, trivially revertible through version control.",
+o:["Plan mode — forty files is a large scope.",
+"Direct execution — reversible, well understood, and covered by tests.",
+"Plan mode, because any multi-file change needs approval.",
+"Direct execution, but only after disabling the tests to avoid noise."],c:1,
+w:"The inverse of the previous question, and the pair is how the exam checks that you are reasoning about the criteria rather than counting files."},
+
+{a:"plan",t:"Plan mode · 67%",q:"An engineer asks for a feature in a codebase nobody on the team has worked in. The scope is genuinely unknown. Why is plan mode the right start?",
+o:["Because it produces documentation for the ticket.",
+"Because it is read-only, which makes exploring safe, and it surfaces the approach before anything is written.",
+"Because it runs faster than direct execution.",
+"Because it prevents the agent from using tools."],c:1,
+w:"Read-only exploration is the mechanism; approval before implementation is the outcome. Option D overstates it — plan mode uses read tools freely, which is exactly what makes it useful for exploring."},
+
+/* ---------- mcp errors ---------- */
+{a:"mcperr",t:"MCP error handling · 75%",q:"An MCP tool returns a 401 because its credential has expired. What should the tool surface to the agent?",
+o:["A generic “request failed” message so the agent retries.",
+"A structured error naming the type as authentication, marked non-recoverable, suggesting escalation.",
+"An exception that terminates the session.",
+"An empty result, so the agent moves on."],c:1,
+w:"Auth failures are not transient and retrying them burns turns. The agent can only branch on what the error tells it — type, recoverability, and suggested next action. An empty result is the worst of the four: it looks like a successful lookup that found nothing."},
+
+{a:"mcperr",t:"MCP error handling · 75%",q:"Which set of fields makes an MCP tool error genuinely actionable?",
+o:["A human-readable message and a timestamp.",
+"An error type or code, a recoverability flag, a suggested next action, and which input caused it.",
+"The full stack trace from the server.",
+"An HTTP status code alone."],c:1,
+w:"Each field maps to a decision: type says which branch, recoverability says whether to retry at all, the suggestion says what to try, and the offending input says what to fix. A stack trace is diagnostics for you, not a decision for the agent."},
+
+/* ---------- resumption ---------- */
+{a:"resume",t:"Session resumption · 83%",q:"An agent resumes a refactor started yesterday. Six files changed overnight. What does it do first?",
+o:["Re-run the original exploration to rebuild understanding.",
+"Re-analyse the six changed files specifically and inject the prior findings from the handoff.",
+"Trust yesterday's summary and continue where it left off.",
+"Ask the user to describe what changed."],c:1,
+w:"Targeted re-analysis of what changed, plus context injection for what did not. A full re-exploration repeats work the scratchpad already holds; trusting the summary is exactly wrong for the six files that moved."},
+
+/* ---------- maintenance ---------- */
+{a:"hold",t:"Termination safeguards · 100%",q:"An agent session ends because the loop hit its iteration cap mid-task. What must the orchestration layer guarantee?",
+o:["That the session is retried automatically from the beginning.",
+"That the session still ends in either a completed resolution or a handoff to a human.",
+"That the user is told the agent ran out of iterations.",
+"That the partial work is discarded to avoid inconsistent state."],c:1,
+w:"The objective is “regardless of how the agentic loop terminates”. Any termination path that is not a resolution routes to escalation — telling the user what happened is part of that, not a substitute for it."},
+
+{a:"hold",t:"Handoff packages · 100%",q:"What must a handoff package preserve when control transfers to a human operator?",
+o:["The full transcript, so nothing is lost.",
+"Accumulated context, the findings so far, and the authorization state.",
+"A summary of the user's request and the agent's final recommendation.",
+"The tool definitions the agent had available."],c:1,
+w:"The named triple is context, findings, authorization state. A raw transcript makes the human do the reading the agent should have done; a recommendation without state leaves them unable to tell what was already permitted or attempted."},
+
+{a:"hold",t:"Subtask decomposition · 100%",q:"Which describes dynamic decomposition rather than a fixed plan?",
+o:["Generating the full subtask list up front and executing it in order.",
+"Generating subtasks as findings arrive, so what step three does depends on what step two discovered.",
+"Splitting the task evenly across parallel subagents.",
+"Asking the user to approve each subtask before it runs."],c:1,
+w:"The objective's own contrast: adapting to intermediate findings versus executing a fixed sequence regardless of them. Parallelism and approval gates are orthogonal to that."},
+
+{a:"hold",t:"Hooks · 100%",q:"A policy states that the agent must never write to files under <code>infra/</code>. Which mechanism enforces it?",
+o:["A line in <code>CLAUDE.md</code> stating the rule.",
+"A <code>PreToolUse</code> hook or a settings permission that blocks the call.",
+"A <code>PostToolUse</code> hook that reverts writes to that path.",
+"A skill describing the infrastructure conventions."],c:1,
+w:"Blocking happens before the call. A <code>PostToolUse</code> revert is a plausible distractor and fails on the one thing that matters — the write already happened."},
+
+{a:"hold",t:"Hooks · 100%",q:"The team wants formatting and the linter to run after every file edit, whether or not the model remembers.",
+o:["<code>PreToolUse</code> hook","<code>PostToolUse</code> hook","A rule in <code>CLAUDE.md</code>","A custom slash command the developer runs"],c:1,
+w:"After the edit, deterministically, independent of instruction-following — that is <code>PostToolUse</code> exactly. A slash command depends on somebody remembering to type it."},
+
+{a:"hold",t:"Slash commands · 100%",q:"You want a code-review command available to everyone who clones the repository. Where does it go?",
+o:["<code>~/.claude/commands/review.md</code>","<code>.claude/commands/review.md</code>, committed to the repository","<code>CLAUDE.md</code>, as a section","<code>.claude/settings.local.json</code>"],c:1,
+w:"Project directory for team-shared commands, home directory for personal ones across projects. The filename becomes the command name."},
+
+{a:"hold",t:"Configuration mechanism · 100%",q:"Guidance that should apply only when <code>*.test.ts</code> files are being edited. Where does it live?",
+o:["<code>CLAUDE.md</code>, with a note about when it applies.",
+"<code>.claude/rules/</code> with a glob pattern matching the test files.",
+"A <code>PreToolUse</code> hook that checks the path.",
+"A skill invoked manually before editing tests."],c:1,
+w:"Scoped guidance is what globbed rules are for. <code>CLAUDE.md</code> loads regardless and spends context on turns where it is irrelevant; a hook is the answer only if the guidance is a boundary rather than advice."},
+
+{a:"hold",t:"Configuration mechanism · 100%",q:"“Never commit directly to <code>main</code>” has to hold even when the model judges it reasonable. Where does it belong?",
+o:["<code>CLAUDE.md</code>, phrased emphatically.",
+"A settings permission or hook that denies the operation.",
+"A <code>.claude/rules/</code> entry scoped to git operations.",
+"A skill covering the branching workflow."],c:1,
+w:"The discriminator is “regardless of model discretion”. Everything except the permission or hook is guidance, and guidance is weighed rather than enforced — emphasis does not change the category."},
+
+{a:"hold",t:"Project context · 100%",q:"A task needs one specific schema file that is not relevant to any other session. Best way to provide it?",
+o:["Add it to <code>CLAUDE.md</code> so it is always available.",
+"Use an <code>@</code> reference to the file in the request.",
+"Paste its contents inline into the prompt.",
+"Create a skill that reads it."],c:1,
+w:"Specific, current, not reusable — that is an <code>@</code> reference. <code>CLAUDE.md</code> is for what recurs across sessions; pasting works but goes stale the moment the file changes."},
+
+{a:"hold",t:"Processing mode · 100%",q:"Thirty thousand documents need classifying overnight. No user is waiting and nothing downstream is blocked until the morning.",
+o:["Messages API with high concurrency.",
+"Message Batches API.",
+"Messages API with streaming enabled.",
+"Messages API, throttled to stay inside rate limits."],c:1,
+w:"Non-blocking, high volume, tolerant of a processing window measured in hours — the batch case exactly, at half the token cost. Streaming is a latency feature and batches do not support it, which is a fair discriminator on its own."},
+
+{a:"hold",t:"Structured output · 100%",q:"A downstream service will fail if the response does not match a schema exactly. Which method?",
+o:["Prompt-based formatting with a clear example.",
+"Tool use with a JSON schema, with invocation forced.",
+"A prefilled assistant response that opens the JSON object.",
+"Prompt-based formatting plus a retry loop on parse failure."],c:1,
+w:"Ranked by strictness: tool use with a schema, then prefill, then prompt formatting. A retry loop is a mitigation for the loosest option, not a substitute for the strictest."},
+
+{a:"hold",t:"Schema design · 100%",q:"Why do optional and nullable fields improve extraction quality?",
+o:["They reduce the token cost of the schema.",
+"They let the model represent missing or ambiguous information instead of inventing a value.",
+"They make validation faster downstream.",
+"They allow the model to skip fields it finds difficult."],c:1,
+w:"Option D is the near-miss and it is worth being able to articulate the difference: the model is not being permitted to give up, it is being given a way to say “not present” truthfully."},
+
+{a:"hold",t:"Feedback loops · 100%",q:"Reviewers correct extraction errors daily. What turns that into a feedback loop?",
+o:["Reporting the correction rate to stakeholders each week.",
+"Capturing structured metadata about each error and using the patterns to revise prompts, schemas and few-shot examples.",
+"Retraining the model on the corrected documents.",
+"Raising the confidence threshold until the error rate falls."],c:1,
+w:"Structured capture, then a change to the artefacts you control. Reporting is measurement without a loop; raising the threshold hides errors by sending more to review, which is the opposite of improvement."}
+];
+
+const AREAS=[["all","Everything"],["explore","Exploration"],["escalate","Escalation"],["toolchoice","tool_choice"],["refine","Refinement"],["mcp","MCP setup"],["routing","Routing"],["loop","Agent loop"],["context","Context"],["stateless","Statelessness"],["extract","Extraction"],["tooldesc","Tool descriptions"],["plan","Plan mode"],["mcperr","MCP errors"],["resume","Resumption"],["hold","Already at 100%"]];
+const K=["A","B","C","D"];
+let filter="all";
+const state={};
+
+const bank=document.getElementById("bank");
+const empty=document.getElementById("empty");
+
+const fbox=document.getElementById("filters");
+AREAS.forEach(([id,label])=>{
+  const b=document.createElement("button");
+  b.className="f";b.type="button";b.textContent=label;
+  b.setAttribute("aria-pressed",id===filter?"true":"false");
+  b.onclick=()=>{filter=id;[...fbox.children].forEach(c=>c.setAttribute("aria-pressed","false"));b.setAttribute("aria-pressed","true");render();};
+  fbox.appendChild(b);
+});
+
+function tally(){
+  const done=Object.keys(state).length;
+  const ok=Object.values(state).filter(v=>v.ok).length;
+  document.getElementById("t-done").textContent=done;
+  document.getElementById("t-total").textContent=Q.length;
+  document.getElementById("t-ok").textContent=ok;
+  document.getElementById("t-no").textContent=done-ok;
+}
+
+function render(){
+  bank.innerHTML="";
+  const list=Q.map((q,i)=>[q,i]).filter(([q])=>filter==="all"||q.a===filter);
+  empty.hidden=list.length>0;
+  list.forEach(([q,i])=>{
+    const s=state[i];
+    const art=document.createElement("article");
+    art.className="q"+(s?(s.ok?" done-ok":" done-no"):"");
+    const meta=document.createElement("div");
+    meta.className="qmeta";
+    meta.innerHTML='<span>'+q.t+'</span><span>#'+String(i+1).padStart(2,"0")+'</span>';
+    art.appendChild(meta);
+    const p=document.createElement("p");
+    p.className="qtext";p.innerHTML=q.q;art.appendChild(p);
+    const ul=document.createElement("ul");ul.className="opts";
+    q.o.forEach((text,j)=>{
+      const li=document.createElement("li");
+      const b=document.createElement("button");
+      b.className="opt";b.type="button";
+      b.innerHTML='<span class="k">'+K[j]+'</span><span>'+text+'</span>';
+      if(s){
+        b.disabled=true;
+        if(j===q.c)b.classList.add("right");
+        else if(j===s.picked)b.classList.add("wrong");
+      }else{
+        b.onclick=()=>{state[i]={ok:j===q.c,picked:j};render();};
+      }
+      li.appendChild(b);ul.appendChild(li);
+    });
+    art.appendChild(ul);
+    if(s){
+      const why=document.createElement("div");
+      why.className="why";
+      why.innerHTML="<b>"+(s.ok?"Correct \u2014 "+K[q.c]:"The answer is "+K[q.c])+"</b>"+q.w;
+      art.appendChild(why);
+    }
+    bank.appendChild(art);
+  });
+  tally();
+}
+
+document.getElementById("reset").onclick=()=>{for(const k in state)delete state[k];render();};
+render();
+</script>
+</body>
+</html>

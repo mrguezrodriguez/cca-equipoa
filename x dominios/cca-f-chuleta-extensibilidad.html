@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chuleta CCA-F · Cómo se extiende Claude Code</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14202F;
+    --ink-soft:#4A5A6B;
+    --paper:#F2F4F1;
+    --surface:#FFFFFF;
+    --line:#D3DAD6;
+    --teal:#0E6E78;
+    --teal-pale:#E2EFF0;
+    --amber:#C4922B;
+    --amber-pale:#F7EDD6;
+    --display:"Archivo", "Helvetica Neue", Arial, sans-serif;
+    --body:"Source Serif 4", Georgia, serif;
+    --mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--body);
+    font-size:17px;
+    line-height:1.6;
+  }
+  .wrap{max-width:1060px;margin:0 auto;padding:0 24px 96px}
+
+  /* ---------- cabecera ---------- */
+  header{
+    background:var(--ink);
+    color:var(--paper);
+    padding:56px 0 0;
+    margin-bottom:56px;
+  }
+  .head-inner{max-width:1060px;margin:0 auto;padding:0 24px 48px}
+  h1{
+    font-family:var(--display);
+    font-weight:700;
+    font-size:clamp(2rem,5.2vw,3.4rem);
+    line-height:1.04;
+    letter-spacing:-.025em;
+    margin:0 0 20px;
+    max-width:22ch;
+  }
+  .dek{
+    font-size:1.075rem;
+    color:#C3CEDA;
+    max-width:62ch;
+    margin:0 0 8px;
+  }
+  .dek b{color:#fff;font-weight:600}
+  .kicker{
+    font-family:var(--display);
+    font-weight:600;
+    font-size:.82rem;
+    letter-spacing:.04em;
+    color:var(--amber);
+    margin:0 0 14px;
+  }
+
+  /* ---------- eje / timeline ---------- */
+  .axis{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:28px 26px 22px;
+    margin:0 0 52px;
+  }
+  .axis h2{margin-top:0}
+  .track{display:grid;gap:14px;margin-top:22px}
+  .band{
+    display:grid;
+    grid-template-columns:170px 1fr;
+    gap:18px;
+    align-items:start;
+    padding-bottom:14px;
+    border-bottom:1px solid var(--line);
+  }
+  .band:last-child{border-bottom:0;padding-bottom:0}
+  .band-when{
+    font-family:var(--display);
+    font-weight:600;
+    font-size:.9rem;
+    line-height:1.3;
+    color:var(--teal);
+    padding-top:3px;
+  }
+  .band-when span{display:block;font-weight:500;color:var(--ink-soft);font-size:.82rem;margin-top:3px}
+  .chips{display:flex;flex-wrap:wrap;gap:7px}
+  .chip{
+    font-family:var(--display);
+    font-weight:600;
+    font-size:.84rem;
+    padding:5px 11px;
+    border-radius:3px;
+    background:var(--teal-pale);
+    color:#0A555D;
+    border:1px solid #C4DDE0;
+  }
+  .chip.cost-high{background:var(--amber-pale);color:#87651B;border-color:#E6D2A5}
+  .cost-key{
+    display:flex;gap:20px;flex-wrap:wrap;
+    margin-top:20px;font-size:.9rem;color:var(--ink-soft);
+    font-family:var(--display);font-weight:500;
+  }
+  .swatch{display:inline-block;width:11px;height:11px;border-radius:2px;margin-right:7px;vertical-align:baseline}
+  .sw-a{background:var(--teal-pale);border:1px solid #C4DDE0}
+  .sw-b{background:var(--amber-pale);border:1px solid #E6D2A5}
+
+  /* ---------- tipografía general ---------- */
+  h2{
+    font-family:var(--display);
+    font-weight:700;
+    font-size:1.55rem;
+    letter-spacing:-.018em;
+    margin:0 0 14px;
+  }
+  h3{
+    font-family:var(--display);
+    font-weight:600;
+    font-size:1.1rem;
+    margin:34px 0 10px;
+  }
+  section{margin-bottom:60px}
+  p{max-width:70ch;margin:0 0 16px}
+  .lead{font-size:1.05rem}
+  code{
+    font-family:var(--mono);
+    font-size:.86em;
+    background:#E7EBE7;
+    padding:1px 5px;
+    border-radius:3px;
+  }
+  strong{font-weight:600}
+  a{color:var(--teal)}
+
+  /* ---------- tablas ---------- */
+  .scroller{overflow-x:auto;border:1px solid var(--line);border-radius:4px;background:var(--surface)}
+  table{border-collapse:collapse;width:100%;min-width:760px;font-family:var(--display);font-size:.905rem}
+  th,td{text-align:left;padding:13px 16px;border-bottom:1px solid var(--line);vertical-align:top}
+  thead th{
+    background:var(--ink);
+    color:var(--paper);
+    font-weight:600;
+    font-size:.86rem;
+    line-height:1.35;
+    border-bottom:0;
+    position:sticky;
+    top:0;
+  }
+  tbody tr:last-child td{border-bottom:0}
+  tbody td:first-child{font-weight:600;white-space:nowrap}
+  tbody td:first-child em{display:block;font-family:var(--mono);font-style:normal;font-weight:400;font-size:.78rem;color:var(--ink-soft);margin-top:3px}
+  .hi{color:#87651B;font-weight:600}
+  .lo{color:#0A555D;font-weight:600}
+  .caption{font-size:.88rem;color:var(--ink-soft);margin-top:10px;max-width:70ch}
+
+  /* ---------- reglas de decisión ---------- */
+  .rules{display:grid;gap:0;border-top:1px solid var(--line)}
+  .rule{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:24px;
+    padding:18px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .rule-if{font-weight:600}
+  .rule-if span{
+    display:block;
+    font-family:var(--display);
+    font-size:.78rem;
+    font-weight:600;
+    color:var(--amber);
+    margin-bottom:4px;
+  }
+  .rule-then span{
+    display:block;
+    font-family:var(--display);
+    font-size:.78rem;
+    font-weight:600;
+    color:var(--teal);
+    margin-bottom:4px;
+  }
+  .rule p{margin:0;font-size:.97rem}
+
+  /* ---------- MCP ---------- */
+  .prims{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin:18px 0 26px}
+  .prim{border-left:3px solid var(--teal);padding:2px 0 2px 14px}
+  .prim h4{font-family:var(--display);font-size:1rem;margin:0 0 5px}
+  .prim p{font-size:.94rem;margin:0}
+
+  /* ---------- repaso ---------- */
+  details{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:14px 18px;
+    margin-bottom:10px;
+  }
+  summary{
+    cursor:pointer;
+    font-family:var(--display);
+    font-weight:600;
+    font-size:.98rem;
+  }
+  summary::marker{color:var(--teal)}
+  details p{margin:12px 0 2px;font-size:.97rem}
+
+  .pull{
+    background:var(--ink);
+    color:var(--paper);
+    padding:30px 32px;
+    border-radius:4px;
+    font-size:1.12rem;
+    line-height:1.55;
+  }
+  .pull p{max-width:none;margin:0}
+  .pull b{color:var(--amber);font-weight:600}
+
+  footer{
+    border-top:1px solid var(--line);
+    padding-top:22px;
+    font-size:.9rem;
+    color:var(--ink-soft);
+  }
+
+  @media (max-width:720px){
+    body{font-size:16px}
+    .band{grid-template-columns:1fr;gap:8px}
+    .rule{grid-template-columns:1fr;gap:12px}
+    .prims{grid-template-columns:1fr}
+    .wrap,.head-inner{padding-left:18px;padding-right:18px}
+  }
+  @media print{
+    body{background:#fff;font-size:11pt}
+    header{background:#fff;color:#000;padding-top:0;border-bottom:2px solid #000}
+    .dek{color:#333}.kicker{color:#000}
+    thead th{background:#EEE;color:#000;position:static}
+    .pull{background:#fff;color:#000;border:1px solid #000}
+    .pull b{color:#000}
+    details{page-break-inside:avoid}
+    details[open] p{display:block}
+    section{page-break-inside:avoid}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="head-inner">
+    <p class="kicker">Claude Certified Architect — Foundations</p>
+    <h1>Siete formas de dirigir a Claude Code, y una de conectarlo</h1>
+    <p class="dek">Todo el temario de extensibilidad se ordena en dos ejes: <b>cuándo entra la instrucción en contexto</b> y <b>cuánta autoridad tiene</b>. Con esos dos ejes deduces casi cualquier pregunta del examen, incluso las que no te sepas.</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="axis">
+    <h2>Eje 1 · Cuándo se carga</h2>
+    <p class="caption">Este es el orden mental: de lo que siempre pesa a lo que no pesa nunca. El coste de contexto casi se deduce solo de aquí.</p>
+    <div class="track">
+      <div class="band">
+        <div class="band-when">Inicio de sesión<span>Ocupa contexto toda la sesión</span></div>
+        <div class="chips">
+          <span class="chip cost-high">CLAUDE.md raíz</span>
+          <span class="chip cost-high">Rules sin <code>paths</code></span>
+          <span class="chip cost-high">Output styles</span>
+          <span class="chip cost-high">append-system-prompt</span>
+          <span class="chip cost-high">Definiciones de tools MCP</span>
+        </div>
+      </div>
+      <div class="band">
+        <div class="band-when">Solo el titular<span>Nombre y descripción al inicio; el cuerpo, después</span></div>
+        <div class="chips">
+          <span class="chip">Skills</span>
+          <span class="chip">Subagents</span>
+        </div>
+      </div>
+      <div class="band">
+        <div class="band-when">Al tocar el fichero<span>Carga condicionada por ruta</span></div>
+        <div class="chips">
+          <span class="chip">CLAUDE.md de subdirectorio</span>
+          <span class="chip">Rules con <code>paths</code></span>
+        </div>
+      </div>
+      <div class="band">
+        <div class="band-when">Nunca entra<span>Lo ejecuta el harness, fuera de la ventana</span></div>
+        <div class="chips">
+          <span class="chip">Hooks</span>
+        </div>
+      </div>
+    </div>
+    <div class="cost-key">
+      <span><i class="swatch sw-b"></i>Coste alto o permanente</span>
+      <span><i class="swatch sw-a"></i>Coste bajo o condicionado</span>
+    </div>
+  </div>
+
+  <section>
+    <h2>Eje 2 · Cuánta autoridad</h2>
+    <p class="lead">Una instrucción es probabilística: Claude la sigue casi siempre, pero puede fallar en sesiones largas, en situaciones ambiguas o por una prompt injection en un fichero que abre durante la tarea. Una barrera real tiene que ser determinista, y lo determinista son <strong>hooks</strong> y <strong>permisos</strong>. Un hook <code>PreToolUse</code> puede inspeccionar cualquier llamada a herramienta y salir con código 2 para denegarla.</p>
+    <p>Por encima de todo están los <strong>managed settings</strong>: los despliega un administrador, el usuario no puede sobrescribirlos con su configuración local y son la única forma de imponer una barrera determinista a nivel de organización.</p>
+  </section>
+
+  <section>
+    <h2>La tabla</h2>
+    <div class="scroller">
+      <table>
+        <thead>
+          <tr>
+            <th>Método</th>
+            <th>Qué es</th>
+            <th>Cuándo se carga</th>
+            <th>Al compactar</th>
+            <th>Coste</th>
+            <th>Para qué</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>CLAUDE.md raíz</td>
+            <td>Lo que Claude siempre sabe</td>
+            <td>Inicio de sesión, se queda toda la sesión</td>
+            <td>Memoizado: se relee tras compactar</td>
+            <td class="hi">Alto</td>
+            <td>Comandos de build, layout del repo, convenciones de equipo</td>
+          </tr>
+          <tr>
+            <td>CLAUDE.md subdir</td>
+            <td>Contexto local a una carpeta</td>
+            <td>Al leer un fichero de ese subdirectorio</td>
+            <td>Se pierde hasta que se vuelve a tocar</td>
+            <td class="lo">Bajo</td>
+            <td>Convenciones de un subdirectorio o de un equipo en monorepo</td>
+          </tr>
+          <tr>
+            <td>Rules<em>.claude/rules/</em></td>
+            <td>Restricciones y convenciones concretas</td>
+            <td>Inicio, o solo al tocar los <code>paths</code></td>
+            <td>Se re-inyectan</td>
+            <td class="hi">Medio</td>
+            <td>«Todo handler de API valida input con Zod»</td>
+          </tr>
+          <tr>
+            <td>Skills<em>.claude/skills/</em></td>
+            <td>Procedimientos bajo demanda</td>
+            <td>Nombre y descripción al inicio; cuerpo al invocarse</td>
+            <td>Re-inyectadas hasta un presupuesto común; caen primero las más antiguas</td>
+            <td class="lo">Bajo</td>
+            <td>Runbooks de despliegue, checklists de release, procesos de review</td>
+          </tr>
+          <tr>
+            <td>Subagents<em>.claude/agents/</em></td>
+            <td>Trabajador aislado con su propia ventana</td>
+            <td>Nombre, descripción y tools al inicio; cuerpo al llamarse vía Agent tool</td>
+            <td>Solo vuelve su mensaje final más metadatos</td>
+            <td class="lo">Bajo</td>
+            <td>Búsqueda profunda, análisis de logs, auditoría de dependencias</td>
+          </tr>
+          <tr>
+            <td>Hooks<em>settings.json</em></td>
+            <td>Garantía determinista en eventos del ciclo de vida</td>
+            <td>Al dispararse el evento</td>
+            <td>La saltan por completo</td>
+            <td class="lo">Bajo</td>
+            <td>Linters tras editar, bloquear comandos, avisar a Slack, backup en PreCompact</td>
+          </tr>
+          <tr>
+            <td>MCP<em>.mcp.json</em></td>
+            <td>Conexión a datos y sistemas externos</td>
+            <td>Definiciones de tools en cada sesión</td>
+            <td>—</td>
+            <td class="hi">Según nº de servidores</td>
+            <td>GitHub, Supabase, Sentry, Figma, Playwright</td>
+          </tr>
+          <tr>
+            <td>Output styles<em>.claude/output-styles/</em></td>
+            <td>Cambio de rol; se inyecta en el system prompt</td>
+            <td>Inicio de cada sesión</td>
+            <td>Nunca se compactan</td>
+            <td class="hi">Alto</td>
+            <td>Pasar de asistente de código a asistente general</td>
+          </tr>
+          <tr>
+            <td>append-system-prompt<em>flag de CLI</em></td>
+            <td>Añadido puramente aditivo al system prompt</td>
+            <td>Al invocar; solo esa invocación</td>
+            <td>Nunca se compacta</td>
+            <td class="hi">Moderado</td>
+            <td>Tono, formato, longitud, estándares puntuales</td>
+          </tr>
+          <tr>
+            <td>Plugins</td>
+            <td>El empaquetado de todo lo anterior</td>
+            <td colspan="3">Depende de lo que contenga</td>
+            <td>Compartir un setup coherente entre repos o con el equipo</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="caption">Ojo con output styles: sustituyen al estilo por defecto salvo que pongas <code>keep-coding-instructions: true</code>, y con ello se van instrucciones críticas de Claude Code (cómo acotar cambios, cuándo comentar código, qué hacer con temas de seguridad, verificar antes de dar algo por terminado).</p>
+  </section>
+
+  <section>
+    <h2>MCP en detalle</h2>
+    <p class="lead">Estándar abierto para conectar a Claude con datos y herramientas externas. Por debajo es <strong>JSON-RPC 2.0</strong> sobre dos transportes: <strong>stdio</strong> (servidor local como proceso hijo) o <strong>HTTP</strong> para remotos, con OAuth nativo. SSE está deprecado en favor de streamable HTTP.</p>
+
+    <h3>Las tres primitivas</h3>
+    <div class="prims">
+      <div class="prim">
+        <h4>Tools</h4>
+        <p>Acciones que Claude ejecuta: llamar APIs, correr comandos, modificar datos.</p>
+      </div>
+      <div class="prim">
+        <h4>Resources</h4>
+        <p>Datos que Claude lee: esquemas de BD, árboles de ficheros, respuestas de API. Se cargan al referenciarse.</p>
+      </div>
+      <div class="prim">
+        <h4>Prompts</h4>
+        <p>Plantillas reutilizables. En Claude Code aparecen como slash commands: <code>/mcp__servidor__prompt</code>.</p>
+      </div>
+    </div>
+
+    <h3>Los tres scopes</h3>
+    <div class="scroller">
+      <table>
+        <thead>
+          <tr><th>Scope</th><th>Dónde vive</th><th>Quién lo ve</th><th>Cuándo usarlo</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>local <em>por defecto</em></td><td><code>~/.claude.json</code></td><td>Solo tú, solo en ese proyecto</td><td>Pruebas y servidores personales de un proyecto</td></tr>
+          <tr><td>project</td><td><code>.mcp.json</code> en la raíz</td><td>Todo el equipo, se commitea a git</td><td>Infraestructura compartida</td></tr>
+          <tr><td>user</td><td><code>~/.claude.json</code></td><td>Solo tú, en todos tus proyectos</td><td>Utilidades que quieres en todas partes</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="caption">Se añaden con <code>claude mcp add</code> y <code>--scope project</code> o <code>--scope user</code>. Dentro de sesión, <code>/mcp</code> muestra estado de conexión, tools disponibles y prompts de autenticación. La primera vez que Claude Code ve un servidor de scope project te pide aprobarlo: ese permiso existe para que un repo que clonas no pueda lanzar procesos en tu máquina sin tu consentimiento.</p>
+
+    <h3>Los dos puntos de arquitectura</h3>
+    <p><strong>Coste.</strong> Cada servidor conectado ocupa sitio en la ventana, porque sus nombres de tools e instrucciones se cargan en cada sesión, se usen o no. De ahí que convenga desconectar los que no uses, y que una herramienta con equivalente en CLI (<code>gh</code>, <code>aws</code>) salga más barata en contexto: no añade definiciones persistentes.</p>
+    <p><strong>Riesgo.</strong> Cuidado con servidores MCP que traen contenido no confiable: pueden exponerte a prompt injection. Es una restricción de diseño, no una nota al pie.</p>
+  </section>
+
+  <section>
+    <h2>Si te ves haciendo esto, cámbialo de sitio</h2>
+    <div class="rules">
+      <div class="rule">
+        <div class="rule-if"><span>En vez de</span><p>«Cada vez que X, haz siempre Y» en CLAUDE.md</p></div>
+        <div class="rule-then"><span>Usa</span><p>Un hook. Que el modelo <em>decida</em> ejecutar el formateador no es lo mismo que el formateador ejecutándose.</p></div>
+      </div>
+      <div class="rule">
+        <div class="rule-if"><span>En vez de</span><p>«Nunca hagas esto» en CLAUDE.md</p></div>
+        <div class="rule-then"><span>Usa</span><p>Hooks o permisos. Una instrucción se puede razonar; una barrera determinista, no.</p></div>
+      </div>
+      <div class="rule">
+        <div class="rule-if"><span>En vez de</span><p>Un procedimiento de 30 líneas en CLAUDE.md</p></div>
+        <div class="rule-then"><span>Usa</span><p>Una skill. CLAUDE.md es para hechos permanentes; los runbooks cargan solo cuando se invocan.</p></div>
+      </div>
+      <div class="rule">
+        <div class="rule-if"><span>En vez de</span><p>Una rule que solo aplica a <code>src/api/**</code> pero sin <code>paths</code></p></div>
+        <div class="rule-then"><span>Usa</span><p>La misma rule con <code>paths</code>. Sin scope es mecánicamente idéntica a meterlo en CLAUDE.md: siempre cargada, siempre gastando tokens.</p></div>
+      </div>
+      <div class="rule">
+        <div class="rule-if"><span>En vez de</span><p>Preferencias personales en el CLAUDE.md del proyecto</p></div>
+        <div class="rule-then"><span>Usa</span><p>El equivalente a nivel de usuario. Todos los métodos basados en ficheros lo tienen, y se carga en cualquier repo.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Repaso rápido</h2>
+    <details>
+      <summary>Hook o skill</summary>
+      <p>Garantía frente a criterio. El hook se dispara siempre y no piensa; la skill son instrucciones que Claude interpreta. Formatear al guardar es un hook; un checklist de release es una skill.</p>
+    </details>
+    <details>
+      <summary>Skill o subagent</summary>
+      <p>Skill si quieres ver y dirigir cada paso dentro del hilo principal. Subagent si los resultados intermedios ensuciarían la conversación y solo te importa el resultado final.</p>
+    </details>
+    <details>
+      <summary>MCP o skill</summary>
+      <p>Conexión frente a know-how. MCP te da la herramienta; la skill enseña a usarla bien.</p>
+    </details>
+    <details>
+      <summary>Rule o CLAUDE.md de subdirectorio</summary>
+      <p>Rule con <code>paths</code> cuando la restricción es transversal y afecta a ficheros repartidos por varios rincones del repo. CLAUDE.md de subdirectorio cuando la convención pertenece a esa carpeta concreta.</p>
+    </details>
+    <details>
+      <summary>Output style o append-system-prompt</summary>
+      <p>El output style <em>sustituye</em> el prompt por defecto y cambia el rol; el flag solo <em>añade</em> y se aplica a esa invocación. Si solo quieres tocar tono o formato, el flag es menos destructivo.</p>
+    </details>
+    <details>
+      <summary>Cuántos niveles anidan los subagents</summary>
+      <p>Hasta cinco. Y los dynamic workflows orquestan de decenas a cientos de agentes en segundo plano, con el plan y los resultados intermedios en variables de script en vez de en la ventana de contexto.</p>
+    </details>
+  </section>
+
+  <div class="pull">
+    <p>CLAUDE.md es conocimiento siempre activo. Rules son restricciones. Skills es conocimiento bajo demanda. MCP son conexiones. Subagents son aislamiento. Hooks son garantías. Plugins son <b>el zip de todo lo anterior</b>.</p>
+  </div>
+
+  <footer>
+    <p>Basado en <a href="https://claude.com/blog/steering-claude-code-skills-hooks-rules-subagents-and-more">Steering Claude Code</a> (Anthropic, 18 jun 2026) y la documentación de MCP en <a href="https://code.claude.com/docs/en/mcp-quickstart">code.claude.com</a>. Preparación CCA-F.</p>
+  </footer>
+
+</div>
+</body>
+</html>
